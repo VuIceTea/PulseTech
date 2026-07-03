@@ -351,12 +351,12 @@ export const PRODUCTS: Product[] = [
     basePrice: 5790000,
     originalPrice: 6190000,
     discount: 6,
-    image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: 'Tiêu Chuẩn', priceOffset: 0 }
@@ -375,10 +375,103 @@ export const PRODUCTS: Product[] = [
     rating: 4.8,
     reviewsCount: 88,
     reviews: [],
-    isFeatured: false,
+    isFeatured: true,
     isFlashSale: false,
     badge: 'Chống ồn ANC',
     stock: 100
+  },
+  {
+    id: 'cap-sac-apple-lightning',
+    name: 'Cáp Sạc Nhanh Apple Lightning (1m)',
+    brand: 'Apple',
+    category: 'accessory',
+    basePrice: 490000,
+    originalPrice: 590000,
+    discount: 17,
+    image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop'],
+    colors: [{ name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop' }],
+    storages: [{ name: '1m', priceOffset: 0 }],
+    specs: {
+      screen: 'Không có',
+      os: 'iOS/iPadOS',
+      camera: 'Không có',
+      frontCamera: 'Không có',
+      cpu: 'Không có',
+      ram: 'Không có',
+      storage: 'Không có',
+      battery: 'Không có'
+    },
+    description: 'Cáp sạc chính hãng Apple hỗ trợ sạc nhanh và truyền tải dữ liệu cực ổn định.',
+    rating: 4.7,
+    reviewsCount: 54,
+    reviews: [],
+    isFeatured: true,
+    isFlashSale: true,
+    badge: 'Chính hãng',
+    stock: 80
+  },
+  {
+    id: 'cu-sac-samsung-25w',
+    name: 'Củ Sạc Nhanh Samsung Type-C 25W',
+    brand: 'Samsung',
+    category: 'accessory',
+    basePrice: 350000,
+    originalPrice: 450000,
+    discount: 22,
+    image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop'],
+    colors: [{ name: 'Đen', hex: '#000000', image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop' }],
+    storages: [{ name: '25W', priceOffset: 0 }],
+    specs: {
+      screen: 'Không có',
+      os: 'Android/iOS',
+      camera: 'Không có',
+      frontCamera: 'Không có',
+      cpu: 'Không có',
+      ram: 'Không có',
+      storage: 'Không có',
+      battery: 'Không có'
+    },
+    description: 'Củ sạc nhanh Samsung công suất 25W, ổn định dòng điện, an toàn tuyệt đối khi sử dụng.',
+    rating: 4.8,
+    reviewsCount: 62,
+    reviews: [],
+    isFeatured: true,
+    isFlashSale: false,
+    badge: 'Sạc Siêu Nhanh',
+    stock: 90
+  },
+  {
+    id: 'op-lung-magsafe-iphone-15',
+    name: 'Ốp Lưng Silicon MagSafe iPhone 15 Pro Max',
+    brand: 'Apple',
+    category: 'accessory',
+    basePrice: 990000,
+    originalPrice: 1290000,
+    discount: 23,
+    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop'],
+    colors: [{ name: 'Xanh Lá', hex: '#4b5320', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop' }],
+    storages: [{ name: 'Tiêu Chuẩn', priceOffset: 0 }],
+    specs: {
+      screen: 'Không có',
+      os: 'iOS',
+      camera: 'Không có',
+      frontCamera: 'Không có',
+      cpu: 'Không có',
+      ram: 'Không có',
+      storage: 'Không có',
+      battery: 'Không có'
+    },
+    description: 'Ốp lưng tích hợp vòng nam châm MagSafe từ tính, ôm khít bảo vệ điện thoại khỏi va đập.',
+    rating: 4.9,
+    reviewsCount: 38,
+    reviews: [],
+    isFeatured: true,
+    isFlashSale: false,
+    badge: 'Hỗ trợ MagSafe',
+    stock: 50
   }
 ];
 
@@ -386,5 +479,5 @@ export const BRANDS = ['Apple', 'Samsung', 'Xiaomi', 'Oppo'];
 export const CATEGORIES = [
   { id: 'phone', name: 'Điện thoại', count: 5 },
   { id: 'tablet', name: 'Máy tính bảng', count: 2 },
-  { id: 'accessory', name: 'Phụ kiện', count: 1 }
+  { id: 'accessory', name: 'Phụ kiện', count: 4 }
 ];
