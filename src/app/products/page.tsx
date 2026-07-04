@@ -33,6 +33,7 @@ function ProductsListContent() {
   const [selectedRam, setSelectedRam] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('featured');
   const [searchQuery, setSearchQuery] = useState<string>(urlSearch);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
   // State mở Popover bộ lọc (mobile & desktop)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -41,6 +42,11 @@ function ProductsListContent() {
     setSelectedCategory(urlCategory);
     setSelectedBrand(urlBrand);
     setSearchQuery(urlSearch);
+    
+    // Reset page loading when URL search params change
+    setIsPageLoading(true);
+    const timer = setTimeout(() => setIsPageLoading(false), 800);
+    return () => clearTimeout(timer);
   }, [urlCategory, urlBrand, urlSearch]);
 
   const priceRanges = [
@@ -325,7 +331,41 @@ function ProductsListContent() {
 
       {/* DANH SÁCH SẢN PHẨM */}
       <section>
-        {sortedProducts.length > 0 ? (
+        {isPageLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse bg-white border border-gray-100 rounded-3xl p-4 flex flex-col justify-between h-[360px]"
+              >
+                <div>
+                  {/* Image Placeholder */}
+                  <div className="w-full aspect-square bg-gray-200 rounded-2xl mb-4" />
+                  {/* Brand Placeholder */}
+                  <div className="h-3 bg-gray-200 rounded w-1/4 mb-2" />
+                  {/* Name Placeholder */}
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-3" />
+                  {/* Specs tag Placeholder */}
+                  <div className="flex gap-2.5 mb-3">
+                    <div className="h-3 bg-gray-150 rounded w-1/4" />
+                    <div className="h-3 bg-gray-150 rounded w-1/3" />
+                  </div>
+                  {/* Star Rating Placeholder */}
+                  <div className="h-3.5 bg-gray-200 rounded w-1/2" />
+                </div>
+                {/* Pricing Area Placeholder */}
+                <div className="flex items-center justify-between mt-4 pt-2 border-t border-gray-50">
+                  <div className="space-y-1.5 w-1/2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3 bg-gray-150 rounded w-1/2" />
+                  </div>
+                  {/* Add to Cart button Placeholder */}
+                  <div className="w-9 h-9 rounded-2xl bg-gray-200 shrink-0" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : sortedProducts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             {sortedProducts.map((product) => (
               <ProductCard key={product.id} product={product} />

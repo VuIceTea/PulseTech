@@ -21,6 +21,12 @@ export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
@@ -72,6 +78,46 @@ export default function CartPage() {
       }, 500);
     }
   };
+
+  if (isPageLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold animate-pulse">
+        {/* Page Header */}
+        <div className="border-b border-gray-200 pb-5 mb-8">
+          <div className="h-8 bg-gray-200 rounded w-1/3" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Items skeleton */}
+          <div className="lg:col-span-8 flex flex-col gap-4">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="bg-white border border-gray-100 rounded-3xl p-5 flex items-center justify-between gap-4 h-[120px]">
+                <div className="flex gap-4 items-center flex-1">
+                  <div className="w-20 h-20 bg-gray-200 rounded-2xl shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-gray-200 rounded w-2/3" />
+                    <div className="h-3 bg-gray-150 rounded w-1/3" />
+                  </div>
+                </div>
+                <div className="w-12 h-4 bg-gray-200 rounded" />
+                <div className="w-8 h-8 rounded-full bg-gray-200" />
+              </div>
+            ))}
+          </div>
+          {/* Summary skeleton */}
+          <div className="lg:col-span-4">
+            <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
+              <div className="h-5 bg-gray-200 rounded w-1/2" />
+              <div className="space-y-2 pt-2">
+                <div className="h-3.5 bg-gray-150 rounded w-full" />
+                <div className="h-3.5 bg-gray-150 rounded w-5/6" />
+              </div>
+              <div className="h-10 bg-gray-200 rounded-xl w-full mt-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold">

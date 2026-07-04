@@ -18,6 +18,12 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Redirect if already logged in
   if (user) {
@@ -53,6 +59,24 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
+
+  if (isPageLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center py-16 px-4 bg-[#f8f9fa] font-semibold animate-pulse">
+        <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col gap-6 h-[480px]">
+          <div className="h-6 bg-gray-200 rounded w-1/3 mx-auto" />
+          <div className="h-4 bg-gray-150 rounded w-2/3 mx-auto" />
+          <div className="space-y-4 mt-6">
+            <div className="h-10 bg-gray-200 rounded-2xl w-full" />
+            <div className="h-10 bg-gray-200 rounded-2xl w-full" />
+            <div className="h-10 bg-gray-200 rounded-2xl w-full" />
+            <div className="h-10 bg-gray-200 rounded-2xl w-full" />
+          </div>
+          <div className="h-12 bg-gray-200 rounded-2xl w-full mt-6" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex items-center justify-center py-16 px-4 bg-[#f8f9fa] font-semibold">

@@ -34,6 +34,14 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
   const [showFullSpecs, setShowFullSpecs] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Update selected color image sync
   const handleColorSelect = (color: ColorVariant) => {
@@ -61,6 +69,70 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
       router.push('/cart');
     }
   };
+
+  if (isPageLoading) {
+    return (
+      <div className="bg-[#f8f9fa] pb-16 animate-pulse">
+        {/* Breadcrumbs Skeleton */}
+        <div className="bg-white border-b border-gray-100 py-3 mb-6">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center gap-2">
+            <div className="h-3 bg-gray-200 rounded w-16" />
+            <ChevronRight className="h-3 w-3 text-gray-300" />
+            <div className="h-3 bg-gray-200 rounded w-16" />
+            <ChevronRight className="h-3 w-3 text-gray-300" />
+            <div className="h-3 bg-gray-200 rounded w-20" />
+          </div>
+        </div>
+
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="h-7 bg-gray-200 rounded w-1/3 mb-2" />
+            <div className="h-4 bg-gray-200 rounded w-1/4" />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left: Gallery Skeleton (7 Cols) */}
+            <div className="lg:col-span-7 flex flex-col gap-4">
+              <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm aspect-square w-full bg-gray-50 flex items-center justify-center relative overflow-hidden" />
+              <div className="flex gap-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="w-20 h-20 bg-white border border-gray-100 rounded-2xl shrink-0" />
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Info Skeleton (5 Cols) */}
+            <div className="lg:col-span-5 flex flex-col gap-6">
+              <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col gap-4">
+                <div className="h-5 bg-gray-200 rounded w-1/2" />
+                <div className="h-6 bg-gray-200 rounded w-1/3" />
+                <div className="h-4 bg-gray-150 rounded w-2/3" />
+                <div className="space-y-2 mt-4">
+                  <div className="h-3.5 bg-gray-200 rounded w-1/4" />
+                  <div className="flex gap-2">
+                    <div className="w-12 h-12 rounded-xl bg-gray-200" />
+                    <div className="w-12 h-12 rounded-xl bg-gray-200" />
+                  </div>
+                </div>
+                <div className="space-y-2 mt-4">
+                  <div className="h-3.5 bg-gray-200 rounded w-1/4" />
+                  <div className="flex gap-2">
+                    <div className="h-10 bg-gray-200 rounded-xl w-24" />
+                    <div className="h-10 bg-gray-200 rounded-xl w-24" />
+                  </div>
+                </div>
+                <div className="flex gap-4 mt-6">
+                  <div className="h-12 bg-gray-200 rounded-2xl flex-1" />
+                  <div className="h-12 bg-gray-200 rounded-2xl flex-1" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f8f9fa] pb-16">

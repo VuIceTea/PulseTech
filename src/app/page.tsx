@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { HeroBanner } from "@/components/HeroBanner";
 import { FlashSale } from "@/components/FlashSale";
@@ -19,16 +19,31 @@ import {
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<"all" | "apple" | "samsung">(
+  const [activeTab, setActiveTab] = useState<"all" | "phone" | "accessory">(
     "all",
   );
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
 
-  // Filter featured products
-  const featuredProducts = PRODUCTS.filter((p) => p.isFeatured);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsPageLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const filteredFeatured = featuredProducts.filter((p) => {
-    if (activeTab === "apple") return p.brand === "Apple";
-    if (activeTab === "samsung") return p.brand === "Samsung";
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
+
+  // Filter recommended products
+  const recommendedProducts = PRODUCTS.filter((p) => {
+    if (activeTab === "phone") return p.category === "phone";
+    if (activeTab === "accessory") return p.category === "accessory";
     return true;
   });
 
@@ -60,149 +75,202 @@ export default function Home() {
     show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
 
+  if (isPageLoading) {
+    return (
+      <div className="pb-16 bg-[#f8f9fa] overflow-hidden">
+        {/* Banner Skeleton */}
+        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+          <div className="w-full h-[280px] sm:h-[400px] bg-gray-200 animate-pulse rounded-3xl" />
+        </div>
+
+        {/* ===== DANH MỤC NỔI BẬT SKELETON ===== */}
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+            <div className="h-6 bg-gray-200 animate-pulse rounded w-1/4" />
+            <div className="flex gap-2">
+              <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
+              <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
+            </div>
+          </div>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 md:gap-4 justify-items-center">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="flex flex-col items-center w-full animate-pulse">
+                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-36 sm:h-36 rounded-full bg-gray-200" />
+                <div className="h-4 bg-gray-200 rounded w-2/3 mt-3 mx-auto" />
+                <div className="h-3 bg-gray-200 rounded w-1/2 mt-1.5 mx-auto" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Flash Sale Banner Skeleton */}
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="w-full h-[180px] sm:h-[260px] bg-gray-200 animate-pulse rounded-3xl" />
+        </div>
+
+        {/* Recommended for You Skeleton */}
+        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 mb-6">
+            <div className="h-6 bg-gray-200 animate-pulse rounded w-1/4" />
+            <div className="h-4 bg-gray-200 animate-pulse rounded w-1/3" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div key={i} className="animate-pulse flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl h-[120px]">
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  <div className="w-20 h-20 bg-gray-200 rounded-xl shrink-0" />
+                  <div className="flex-1 min-w-0 flex flex-col gap-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3.5 bg-gray-200 rounded w-1/4" />
+                    <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  </div>
+                </div>
+                <div className="w-8 h-8 rounded-lg bg-gray-200 shrink-0 ml-2" />
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="pb-16 bg-[#f8f9fa] overflow-hidden">
       {/* Banner Section */}
       <HeroBanner />
 
-      {/* Categories Section */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="h-6 w-1 bg-primary rounded-full" />
-          <h2 className="font-display font-extrabold text-lg sm:text-xl uppercase tracking-wider text-brand-black">
+      {/* ===== DANH MỤC NỔI BẬT (COLLECTION LIST) ===== */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+          <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black tracking-tight uppercase">
             Danh Mục Nổi Bật
           </h2>
+          <div className="flex items-center gap-3">
+            <button className="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center text-brand-black hover:bg-primary hover:border-primary hover:text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
+              <ChevronRight className="h-5 w-5 rotate-180" />
+            </button>
+            <button className="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center text-brand-black hover:bg-primary hover:border-primary hover:text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
+              <ChevronRight className="h-5 w-5" />
+            </button>
+          </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+
+        {/* Category Row — 6 large circular cards filling the space */}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 md:gap-4 justify-items-center">
           {[
             {
               id: "phone",
-              name: "Điện thoại",
-              icon: <Smartphone className="h-5 w-5" />,
-              colorClass:
-                "bg-rose-50 text-rose-600 group-hover:bg-rose-500 group-hover:text-white",
-              badge: "Hot",
-              count: "250+ sản phẩm",
+              name: "ĐIỆN THOẠI",
+              count: "250+ SẢN PHẨM",
+              img: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=400&h=400&fit=crop&crop=center&q=80",
+              bg: "bg-[#dbebff]",
+              href: "/products?category=phone",
             },
             {
               id: "tablet",
-              name: "Máy tính bảng",
-              icon: <Tablet className="h-5 w-5" />,
-              colorClass:
-                "bg-sky-50 text-sky-600 group-hover:bg-sky-500 group-hover:text-white",
-              badge: "Mới",
-              count: "80+ sản phẩm",
+              name: "MÁY TÍNH BẢNG",
+              count: "80+ SẢN PHẨM",
+              img: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=400&h=400&fit=crop&crop=center&q=80",
+              bg: "bg-[#e0f2fe]",
+              href: "/products?category=tablet",
             },
             {
-              id: "accessory",
-              name: "Phụ kiện",
-              icon: <Headphones className="h-5 w-5" />,
-              colorClass:
-                "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white",
-              badge: "Giảm 30%",
-              count: "150+ sản phẩm",
+              id: "headphone",
+              name: "TAI NGHE",
+              count: "110+ SẢN PHẨM",
+              img: "https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=400&h=400&fit=crop&crop=center&q=80",
+              bg: "bg-[#f3f4f6]",
+              href: "/products?category=accessory",
             },
             {
-              id: "laptop",
-              name: "Laptop",
-              icon: <Laptop className="h-5 w-5" />,
-              colorClass:
-                "bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white",
-              badge: "Ưu đãi",
-              count: "120+ sản phẩm",
+              id: "charger",
+              name: "CÁP & CỦ SẠC",
+              count: "45+ SẢN PHẨM",
+              img: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=400&h=400&fit=crop&crop=center&q=80",
+              bg: "bg-[#111827]",
+              href: "/products?category=accessory",
             },
             {
-              id: "watch",
-              name: "Đồng hồ",
-              icon: <Watch className="h-5 w-5" />,
-              colorClass:
-                "bg-purple-50 text-purple-600 group-hover:bg-purple-500 group-hover:text-white",
-              badge: "Bán chạy",
-              count: "90+ sản phẩm",
+              id: "case",
+              name: "ỐP LƯNG",
+              count: "95+ SẢN PHẨM",
+              img: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop&crop=center&q=80",
+              bg: "bg-[#27273a]",
+              href: "/products?category=accessory",
             },
             {
-              id: "audio",
-              name: "Âm thanh",
-              icon: <Headphones className="h-5 w-5" />,
-              colorClass:
-                "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-500 group-hover:text-white",
-              badge: "Deal hời",
-              count: "110+ sản phẩm",
+              id: "smartwatch",
+              name: "ĐỒNG HỒ",
+              count: "90+ SẢN PHẨM",
+              img: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=400&h=400&fit=crop&crop=center&q=80",
+              bg: "bg-[#181824]",
+              href: "/products?category=accessory",
             },
-          ].map((cat) => (
-            <Link
+          ].map((cat, i) => (
+            <motion.div
               key={cat.id}
-              href={
-                cat.id === "phone" ||
-                cat.id === "tablet" ||
-                cat.id === "accessory"
-                  ? `/products?category=${cat.id}`
-                  : "/products"
-              }
-              className="bg-white p-5 rounded-4xl flex flex-col items-center justify-center gap-3 text-center group hover:border-primary/20 hover:shadow-lg transition-all duration-500 cursor-pointer active:scale-95 relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
+              className="flex flex-col items-center w-full"
             >
-              {/* Promotion Badge */}
-              <span
-                className={`absolute top-2.5 right-2.5 text-[8px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider scale-95 transition-all duration-300 ${
-                  cat.badge === "Hot"
-                    ? "bg-red-500 text-white"
-                    : cat.badge === "Mới"
-                      ? "bg-blue-500 text-white"
-                      : cat.badge === "Ưu đãi"
-                        ? "bg-amber-500 text-brand-light"
-                        : "bg-brand-black text-white"
-                }`}
+              <Link
+                href={cat.href}
+                className="group flex flex-col items-center gap-3 cursor-pointer w-full text-center"
               >
-                {cat.badge}
-              </span>
+                {/* Large round image container */}
+                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 lg:w-44 lg:h-44 xl:w-44 xl:h-44 rounded-full flex items-center justify-center bg-gray-100 overflow-hidden shadow-sm group-hover:shadow-lg group-hover:scale-105 transition-all duration-350 relative border border-gray-200/20">
+                  <div className={`absolute inset-0 ${cat.bg} transition-opacity duration-300`} />
+                  <img
+                    src={cat.img}
+                    alt={cat.name}
+                    className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-350 group-hover:scale-110"
+                  />
+                </div>
 
-              {/* Icon Container */}
-              <div
-                className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 transform group-hover:scale-110 shadow-sm ${cat.colorClass}`}
-              >
-                {cat.icon}
-              </div>
-
-              {/* Text details */}
-              <div className="flex flex-col gap-0.5">
-                <span className="font-display font-bold text-xs text-brand-black group-hover:text-primary transition-colors leading-tight">
-                  {cat.name}
-                </span>
-                <span className="text-[9px] text-gray-400 font-semibold group-hover:text-primary/70 transition-colors">
-                  {cat.count}
-                </span>
-              </div>
-            </Link>
+                {/* Text underneath */}
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="font-display font-bold text-xs sm:text-sm text-brand-black tracking-wider group-hover:text-primary transition-colors duration-200 uppercase">
+                    {cat.name}
+                  </span>
+                  <span className="text-[9px] sm:text-[10px] text-gray-400 font-bold uppercase tracking-wide">
+                    {cat.count}
+                  </span>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </section>
 
+
       {/* Flash Sale Banner (countdown + dynamic products) */}
       <FlashSale />
 
-      {/* Featured Products Tabs Section */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Recommended for You — Redesigned matching reference image */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-200 pb-4 mb-6">
-          <h2 className="font-display font-extrabold text-lg sm:text-2xl uppercase tracking-wider text-brand-black flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary animate-pulse" />
-            <span>Gợi Ý Cho Bạn</span>
+        <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 mb-6">
+          <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black tracking-tight uppercase">
+            Gợi Ý Cho Bạn
           </h2>
 
-          {/* Brand Tabs */}
-          <div className="flex gap-2">
+          {/* Categories Tabs */}
+          <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
             {[
-              { id: "all", name: "Tất cả" },
-              { id: "apple", name: "Apple" },
-              { id: "samsung", name: "Samsung" },
+              { id: "all", name: "TẤT CẢ SẢN PHẨM" },
+              { id: "phone", name: "ĐIỆN THOẠI" },
+              { id: "accessory", name: "PHỤ KIỆN" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`text-xs font-bold px-4 py-2 rounded-xl transition duration-300 ${
+                className={`text-xs font-extrabold tracking-wider pb-2 transition-all duration-300 border-b-2 whitespace-nowrap cursor-pointer ${
                   activeTab === tab.id
-                    ? "bg-brand-black text-white shadow-md"
-                    : "bg-white text-gray-500 border border-gray-100 hover:bg-gray-50"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-gray-400 hover:text-brand-black"
                 }`}
               >
                 {tab.name}
@@ -211,19 +279,76 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Featured Products Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5"
-        >
-          {filteredFeatured.slice(0, 8).map((product) => (
-            <motion.div key={product.id} variants={itemVariants}>
-              <ProductCard product={product} />
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* 3x3 Horizontal Product Cards Layout */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 9 }).map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl h-[120px]"
+              >
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  {/* Image Placeholder */}
+                  <div className="w-20 h-20 bg-gray-100 rounded-xl shrink-0" />
+                  {/* Info Placeholder */}
+                  <div className="flex-1 min-w-0 flex flex-col gap-2">
+                    <div className="h-4 bg-gray-200 rounded w-3/4" />
+                    <div className="h-3.5 bg-gray-200 rounded w-1/4" />
+                    <div className="h-3 bg-gray-150 rounded w-1/3" />
+                  </div>
+                </div>
+                {/* Chevron Placeholder */}
+                <div className="w-8 h-8 rounded-lg bg-gray-100 shrink-0 ml-2" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          >
+            {recommendedProducts.slice(0, 9).map((product) => (
+              <motion.div key={product.id} variants={itemVariants}>
+                <Link
+                  href="/products"
+                  className="group flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl hover:shadow-md hover:border-primary/20 transition-all duration-300 cursor-pointer h-[120px]"
+                >
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    {/* Left Side: Product Image with background container */}
+                    <div className="w-20 h-20 bg-[#f5f5f7] rounded-xl flex items-center justify-center p-2 shrink-0 relative overflow-hidden">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+
+                    {/* Middle: Product Info */}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <h3 className="font-display font-bold text-sm sm:text-base text-brand-black truncate group-hover:text-primary transition-colors leading-snug">
+                        {product.name}
+                      </h3>
+                      <span className="font-extrabold text-sm text-primary mt-1">
+                        {product.basePrice.toLocaleString("vi-VN")}đ
+                      </span>
+                      <span className="inline-flex items-center text-[9px] sm:text-[10px] bg-green-50 text-green-600 font-extrabold uppercase tracking-wide px-2 py-0.5 rounded-md mt-2 self-start">
+                        Còn hàng
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right Side: Action Chevron */}
+                  <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-xs ml-2">
+                    <ChevronRight className="h-4 w-4" />
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
 
         {/* Brand Banners */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
