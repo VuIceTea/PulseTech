@@ -60,16 +60,14 @@ export const PRODUCTS: Product[] = [
     basePrice: 29990000,
     originalPrice: 34990000,
     discount: 14,
-    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1695048133140-fdc009f3b63b?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1695048065095-2cc1b91de999?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Titan Tự Nhiên', hex: '#8a7f76', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Titan Xanh', hex: '#2f3c4d', image: 'https://images.unsplash.com/photo-1695048065095-2cc1b91de999?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Titan Đen', hex: '#232426', image: 'https://images.unsplash.com/photo-1695048133140-fdc009f3b63b?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Titan Tự Nhiên', hex: '#8a7f76', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Titan Xanh', hex: '#2f3c4d', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Titan Đen', hex: '#232426', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: '256GB', priceOffset: 0 },
@@ -106,15 +104,14 @@ export const PRODUCTS: Product[] = [
     basePrice: 26990000,
     originalPrice: 33990000,
     discount: 20,
-    image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Xám Titan', hex: '#777777', image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Tím Titan', hex: '#433d4f', image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Vàng Titan', hex: '#d4af37', image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Xám Titan', hex: '#777777', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Tím Titan', hex: '#433d4f', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Vàng Titan', hex: '#d4af37', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: '256GB', priceOffset: 0 },
@@ -151,13 +148,13 @@ export const PRODUCTS: Product[] = [
     basePrice: 28990000,
     originalPrice: 32990000,
     discount: 12,
-    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Đen Tuyển', hex: '#111111', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Trắng Sữa', hex: '#f0f0f0', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Đen Tuyển', hex: '#111111', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Trắng Sữa', hex: '#f0f0f0', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: '512GB', priceOffset: 0 }
@@ -191,14 +188,14 @@ export const PRODUCTS: Product[] = [
     basePrice: 19490000,
     originalPrice: 22990000,
     discount: 15,
-    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Xanh Dương', hex: '#c5e2ec', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Hồng Phấn', hex: '#fad4d8', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Đen Nhám', hex: '#222222', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Xanh Dương', hex: '#c5e2ec', image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Hồng Phấn', hex: '#fad4d8', image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Đen Nhám', hex: '#222222', image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: '128GB', priceOffset: 0 },
@@ -233,13 +230,13 @@ export const PRODUCTS: Product[] = [
     basePrice: 9490000,
     originalPrice: 10990000,
     discount: 13,
-    image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Xanh Navy', hex: '#1b2c45', image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Xanh Iceblue', hex: '#e2f4ff', image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Xanh Navy', hex: '#1b2c45', image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Xanh Iceblue', hex: '#e2f4ff', image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: '128GB', priceOffset: 0 },
@@ -272,13 +269,13 @@ export const PRODUCTS: Product[] = [
     basePrice: 28990000,
     originalPrice: 29990000,
     discount: 3,
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?q=80&w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?q=80&w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Bạc', hex: '#e3e4e6', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Đen Không Gian', hex: '#2c2d30', image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Bạc', hex: '#e3e4e6', image: 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?q=80&w=600&auto=format&fit=crop' },
+      { name: 'Đen Không Gian', hex: '#2c2d30', image: 'https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?q=80&w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: '256GB', priceOffset: 0 },
@@ -351,12 +348,12 @@ export const PRODUCTS: Product[] = [
     basePrice: 5790000,
     originalPrice: 6190000,
     discount: 6,
-    image: 'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop',
     images: [
-      'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop'
+      'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop'
     ],
     colors: [
-      { name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop' }
+      { name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop' }
     ],
     storages: [
       { name: 'Tiêu Chuẩn', priceOffset: 0 }
@@ -419,9 +416,9 @@ export const PRODUCTS: Product[] = [
     basePrice: 350000,
     originalPrice: 450000,
     discount: 22,
-    image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop',
-    images: ['https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop'],
-    colors: [{ name: 'Đen', hex: '#000000', image: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop' }],
+    image: 'https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop'],
+    colors: [{ name: 'Đen', hex: '#000000', image: 'https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop' }],
     storages: [{ name: '25W', priceOffset: 0 }],
     specs: {
       screen: 'Không có',
@@ -450,9 +447,9 @@ export const PRODUCTS: Product[] = [
     basePrice: 990000,
     originalPrice: 1290000,
     discount: 23,
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop',
-    images: ['https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop'],
-    colors: [{ name: 'Xanh Lá', hex: '#4b5320', image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop' }],
+    image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?q=80&w=600&auto=format&fit=crop',
+    images: ['https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?q=80&w=600&auto=format&fit=crop'],
+    colors: [{ name: 'Xanh Lá', hex: '#4b5320', image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?q=80&w=600&auto=format&fit=crop' }],
     storages: [{ name: 'Tiêu Chuẩn', priceOffset: 0 }],
     specs: {
       screen: 'Không có',

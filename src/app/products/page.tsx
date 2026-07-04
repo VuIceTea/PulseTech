@@ -37,12 +37,14 @@ function ProductsListContent() {
 
   // State mở Popover bộ lọc (mobile & desktop)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isPriceOpen, setIsPriceOpen] = useState(false);
 
   useEffect(() => {
     setSelectedCategory(urlCategory);
     setSelectedBrand(urlBrand);
     setSearchQuery(urlSearch);
-    
+
     // Reset page loading when URL search params change
     setIsPageLoading(true);
     const timer = setTimeout(() => setIsPageLoading(false), 800);
@@ -115,7 +117,13 @@ function ProductsListContent() {
           <SlidersHorizontal className="h-4 w-4 text-primary" /> Bộ lọc nâng cao
         </h3>
         {hasActiveFilters && (
-          <button onClick={handleResetFilters} className="text-primary text-[11px] font-bold flex items-center gap-1 hover:underline">
+          <button 
+            onClick={() => {
+              handleResetFilters();
+              setIsFilterOpen(false);
+            }} 
+            className="cursor-pointer text-primary text-[11px] font-bold flex items-center gap-1 hover:underline"
+          >
             <RotateCcw className="h-3 w-3" /> Xóa tất cả
           </button>
         )}
@@ -125,14 +133,27 @@ function ProductsListContent() {
 
       {/* Danh mục */}
       <div className="space-y-2 mb-5">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Danh Mục</h4>
-        <div className="flex flex-col gap-1">
-          <button onClick={() => setSelectedCategory('')} className={cn("flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-xl text-left transition", !selectedCategory ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}>
+        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2 px-4 text-left">Danh Mục</h4>
+        <div className="flex flex-col gap-1 px-4">
+          <button 
+            onClick={() => {
+              setSelectedCategory('');
+              setIsFilterOpen(false);
+            }} 
+            className={cn("cursor-pointer flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-xl text-left transition w-full", !selectedCategory ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}
+          >
             <span>Tất cả</span>
             {!selectedCategory && <Check className="h-3.5 w-3.5" />}
           </button>
           {CATEGORIES.map((cat) => (
-            <button key={cat.id} onClick={() => setSelectedCategory(cat.id)} className={cn("flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-xl text-left transition", selectedCategory === cat.id ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}>
+            <button 
+              key={cat.id} 
+              onClick={() => {
+                setSelectedCategory(cat.id);
+                setIsFilterOpen(false);
+              }} 
+              className={cn("cursor-pointer flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-xl text-left transition w-full", selectedCategory === cat.id ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}
+            >
               <span>{cat.name}</span>
               {selectedCategory === cat.id && <Check className="h-3.5 w-3.5" />}
             </button>
@@ -144,10 +165,17 @@ function ProductsListContent() {
 
       {/* Mức giá */}
       <div className="space-y-2 mb-5">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Mức Giá</h4>
-        <div className="flex flex-col gap-1">
+        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2 px-4 text-left">Mức Giá</h4>
+        <div className="flex flex-col gap-1 px-4">
           {priceRanges.map((range) => (
-            <button key={range.id} onClick={() => setSelectedPriceRange(selectedPriceRange === range.id ? '' : range.id)} className={cn("flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-xl text-left transition", selectedPriceRange === range.id ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}>
+            <button 
+              key={range.id} 
+              onClick={() => {
+                setSelectedPriceRange(selectedPriceRange === range.id ? '' : range.id);
+                setIsFilterOpen(false);
+              }} 
+              className={cn("cursor-pointer flex items-center justify-between text-xs font-bold px-3 py-2.5 rounded-xl text-left transition w-full", selectedPriceRange === range.id ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}
+            >
               <span>{range.name}</span>
               {selectedPriceRange === range.id && <Check className="h-3.5 w-3.5" />}
             </button>
@@ -159,10 +187,17 @@ function ProductsListContent() {
 
       {/* RAM */}
       <div className="space-y-2">
-        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2">Bộ Nhớ RAM</h4>
-        <div className="flex flex-wrap gap-2">
+        <h4 className="text-[11px] font-bold uppercase tracking-wider text-gray-400 mb-2 px-4 text-left">Bộ Nhớ RAM</h4>
+        <div className="flex flex-wrap gap-2 px-4">
           {rams.map((ram) => (
-            <button key={ram} onClick={() => setSelectedRam(selectedRam === ram ? '' : ram)} className={cn("text-xs font-bold py-2 px-3 border rounded-xl transition", selectedRam === ram ? 'border-primary bg-primary-light text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50')}>
+            <button 
+              key={ram} 
+              onClick={() => {
+                setSelectedRam(selectedRam === ram ? '' : ram);
+                setIsFilterOpen(false);
+              }} 
+              className={cn("cursor-pointer text-xs font-bold py-2 px-3 border rounded-xl transition", selectedRam === ram ? 'border-primary bg-primary-light text-primary' : 'border-gray-200 text-gray-600 hover:bg-gray-50')}
+            >
               {ram}
             </button>
           ))}
@@ -181,7 +216,7 @@ function ProductsListContent() {
           {selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory)?.name : 'Tất Cả Sản Phẩm'}
         </h1>
         <p className="text-gray-500 text-xs sm:text-sm font-semibold mt-1">
-          Hiển thị <strong className="text-brand-black">{sortedProducts.length}</strong> sản phẩm phù hợp
+          Hiển thị <strong className="text-[#d70018f2]">{sortedProducts.length}</strong> sản phẩm phù hợp
         </p>
       </div>
 
@@ -199,22 +234,22 @@ function ProductsListContent() {
           </h3>
 
           <div className="flex flex-wrap gap-2">
-            <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-2 h-9 px-4 text-xs font-bold border-gray-200 hover:border-primary hover:text-primary rounded-full">
-              <SlidersHorizontal className="h-4 w-4" />
-              Bộ Lọc
-              {hasActiveFilters && <span className="bg-primary text-white text-[9px] rounded-full h-4 w-4 flex items-center justify-center">!</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[340px] p-0" align="start">
-            <FilterContent />
-          </PopoverContent>
-        </Popover>
+            <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="cursor-pointer flex items-center gap-2 h-9 px-4 text-xs font-bold border-gray-200 hover:border-primary hover:text-primary rounded-full">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Bộ Lọc
+                  {hasActiveFilters && <span className="bg-primary text-white text-[9px] rounded-full h-4 w-4 flex items-center justify-center">!</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[340px] p-0 border-none ring-0 shadow-lg bg-popover text-popover-foreground rounded-2xl" align="start">
+                <FilterContent />
+              </PopoverContent>
+            </Popover>
             <button
               onClick={() => setSelectedBrand("")}
               className={cn(
-                "px-5 py-2 rounded-xl border text-sm font-semibold transition",
+                "cursor-pointer px-5 py-2 rounded-xl border text-sm font-semibold transition",
                 selectedBrand === ""
                   ? "border-primary bg-primary text-white"
                   : "border-gray-200 bg-white hover:border-primary hover:text-primary"
@@ -228,7 +263,7 @@ function ProductsListContent() {
                 key={brand}
                 onClick={() => setSelectedBrand(brand)}
                 className={cn(
-                  "px-5 py-2 rounded-xl border text-sm font-semibold transition",
+                  "cursor-pointer px-5 py-2 rounded-xl border text-sm font-semibold transition",
                   selectedBrand === brand
                     ? "border-primary bg-primary text-white"
                     : "border-gray-200 bg-white hover:border-primary hover:text-primary"
@@ -241,19 +276,36 @@ function ProductsListContent() {
         </div>
 
         {/* Chip Giá */}
-        <Popover>
+        <Popover open={isPriceOpen} onOpenChange={setIsPriceOpen}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="flex items-center gap-1.5 h-9 px-4 text-xs font-bold border-gray-200 hover:border-primary hover:text-primary rounded-full">
+            <Button variant="outline" className="cursor-pointer flex items-center gap-1.5 h-9 px-4 text-xs font-bold border-gray-200 hover:border-primary hover:text-primary rounded-full">
               Giá {selectedPriceRange && <span className="text-primary">({priceRanges.find(r => r.id === selectedPriceRange)?.name})</span>}
               <ChevronDown className="h-3 w-3" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-56 p-2" align="start">
-            <div className="flex flex-col gap-1">
-              <button onClick={() => setSelectedPriceRange('')} className={cn("text-xs font-bold px-3 py-2 rounded-lg text-left transition", !selectedPriceRange ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}>Tất cả</button>
+          <PopoverContent className="w-56 p-2 border-none ring-0 shadow-lg bg-popover text-popover-foreground rounded-2xl" align="start">
+            <div className="flex flex-col gap-1 px-1 w-full">
+              <button 
+                onClick={() => {
+                  setSelectedPriceRange('');
+                  setIsPriceOpen(false);
+                }} 
+                className={cn("cursor-pointer flex items-center justify-between text-xs font-bold px-3 py-2 rounded-lg text-left transition w-full", !selectedPriceRange ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}
+              >
+                <span>Tất cả</span>
+                {!selectedPriceRange && <Check className="h-3.5 w-3.5" />}
+              </button>
               {priceRanges.map((range) => (
-                <button key={range.id} onClick={() => setSelectedPriceRange(range.id)} className={cn("text-xs font-bold px-3 py-2 rounded-lg text-left transition", selectedPriceRange === range.id ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}>
-                  {range.name}
+                <button 
+                  key={range.id} 
+                  onClick={() => {
+                    setSelectedPriceRange(range.id);
+                    setIsPriceOpen(false);
+                  }} 
+                  className={cn("cursor-pointer flex items-center justify-between text-xs font-bold px-3 py-2 rounded-lg text-left transition w-full", selectedPriceRange === range.id ? 'bg-primary-light text-primary' : 'text-gray-600 hover:bg-gray-50')}
+                >
+                  <span>{range.name}</span>
+                  {selectedPriceRange === range.id && <Check className="h-3.5 w-3.5" />}
                 </button>
               ))}
             </div>
@@ -262,13 +314,19 @@ function ProductsListContent() {
 
         {/* 3. Hiển thị chip lọc đang active */}
         {selectedCategory && (
-          <button onClick={() => setSelectedCategory('')} className="h-9 px-3 text-xs font-bold bg-primary-light text-primary rounded-full flex items-center gap-1.5 border border-primary/20 hover:bg-red-100 transition">
+          <button 
+            onClick={() => setSelectedCategory('')} 
+            className="cursor-pointer h-9 px-3 text-xs font-bold bg-primary-light text-primary rounded-full flex items-center gap-1.5 border border-primary/20 hover:bg-red-100 transition"
+          >
             {CATEGORIES.find(c => c.id === selectedCategory)?.name}
             <X className="h-3 w-3" />
           </button>
         )}
         {selectedRam && (
-          <button onClick={() => setSelectedRam('')} className="h-9 px-3 text-xs font-bold bg-primary-light text-primary rounded-full flex items-center gap-1.5 border border-primary/20 hover:bg-red-100 transition">
+          <button 
+            onClick={() => setSelectedRam('')} 
+            className="cursor-pointer h-9 px-3 text-xs font-bold bg-primary-light text-primary rounded-full flex items-center gap-1.5 border border-primary/20 hover:bg-red-100 transition"
+          >
             RAM: {selectedRam}
             <X className="h-3 w-3" />
           </button>
@@ -276,7 +334,10 @@ function ProductsListContent() {
 
         {/* 4. Nút Reset tất cả */}
         {hasActiveFilters && (
-          <button onClick={handleResetFilters} className="h-9 px-3 text-xs font-bold text-gray-500 hover:text-primary rounded-full flex items-center gap-1 transition">
+          <button 
+            onClick={handleResetFilters} 
+            className="cursor-pointer h-9 px-3 text-xs font-bold text-gray-500 hover:text-primary rounded-full flex items-center gap-1 transition"
+          >
             <RotateCcw className="h-3 w-3" /> Bỏ lọc
           </button>
         )}
