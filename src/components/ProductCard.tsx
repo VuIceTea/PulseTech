@@ -66,11 +66,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Product Image */}
-        <div className="relative w-full aspect-square mb-4 overflow-hidden rounded-2xl bg-gray-50 flex items-center justify-center">
+        <div className="relative w-full aspect-square mb-4 overflow-hidden rounded-2xl bg-gray-50 flex items-center justify-center p-4">
           <img
             src={product.image}
             alt={product.name}
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500 ease-out"
+            className="object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </div>
 

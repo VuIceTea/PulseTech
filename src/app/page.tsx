@@ -17,6 +17,11 @@ import {
   Laptop,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  ScrollReveal,
+  ScrollRevealGroup,
+  ScrollRevealItem,
+} from "@/components/ScrollReveal";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"all" | "phone" | "accessory">(
@@ -77,59 +82,13 @@ export default function Home() {
 
   if (isPageLoading) {
     return (
-      <div className="pb-16 bg-[#f8f9fa] overflow-hidden">
-        {/* Banner Skeleton */}
-        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-          <div className="w-full h-[280px] sm:h-[400px] bg-gray-200 animate-pulse rounded-3xl" />
+      <div className="flex-1 min-h-[65vh] flex flex-col items-center justify-center bg-[#f8f9fa] transition-opacity duration-300">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-14 w-14 animate-spin rounded-full border-4 border-gray-200/80 border-t-primary" />
+          <span className="text-xs font-extrabold text-gray-400 uppercase tracking-widest animate-pulse">
+            Đang Tải...
+          </span>
         </div>
-
-        {/* ===== DANH MỤC NỔI BẬT SKELETON ===== */}
-        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-            <div className="h-6 bg-gray-200 animate-pulse rounded w-1/4" />
-            <div className="flex gap-2">
-              <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
-              <div className="w-10 h-10 rounded-full bg-gray-200 animate-pulse" />
-            </div>
-          </div>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 md:gap-4 justify-items-center">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="flex flex-col items-center w-full animate-pulse">
-                <div className="w-24 h-24 xs:w-28 xs:h-28 sm:w-36 sm:h-36 rounded-full bg-gray-200" />
-                <div className="h-4 bg-gray-200 rounded w-2/3 mt-3 mx-auto" />
-                <div className="h-3 bg-gray-200 rounded w-1/2 mt-1.5 mx-auto" />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Flash Sale Banner Skeleton */}
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-          <div className="w-full h-[180px] sm:h-[260px] bg-gray-200 animate-pulse rounded-3xl" />
-        </div>
-
-        {/* Recommended for You Skeleton */}
-        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 mb-6">
-            <div className="h-6 bg-gray-200 animate-pulse rounded w-1/4" />
-            <div className="h-4 bg-gray-200 animate-pulse rounded w-1/3" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="animate-pulse flex items-center justify-between p-4 bg-white border border-gray-100 rounded-2xl h-[120px]">
-                <div className="flex items-center gap-4 min-w-0 flex-1">
-                  <div className="w-20 h-20 bg-gray-200 rounded-xl shrink-0" />
-                  <div className="flex-1 min-w-0 flex flex-col gap-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4" />
-                    <div className="h-3.5 bg-gray-200 rounded w-1/4" />
-                    <div className="h-3 bg-gray-200 rounded w-1/3" />
-                  </div>
-                </div>
-                <div className="w-8 h-8 rounded-lg bg-gray-200 shrink-0 ml-2" />
-              </div>
-            ))}
-          </div>
-        </section>
       </div>
     );
   }
@@ -142,22 +101,27 @@ export default function Home() {
       {/* ===== DANH MỤC NỔI BẬT (COLLECTION LIST) ===== */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
-          <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black tracking-tight uppercase">
-            Danh Mục Nổi Bật
-          </h2>
-          <div className="flex items-center gap-3">
-            <button className="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center text-brand-black hover:bg-primary hover:border-primary hover:text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
-              <ChevronRight className="h-5 w-5 rotate-180" />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center text-brand-black hover:bg-primary hover:border-primary hover:text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
-              <ChevronRight className="h-5 w-5" />
-            </button>
+        <ScrollReveal>
+          <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+            <h2 className="font-display font-extrabold text-xl sm:text-2xl text-[#d70018f2] tracking-tight uppercase">
+              Danh Mục Nổi Bật
+            </h2>
+            <div className="flex items-center gap-3">
+              <button className="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center text-brand-black hover:bg-primary hover:border-primary hover:text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
+                <ChevronRight className="h-5 w-5 rotate-180" />
+              </button>
+              <button className="w-10 h-10 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center text-brand-black hover:bg-primary hover:border-primary hover:text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer">
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Category Row — 6 large circular cards filling the space */}
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 md:gap-4 justify-items-center">
+        <ScrollRevealGroup
+          className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3 md:gap-4 justify-items-center"
+          staggerDelay={0.08}
+        >
           {[
             {
               id: "phone",
@@ -195,7 +159,7 @@ export default function Home() {
               id: "case",
               name: "ỐP LƯNG",
               count: "95+ SẢN PHẨM",
-              img: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=400&h=400&fit=crop&crop=center&q=80",
+              img: "https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&h=400&fit=crop&crop=center&q=80",
               bg: "bg-[#27273a]",
               href: "/products?category=accessory",
             },
@@ -208,12 +172,8 @@ export default function Home() {
               href: "/products?category=accessory",
             },
           ].map((cat, i) => (
-            <motion.div
+            <ScrollRevealItem
               key={cat.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
               className="flex flex-col items-center w-full"
             >
               <Link
@@ -240,9 +200,9 @@ export default function Home() {
                   </span>
                 </div>
               </Link>
-            </motion.div>
+            </ScrollRevealItem>
           ))}
-        </div>
+        </ScrollRevealGroup>
       </section>
 
 
@@ -252,32 +212,33 @@ export default function Home() {
       {/* Recommended for You — Redesigned matching reference image */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 mb-6">
-          <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black tracking-tight uppercase">
-            Gợi Ý Cho Bạn
-          </h2>
+        <ScrollReveal>
+          <div className="flex flex-col gap-4 border-b border-gray-100 pb-4 mb-6">
+            <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black tracking-tight uppercase">
+              Gợi Ý Cho Bạn
+            </h2>
 
-          {/* Categories Tabs */}
-          <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
-            {[
-              { id: "all", name: "TẤT CẢ SẢN PHẨM" },
-              { id: "phone", name: "ĐIỆN THOẠI" },
-              { id: "accessory", name: "PHỤ KIỆN" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`text-xs font-extrabold tracking-wider pb-2 transition-all duration-300 border-b-2 whitespace-nowrap cursor-pointer ${
-                  activeTab === tab.id
-                    ? "border-primary text-primary"
-                    : "border-transparent text-gray-400 hover:text-brand-black"
-                }`}
-              >
-                {tab.name}
-              </button>
-            ))}
+            {/* Categories Tabs */}
+            <div className="flex gap-4 overflow-x-auto pb-1 no-scrollbar">
+              {[
+                { id: "all", name: "TẤT CẢ SẢN PHẨM" },
+                { id: "phone", name: "ĐIỆN THOẠI" },
+                { id: "accessory", name: "PHỤ KIỆN" },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`text-xs font-extrabold tracking-wider pb-2 transition-all duration-300 border-b-2 whitespace-nowrap cursor-pointer ${activeTab === tab.id
+                      ? "border-primary text-primary"
+                      : "border-transparent text-gray-400 hover:text-brand-black"
+                    }`}
+                >
+                  {tab.name}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* 3x3 Horizontal Product Cards Layout */}
         {isLoading ? (
@@ -351,67 +312,77 @@ export default function Home() {
         )}
 
         {/* Brand Banners */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+        <ScrollRevealGroup
+          className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12"
+          staggerDelay={0.15}
+        >
           {/* Apple banner */}
-          <div className="relative rounded-3xl overflow-hidden h-[180px] bg-linear-to-r from-zinc-800 to-zinc-950 p-8 flex items-center justify-between text-white shadow-lg group cursor-pointer">
-            <div className="space-y-2 z-10">
-              <span className="text-[10px] font-extrabold tracking-widest text-primary uppercase">
-                Apple Authorized Reseller
-              </span>
-              <h3 className="font-display font-bold text-lg sm:text-xl">
-                Thế Giới Apple Đỉnh Cao
-              </h3>
-              <p className="text-gray-400 text-xs max-w-[200px]">
-                Trải nghiệm iPhone, iPad, AirPods chính hãng giá tốt.
-              </p>
-              <Link
-                href="/products?brand=Apple"
-                className="text-primary font-bold text-xs flex items-center gap-1 hover:underline pt-2"
-              >
-                Mua ngay Apple <ChevronRight className="h-4 w-4" />
-              </Link>
+          <ScrollRevealItem>
+            <div className="relative rounded-3xl overflow-hidden h-[180px] bg-linear-to-r from-zinc-800 to-zinc-950 p-8 flex items-center justify-between text-white shadow-lg group cursor-pointer">
+              <div className="space-y-2 z-10">
+                <span className="text-[10px] font-extrabold tracking-widest text-primary uppercase">
+                  Apple Authorized Reseller
+                </span>
+                <h3 className="font-display font-bold text-lg sm:text-xl">
+                  Thế Giới Apple Đỉnh Cao
+                </h3>
+                <p className="text-gray-400 text-xs max-w-[200px]">
+                  Trải nghiệm iPhone, iPad, AirPods chính hãng giá tốt.
+                </p>
+                <Link
+                  href="/products?brand=Apple"
+                  className="text-primary font-bold text-xs flex items-center gap-1 hover:underline pt-2"
+                >
+                  Mua ngay Apple <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <img
+                src="https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=400&auto=format&fit=crop"
+                alt="Apple devices"
+                className="w-1/3 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500 shadow-md"
+              />
             </div>
-            <img
-              src="https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=400&auto=format&fit=crop"
-              alt="Apple devices"
-              className="w-1/3 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500 shadow-md"
-            />
-          </div>
+          </ScrollRevealItem>
 
           {/* Samsung banner */}
-          <div className="relative rounded-3xl overflow-hidden h-[180px] bg-linear-to-r from-blue-900 to-indigo-950 p-8 flex items-center justify-between text-white shadow-lg group cursor-pointer">
-            <div className="space-y-2 z-10">
-              <span className="text-[10px] font-extrabold tracking-widest text-yellow-400 uppercase">
-                Galaxy Innovation
-              </span>
-              <h3 className="font-display font-bold text-lg sm:text-xl">
-                Trải Nghiệm Galaxy AI
-              </h3>
-              <p className="text-gray-400 text-xs max-w-[200px]">
-                Tính năng dịch thuật trực tiếp, khoanh vùng tìm kiếm AI độc
-                quyền.
-              </p>
-              <Link
-                href="/products?brand=Samsung"
-                className="text-primary font-bold text-xs flex items-center gap-1 hover:underline pt-2"
-              >
-                Mua ngay Samsung <ChevronRight className="h-4 w-4" />
-              </Link>
+          <ScrollRevealItem>
+            <div className="relative rounded-3xl overflow-hidden h-[180px] bg-linear-to-r from-blue-900 to-indigo-950 p-8 flex items-center justify-between text-white shadow-lg group cursor-pointer">
+              <div className="space-y-2 z-10">
+                <span className="text-[10px] font-extrabold tracking-widest text-yellow-400 uppercase">
+                  Galaxy Innovation
+                </span>
+                <h3 className="font-display font-bold text-lg sm:text-xl">
+                  Trải Nghiệm Galaxy AI
+                </h3>
+                <p className="text-gray-400 text-xs max-w-[200px]">
+                  Tính năng dịch thuật trực tiếp, khoanh vùng tìm kiếm AI độc
+                  quyền.
+                </p>
+                <Link
+                  href="/products?brand=Samsung"
+                  className="text-primary font-bold text-xs flex items-center gap-1 hover:underline pt-2"
+                >
+                  Mua ngay Samsung <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+              <img
+                src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=400&auto=format&fit=crop"
+                alt="Samsung devices"
+                className="w-1/3 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500 shadow-md"
+              />
             </div>
-            <img
-              src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=400&auto=format&fit=crop"
-              alt="Samsung devices"
-              className="w-1/3 object-cover rounded-2xl group-hover:scale-105 transition-transform duration-500 shadow-md"
-            />
-          </div>
-        </div>
+          </ScrollRevealItem>
+        </ScrollRevealGroup>
       </section>
 
       {/* Trust Badges */}
       <section className="bg-white border-y border-gray-100 py-12 mt-12">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="flex flex-col items-center gap-2">
+          <ScrollRevealGroup
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center"
+            staggerDelay={0.12}
+          >
+            <ScrollRevealItem className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 bg-primary-light text-primary rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm">
                 🏆
               </div>
@@ -421,8 +392,8 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 Đối tác được ủy quyền bán lẻ hàng đầu tại Việt Nam.
               </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
+            </ScrollRevealItem>
+            <ScrollRevealItem className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 bg-primary-light text-primary rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm">
                 🚚
               </div>
@@ -432,8 +403,8 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 Miễn phí giao hàng trên toàn quốc với mọi đơn từ 500k.
               </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
+            </ScrollRevealItem>
+            <ScrollRevealItem className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 bg-primary-light text-primary rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm">
                 💳
               </div>
@@ -444,8 +415,8 @@ export default function Home() {
                 Trả góp 0% lãi suất bằng thẻ tín dụng hoặc các công ty tài
                 chính.
               </p>
-            </div>
-            <div className="flex flex-col items-center gap-2">
+            </ScrollRevealItem>
+            <ScrollRevealItem className="flex flex-col items-center gap-2">
               <div className="w-12 h-12 bg-primary-light text-primary rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm">
                 🔧
               </div>
@@ -455,8 +426,8 @@ export default function Home() {
               <p className="text-xs text-gray-500">
                 Đổi mới trong 30 ngày nếu lỗi phần cứng từ NSX.
               </p>
-            </div>
-          </div>
+            </ScrollRevealItem>
+          </ScrollRevealGroup>
         </div>
       </section>
     </div>
