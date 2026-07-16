@@ -238,23 +238,23 @@ export const HeroBanner: React.FC = () => {
       id: 5,
       name: 'Laptop & Màn hình',
       icon: <Laptop className="h-4 w-4" />,
-      link: '/products',
+      link: '/products?category=laptop',
       megaMenu: [
         {
           title: 'Thương hiệu Laptop',
           links: [
-            { name: 'MacBook (Apple)', link: '/products' },
-            { name: 'ASUS ROG (Gaming)', link: '/products' },
-            { name: 'Dell XPS (Văn phòng)', link: '/products' },
-            { name: 'Lenovo ThinkPad', link: '/products' }
+            { name: 'MacBook (Apple)', link: '/products?category=laptop' },
+            { name: 'ASUS ROG (Gaming)', link: '/products?category=laptop' },
+            { name: 'Dell XPS (Văn phòng)', link: '/products?category=laptop' },
+            { name: 'Lenovo ThinkPad', link: '/products?category=laptop' }
           ]
         },
         {
           title: 'Màn hình máy tính',
           links: [
-            { name: 'Màn hình ASUS ProArt', link: '/products' },
-            { name: 'Màn hình LG UltraFine', link: '/products' },
-            { name: 'Màn hình cong Samsung', link: '/products' }
+            { name: 'Màn hình ASUS ProArt', link: '/products?category=laptop' },
+            { name: 'Màn hình LG UltraFine', link: '/products?category=laptop' },
+            { name: 'Màn hình cong Samsung', link: '/products?category=laptop' }
           ]
         }
       ]
@@ -263,14 +263,14 @@ export const HeroBanner: React.FC = () => {
       id: 6,
       name: 'Thiết bị âm thanh',
       icon: <Volume2 className="h-4 w-4" />,
-      link: '/products?category=accessory',
+      link: '/products?category=audio',
       megaMenu: [
         {
           title: 'Tai nghe Bluetooth',
           links: [
             { name: 'AirPods Pro 2', link: '/products/tai-nghe-apple-airpods-pro-2' },
-            { name: 'Sony WF-1000XM5', link: '/products?category=accessory' },
-            { name: 'Tai nghe chụp tai Sony WH', link: '/products?category=accessory' }
+            { name: 'Sony WF-1000XM5', link: '/products?category=audio' },
+            { name: 'Tai nghe chụp tai Sony WH', link: '/products?category=audio' }
           ]
         },
         {

@@ -114,7 +114,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-2 text-xs">
               <li className="text-gray-300">
                 <Link
-                  href="/products"
+                  href="/policies?type=warranty"
                   className="hover:text-primary transition flex items-center gap-1"
                 >
                   <ArrowRight className="h-3 w-3" /> Quy định bảo hành
@@ -122,7 +122,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="text-gray-300">
                 <Link
-                  href="/products"
+                  href="/policies?type=shipping"
                   className="hover:text-primary transition flex items-center gap-1"
                 >
                   <ArrowRight className="h-3 w-3" /> Giao hàng & thanh toán
@@ -130,7 +130,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="text-gray-300">
                 <Link
-                  href="/products"
+                  href="/policies?type=return"
                   className="hover:text-primary transition flex items-center gap-1"
                 >
                   <ArrowRight className="h-3 w-3" /> Đổi trả sản phẩm lỗi
@@ -138,7 +138,7 @@ export const Footer: React.FC = () => {
               </li>
               <li className="text-gray-300">
                 <Link
-                  href="/products"
+                  href="/policies?type=terms"
                   className="hover:text-primary transition flex items-center gap-1"
                 >
                   <ArrowRight className="h-3 w-3" /> Điều khoản dịch vụ

@@ -214,8 +214,8 @@ export const Header: React.FC = () => {
                   { id: 2, name: 'Máy tính bảng (Tablet)', icon: <Tablet className="h-4 w-4" />, link: '/products?category=tablet' },
                   { id: 3, name: 'Phụ kiện công nghệ', icon: <Headphones className="h-4 w-4" />, link: '/products?category=accessory' },
                   { id: 4, name: 'Smartwatch (Đồng hồ)', icon: <Watch className="h-4 w-4" />, link: '/products' },
-                  { id: 5, name: 'Laptop & Màn hình', icon: <Laptop className="h-4 w-4" />, link: '/products' },
-                  { id: 6, name: 'Thiết bị âm thanh', icon: <Volume2 className="h-4 w-4" />, link: '/products?category=accessory' },
+                  { id: 5, name: 'Laptop & Màn hình', icon: <Laptop className="h-4 w-4" />, link: '/products?category=laptop' },
+                  { id: 6, name: 'Thiết bị âm thanh', icon: <Volume2 className="h-4 w-4" />, link: '/products?category=audio' },
                   { id: 7, name: 'Thu cũ đổi mới', icon: <RefreshCw className="h-4 w-4" />, link: '/trade-in' },
                 ].map((cat) => (
                   <Link
