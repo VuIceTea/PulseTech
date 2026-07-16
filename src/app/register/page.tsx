@@ -97,7 +97,7 @@ export default function RegisterPage() {
             </span>
           </Link>
           <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black">ĐĂNG KÝ THÀNH VIÊN</h2>
-          <p className="text-xs text-gray-500 mt-1.5 font-semibold">Tạo tài khoản mua sắm và tích điểm Smember</p>
+          <p className="text-xs text-gray-500 mt-1.5 font-semibold">Tạo tài khoản mua sắm và tích điểm PulseMember</p>
         </div>
 
         {/* Form */}

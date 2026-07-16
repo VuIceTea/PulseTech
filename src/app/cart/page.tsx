@@ -81,7 +81,7 @@ export default function CartPage() {
 
   if (isPageLoading) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold animate-pulse">
+      <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold animate-pulse">
         {/* Page Header */}
         <div className="border-b border-gray-200 pb-5 mb-8">
           <div className="h-8 bg-gray-200 rounded w-1/3" />
@@ -120,7 +120,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold">
+    <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold">
       
       {/* Page Header */}
       <div className="border-b border-gray-200 pb-5 mb-8">

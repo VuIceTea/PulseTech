@@ -19,7 +19,7 @@ export const Footer: React.FC = () => {
     <footer className="bg-brand-black text-gray-400 text-sm border-t border-brand-dark mt-auto">
       {/* Top Banner section */}
       <div className="border-b border-brand-dark/80 bg-brand-dark/20 py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-primary/10 rounded-2xl text-primary shrink-0">
@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
                 <h4 className="font-bold text-white text-base">
                   Sản phẩm chính hãng
                 </h4>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-300">
                   Bảo hành 12 tháng chính hãng quốc tế
                 </p>
               </div>
@@ -42,7 +42,7 @@ export const Footer: React.FC = () => {
                 <h4 className="font-bold text-white text-base">
                   Hotline hỗ trợ miễn phí
                 </h4>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-300">
                   Gọi 1800.2097 để được tư vấn (7:30 - 22:00)
                 </p>
               </div>
@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
                 <h4 className="font-bold text-white text-base">
                   Giao hàng siêu tốc
                 </h4>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-300">
                   Miễn phí giao hàng toàn quốc từ 500k
                 </p>
               </div>
@@ -65,7 +65,7 @@ export const Footer: React.FC = () => {
       </div>
 
       {/* Main Footer columns */}
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
           {/* Column 1 */}
           <div>
@@ -74,7 +74,7 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-3 text-xs">
               <li className="flex items-center justify-between">
-                <span>Gọi mua hàng:</span>
+                <span className="text-gray-300">Gọi mua hàng:</span>
                 <a
                   href="tel:18002097"
                   className="text-primary font-bold hover:underline"
@@ -83,7 +83,7 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li className="flex items-center justify-between">
-                <span>Khiếu nại:</span>
+                <span className="text-gray-300">Khiếu nại:</span>
                 <a
                   href="tel:18002098"
                   className="text-primary font-bold hover:underline"
@@ -92,7 +92,7 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li className="flex items-center justify-between">
-                <span>Bảo hành:</span>
+                <span className="text-gray-300">Bảo hành:</span>
                 <a
                   href="tel:18002099"
                   className="text-primary font-bold hover:underline"
@@ -100,7 +100,7 @@ export const Footer: React.FC = () => {
                   1800.2099
                 </a>
               </li>
-              <li className="pt-2 text-gray-500">
+              <li className="pt-2 text-gray-300">
                 Giờ phục vụ: 7:30 - 22:00 (Hàng ngày)
               </li>
             </ul>
@@ -112,7 +112,7 @@ export const Footer: React.FC = () => {
               CHÍNH SÁCH MUA HÀNG
             </h3>
             <ul className="space-y-2 text-xs">
-              <li>
+              <li className="text-gray-300">
                 <Link
                   href="/products"
                   className="hover:text-primary transition flex items-center gap-1"
@@ -120,7 +120,7 @@ export const Footer: React.FC = () => {
                   <ArrowRight className="h-3 w-3" /> Quy định bảo hành
                 </Link>
               </li>
-              <li>
+              <li className="text-gray-300">
                 <Link
                   href="/products"
                   className="hover:text-primary transition flex items-center gap-1"
@@ -128,7 +128,7 @@ export const Footer: React.FC = () => {
                   <ArrowRight className="h-3 w-3" /> Giao hàng & thanh toán
                 </Link>
               </li>
-              <li>
+              <li className="text-gray-300">
                 <Link
                   href="/products"
                   className="hover:text-primary transition flex items-center gap-1"
@@ -136,7 +136,7 @@ export const Footer: React.FC = () => {
                   <ArrowRight className="h-3 w-3" /> Đổi trả sản phẩm lỗi
                 </Link>
               </li>
-              <li>
+              <li className="text-gray-300">
                 <Link
                   href="/products"
                   className="hover:text-primary transition flex items-center gap-1"
@@ -174,7 +174,7 @@ export const Footer: React.FC = () => {
                 </div>
               ))}
             </div>
-            <span className="text-xs text-gray-500 block">
+            <span className="text-xs text-gray-300 block">
               Thanh toán an toàn, bảo mật thông tin 100%.
             </span>
           </div>
@@ -187,7 +187,7 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-3 mb-6">
               <a
                 href="#"
-                className="h-10 w-10 bg-brand-dark hover:bg-[#4267b2] hover:text-white rounded-xl flex items-center justify-center transition"
+                className="h-10 w-10 bg-[#4267b2] text-white hover:bg-[#4267b2] hover:text-white rounded-full flex items-center justify-center transition"
                 title="Facebook"
               >
                 <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
@@ -196,7 +196,7 @@ export const Footer: React.FC = () => {
               </a>
               <a
                 href="#"
-                className="h-10 w-10 bg-brand-dark hover:bg-primary hover:text-white rounded-xl flex items-center justify-center transition"
+                className="h-10 w-10 bg-primary text-white hover:bg-primary hover:text-white rounded-full flex items-center justify-center transition"
                 title="YouTube"
               >
                 <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
@@ -205,7 +205,7 @@ export const Footer: React.FC = () => {
               </a>
             </div>
             <div className="text-xs text-gray-500 border-t border-brand-dark pt-4">
-              <span className="block font-bold text-gray-400">
+              <span className="block font-bold text-gray-300">
                 © 2026 PulseTech
               </span>
             </div>
