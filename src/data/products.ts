@@ -509,8 +509,8 @@ export const PRODUCTS: Product[] = [
       { name: 'Silver', hex: '#e3e4e5', image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop' }
     ],
     storages: [
-      { capacity: '512GB', priceOffset: 0 },
-      { capacity: '1TB', priceOffset: 5000000 }
+      { name: '512GB', priceOffset: 0 },
+      { name: '1TB', priceOffset: 5000000 }
     ],
     specs: {
       screen: '14.2 inch Liquid Retina XDR display',
@@ -519,6 +519,7 @@ export const PRODUCTS: Product[] = [
       frontCamera: '1080p',
       cpu: 'Apple M3 8-core',
       ram: '8GB',
+      storage: '512GB SSD',
       battery: '70Wh',
     },
     description: 'MacBook Pro 14 inch M3 mang đến sức mạnh đột phá cho mọi tác vụ sáng tạo và làm việc chuyên nghiệp. Màn hình Liquid Retina XDR rực rỡ và thời lượng pin bền bỉ.',
@@ -548,7 +549,7 @@ export const PRODUCTS: Product[] = [
       { name: 'Cream', hex: '#F0EAD6', image: 'https://images.unsplash.com/photo-1615592389070-bcc97e0504d3?q=80&w=800&auto=format&fit=crop' }
     ],
     storages: [
-      { capacity: 'Tiêu chuẩn', priceOffset: 0 }
+      { name: 'Tiêu chuẩn', priceOffset: 0 }
     ],
     specs: {
       screen: 'Không có',
@@ -557,6 +558,7 @@ export const PRODUCTS: Product[] = [
       frontCamera: 'Không có',
       cpu: 'Bluetooth 5.2',
       ram: 'Không có',
+      storage: 'Không có',
       battery: 'Cắm điện trực tiếp',
       accessoryType: 'Loa Bluetooth',
       audioFeature: 'Âm thanh vòm Stereo'

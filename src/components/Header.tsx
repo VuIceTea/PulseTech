@@ -99,7 +99,7 @@ export const Header: React.FC = () => {
             </Link>
 
             {/* Track Orders */}
-            <Link href="/cart" className="flex items-center gap-1.5 hover:bg-white/10 p-2 rounded-xl transition">
+            <Link href="/order-tracking" className="flex items-center gap-1.5 hover:bg-white/10 p-2 rounded-xl transition">
               <FileText className="h-4 w-4 shrink-0" />
               <div className="text-[10px] leading-tight text-left">
                 <span className="block font-normal text-white/80">Tra cứu</span>
