@@ -18,6 +18,15 @@ export interface ProductSpec {
   ram: string;
   storage: string;
   battery: string;
+  accessoryType?: string;
+  headphoneType?: string;
+  audioFeature?: string;
+  connectionType?: string;
+  cableLength?: string;
+  chargingPower?: string;
+  chargingPorts?: string;
+  caseMaterial?: string;
+  caseFeature?: string;
 }
 
 export interface Review {
@@ -32,7 +41,7 @@ export interface Product {
   id: string;
   name: string;
   brand: string;
-  category: 'phone' | 'tablet' | 'accessory';
+  category: 'phone' | 'tablet' | 'accessory' | 'laptop' | 'audio';
   basePrice: number;
   originalPrice: number;
   discount: number;
@@ -60,14 +69,14 @@ export const PRODUCTS: Product[] = [
     basePrice: 29990000,
     originalPrice: 34990000,
     discount: 14,
-    image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop',
+    image: '/hot-sale/iphone-15-pro-max.png',
     images: [
-      'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop'
+      '/hot-sale/iphone-15-pro-max.png'
     ],
     colors: [
-      { name: 'Titan Tự Nhiên', hex: '#8a7f76', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Titan Xanh', hex: '#2f3c4d', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Titan Đen', hex: '#232426', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Titan Tự Nhiên', hex: '#8a7f76', image: '/hot-sale/iphone-15-pro-max.png' },
+      { name: 'Titan Xanh', hex: '#2f3c4d', image: '/hot-sale/iphone-15-pro-max.png' },
+      { name: 'Titan Đen', hex: '#232426', image: '/hot-sale/iphone-15-pro-max.png' }
     ],
     storages: [
       { name: '256GB', priceOffset: 0 },
@@ -104,14 +113,14 @@ export const PRODUCTS: Product[] = [
     basePrice: 26990000,
     originalPrice: 33990000,
     discount: 20,
-    image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop',
+    image: '/hot-sale/samsung-galaxy-s24-ultra.png',
     images: [
-      'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop'
+      '/hot-sale/samsung-galaxy-s24-ultra.png'
     ],
     colors: [
-      { name: 'Xám Titan', hex: '#777777', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Tím Titan', hex: '#433d4f', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Vàng Titan', hex: '#d4af37', image: 'https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Xám Titan', hex: '#777777', image: '/hot-sale/samsung-galaxy-s24-ultra.png' },
+      { name: 'Tím Titan', hex: '#433d4f', image: '/hot-sale/samsung-galaxy-s24-ultra.png' },
+      { name: 'Vàng Titan', hex: '#d4af37', image: '/hot-sale/samsung-galaxy-s24-ultra.png' }
     ],
     storages: [
       { name: '256GB', priceOffset: 0 },
@@ -148,13 +157,13 @@ export const PRODUCTS: Product[] = [
     basePrice: 28990000,
     originalPrice: 32990000,
     discount: 12,
-    image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop',
+    image: '/hot-sale/xiaomi-14-ultra.png',
     images: [
-      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop'
+      '/hot-sale/xiaomi-14-ultra.png'
     ],
     colors: [
-      { name: 'Đen Tuyển', hex: '#111111', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Trắng Sữa', hex: '#f0f0f0', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Đen Tuyển', hex: '#111111', image: '/hot-sale/xiaomi-14-ultra.png' },
+      { name: 'Trắng Sữa', hex: '#f0f0f0', image: '/hot-sale/xiaomi-14-ultra.png' }
     ],
     storages: [
       { name: '512GB', priceOffset: 0 }
@@ -188,14 +197,14 @@ export const PRODUCTS: Product[] = [
     basePrice: 19490000,
     originalPrice: 22990000,
     discount: 15,
-    image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop',
+    image: '/hot-sale/iphone-15.png',
     images: [
-      'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop'
+      '/hot-sale/iphone-15.png'
     ],
     colors: [
-      { name: 'Xanh Dương', hex: '#c5e2ec', image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Hồng Phấn', hex: '#fad4d8', image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Đen Nhám', hex: '#222222', image: 'https://images.unsplash.com/photo-1565849906661-3f66bbd292ac?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Xanh Dương', hex: '#c5e2ec', image: '/hot-sale/iphone-15.png' },
+      { name: 'Hồng Phấn', hex: '#fad4d8', image: '/hot-sale/iphone-15.png' },
+      { name: 'Đen Nhám', hex: '#222222', image: '/hot-sale/iphone-15.png' }
     ],
     storages: [
       { name: '128GB', priceOffset: 0 },
@@ -230,13 +239,13 @@ export const PRODUCTS: Product[] = [
     basePrice: 9490000,
     originalPrice: 10990000,
     discount: 13,
-    image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop',
+    image: '/hot-sale/samsung-galaxy-a55.png',
     images: [
-      'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop'
+      '/hot-sale/samsung-galaxy-a55.png'
     ],
     colors: [
-      { name: 'Xanh Navy', hex: '#1b2c45', image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop' },
-      { name: 'Xanh Iceblue', hex: '#e2f4ff', image: 'https://images.unsplash.com/photo-1580910051074-3eb694886505?q=80&w=600&auto=format&fit=crop' }
+      { name: 'Xanh Navy', hex: '#1b2c45', image: '/hot-sale/samsung-galaxy-a55.png' },
+      { name: 'Xanh Iceblue', hex: '#e2f4ff', image: '/hot-sale/samsung-galaxy-a55.png' }
     ],
     storages: [
       { name: '128GB', priceOffset: 0 },
@@ -348,12 +357,12 @@ export const PRODUCTS: Product[] = [
     basePrice: 5790000,
     originalPrice: 6190000,
     discount: 6,
-    image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop',
+    image: '/accessories/airpod-pro-gen2.png',
     images: [
-      'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop'
+      '/accessories/airpod-pro-gen2.png'
     ],
     colors: [
-      { name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=600&auto=format&fit=crop' }
+      { name: 'Trắng', hex: '#ffffff', image: '/accessories/airpod-pro-gen2.png' }
     ],
     storages: [
       { name: 'Tiêu Chuẩn', priceOffset: 0 }
@@ -366,7 +375,10 @@ export const PRODUCTS: Product[] = [
       cpu: 'Chip Apple H2 cực mạnh',
       ram: 'Không có',
       storage: 'Không có',
-      battery: 'Lên đến 6 giờ nghe (30 giờ kèm hộp sạc)'
+      battery: 'Lên đến 6 giờ nghe (30 giờ kèm hộp sạc)',
+      accessoryType: 'Tai nghe',
+      headphoneType: 'True Wireless',
+      audioFeature: 'Chống ồn ANC'
     },
     description: 'Tai nghe AirPods Pro thế hệ thứ 2 mang đến khả năng chống ồn chủ động tốt gấp 2 lần bản cũ, chế độ Xuyên Âm thích ứng thông minh và âm thanh cá nhân hóa theo cấu trúc tai người dùng.',
     rating: 4.8,
@@ -385,9 +397,9 @@ export const PRODUCTS: Product[] = [
     basePrice: 490000,
     originalPrice: 590000,
     discount: 17,
-    image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop',
-    images: ['https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop'],
-    colors: [{ name: 'Trắng', hex: '#ffffff', image: 'https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&auto=format&fit=crop' }],
+    image: '/accessories/day-sac-nhanh-typec-to-lightning.webp',
+    images: ['/accessories/day-sac-nhanh-typec-to-lightning.webp'],
+    colors: [{ name: 'Trắng', hex: '#ffffff', image: '/accessories/day-sac-nhanh-typec-to-lightning.webp' }],
     storages: [{ name: '1m', priceOffset: 0 }],
     specs: {
       screen: 'Không có',
@@ -397,7 +409,10 @@ export const PRODUCTS: Product[] = [
       cpu: 'Không có',
       ram: 'Không có',
       storage: 'Không có',
-      battery: 'Không có'
+      battery: 'Không có',
+      accessoryType: 'Cáp sạc',
+      connectionType: 'Type-C to Lightning',
+      cableLength: '1m'
     },
     description: 'Cáp sạc chính hãng Apple hỗ trợ sạc nhanh và truyền tải dữ liệu cực ổn định.',
     rating: 4.7,
@@ -416,9 +431,9 @@ export const PRODUCTS: Product[] = [
     basePrice: 350000,
     originalPrice: 450000,
     discount: 22,
-    image: 'https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop',
-    images: ['https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop'],
-    colors: [{ name: 'Đen', hex: '#000000', image: 'https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop' }],
+    image: '/accessories/cu-sac-nhanh-samsung-typeC.webp',
+    images: ['/accessories/cu-sac-nhanh-samsung-typeC.webp'],
+    colors: [{ name: 'Đen', hex: '#000000', image: '/accessories/cu-sac-nhanh-samsung-typeC.webp' }],
     storages: [{ name: '25W', priceOffset: 0 }],
     specs: {
       screen: 'Không có',
@@ -428,7 +443,10 @@ export const PRODUCTS: Product[] = [
       cpu: 'Không có',
       ram: 'Không có',
       storage: 'Không có',
-      battery: 'Không có'
+      battery: 'Không có',
+      accessoryType: 'Củ sạc',
+      chargingPower: '25W',
+      chargingPorts: '1 cổng Type-C'
     },
     description: 'Củ sạc nhanh Samsung công suất 25W, ổn định dòng điện, an toàn tuyệt đối khi sử dụng.',
     rating: 4.8,
@@ -447,9 +465,9 @@ export const PRODUCTS: Product[] = [
     basePrice: 990000,
     originalPrice: 1290000,
     discount: 23,
-    image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?q=80&w=600&auto=format&fit=crop',
-    images: ['https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?q=80&w=600&auto=format&fit=crop'],
-    colors: [{ name: 'Xanh Lá', hex: '#4b5320', image: 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?q=80&w=600&auto=format&fit=crop' }],
+    image: '/accessories/op-lung-iphone-15-pro-trong-suot-magsafe.png',
+    images: ['/accessories/op-lung-iphone-15-pro-trong-suot-magsafe.png'],
+    colors: [{ name: 'Xanh Lá', hex: '#4b5320', image: '/accessories/op-lung-iphone-15-pro-trong-suot-magsafe.png' }],
     storages: [{ name: 'Tiêu Chuẩn', priceOffset: 0 }],
     specs: {
       screen: 'Không có',
@@ -459,7 +477,10 @@ export const PRODUCTS: Product[] = [
       cpu: 'Không có',
       ram: 'Không có',
       storage: 'Không có',
-      battery: 'Không có'
+      battery: 'Không có',
+      accessoryType: 'Ốp lưng',
+      caseMaterial: 'Silicon',
+      caseFeature: 'Hỗ trợ MagSafe'
     },
     description: 'Ốp lưng tích hợp vòng nam châm MagSafe từ tính, ôm khít bảo vệ điện thoại khỏi va đập.',
     rating: 4.9,
@@ -469,12 +490,93 @@ export const PRODUCTS: Product[] = [
     isFlashSale: false,
     badge: 'Hỗ trợ MagSafe',
     stock: 50
+  },
+  {
+    id: 'macbook-pro-m3-14',
+    name: 'MacBook Pro 14 inch M3 2023',
+    brand: 'Apple',
+    category: 'laptop',
+    basePrice: 39990000,
+    originalPrice: 42990000,
+    discount: 7,
+    image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop'
+    ],
+    colors: [
+      { name: 'Space Gray', hex: '#535150', image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Silver', hex: '#e3e4e5', image: 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?q=80&w=800&auto=format&fit=crop' }
+    ],
+    storages: [
+      { capacity: '512GB', priceOffset: 0 },
+      { capacity: '1TB', priceOffset: 5000000 }
+    ],
+    specs: {
+      screen: '14.2 inch Liquid Retina XDR display',
+      os: 'macOS',
+      camera: '1080p FaceTime HD camera',
+      frontCamera: '1080p',
+      cpu: 'Apple M3 8-core',
+      ram: '8GB',
+      battery: '70Wh',
+    },
+    description: 'MacBook Pro 14 inch M3 mang đến sức mạnh đột phá cho mọi tác vụ sáng tạo và làm việc chuyên nghiệp. Màn hình Liquid Retina XDR rực rỡ và thời lượng pin bền bỉ.',
+    rating: 5.0,
+    reviewsCount: 15,
+    reviews: [],
+    isFeatured: true,
+    isFlashSale: false,
+    badge: 'Mới ra mắt',
+    stock: 20
+  },
+  {
+    id: 'marshall-stanmore-3',
+    name: 'Loa Bluetooth Marshall Stanmore 3',
+    brand: 'Marshall',
+    category: 'audio',
+    basePrice: 8990000,
+    originalPrice: 10490000,
+    discount: 14,
+    image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=800&auto=format&fit=crop',
+    images: [
+      'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1615592389070-bcc97e0504d3?q=80&w=800&auto=format&fit=crop'
+    ],
+    colors: [
+      { name: 'Black', hex: '#000000', image: 'https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=800&auto=format&fit=crop' },
+      { name: 'Cream', hex: '#F0EAD6', image: 'https://images.unsplash.com/photo-1615592389070-bcc97e0504d3?q=80&w=800&auto=format&fit=crop' }
+    ],
+    storages: [
+      { capacity: 'Tiêu chuẩn', priceOffset: 0 }
+    ],
+    specs: {
+      screen: 'Không có',
+      os: 'Không có',
+      camera: 'Không có',
+      frontCamera: 'Không có',
+      cpu: 'Bluetooth 5.2',
+      ram: 'Không có',
+      battery: 'Cắm điện trực tiếp',
+      accessoryType: 'Loa Bluetooth',
+      audioFeature: 'Âm thanh vòm Stereo'
+    },
+    description: 'Marshall Stanmore III mang đến âm thanh đặc trưng của Marshall với âm trường rộng hơn thiết kế tiền nhiệm. Thiết kế cổ điển sang trọng phù hợp mọi không gian.',
+    rating: 4.8,
+    reviewsCount: 52,
+    reviews: [],
+    isFeatured: true,
+    isFlashSale: true,
+    badge: 'Đang Hot',
+    stock: 40
   }
 ];
 
-export const BRANDS = ['Apple', 'Samsung', 'Xiaomi', 'Oppo'];
+export const BRANDS = ['Apple', 'Samsung', 'Xiaomi', 'Oppo', 'Asus', 'Dell', 'Sony', 'Marshall'];
 export const CATEGORIES = [
   { id: 'phone', name: 'Điện thoại', count: 5 },
   { id: 'tablet', name: 'Máy tính bảng', count: 2 },
+  { id: 'laptop', name: 'Laptop', count: 1 },
+  { id: 'audio', name: 'Âm thanh', count: 1 },
   { id: 'accessory', name: 'Phụ kiện', count: 4 }
 ];

@@ -13,7 +13,14 @@ import {
   LogOut,
   Menu,
   X,
-  Smartphone
+  Smartphone,
+  Tablet,
+  Headphones,
+  Watch,
+  Laptop,
+  Volume2,
+  RefreshCw,
+  ChevronRight
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -38,7 +45,7 @@ export const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-50 w-full text-white shadow-md glass-header">
       {/* Top Header Bar */}
-      <div className="mx-auto max-w-7xl px-4 py-2 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1400px] px-4 py-2 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4 h-14">
 
           {/* Logo */}
@@ -169,7 +176,7 @@ export const Header: React.FC = () => {
             {/* Mobile Hamburger Menu button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 bg-white/15 hover:bg-white/20 rounded-xl transition duration-200"
+              className="lg:hidden p-2 rounded-xl hover:bg-white/10 transition duration-200"
             >
               {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -185,11 +192,11 @@ export const Header: React.FC = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-white/10 bg-primary-dark shadow-inner overflow-hidden"
+            className="lg:hidden border-t border-white/10 bg-primary-dark shadow-inner overflow-hidden"
           >
             <div className="px-4 py-4 space-y-4">
               {/* Mobile Search */}
-              <form onSubmit={handleSearch} className="relative w-full">
+              <form onSubmit={handleSearch} className="md:hidden relative w-full">
                 <input
                   type="text"
                   placeholder="Bạn cần tìm gì hôm nay?"
@@ -200,40 +207,32 @@ export const Header: React.FC = () => {
                 <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               </form>
 
-              {/* Mobile Nav Links */}
-              <nav className="flex flex-col gap-2 font-medium text-sm">
-                <Link
-                  href="/products"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/10 transition"
-                >
-                  <Smartphone className="h-5 w-5" />
-                  Tất cả sản phẩm
-                </Link>
-                <Link
-                  href="/products?category=phone"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/10 transition"
-                >
-                  <Smartphone className="h-5 w-5" />
-                  Điện thoại di động
-                </Link>
-                <Link
-                  href="/products?category=tablet"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/10 transition text-white"
-                >
-                  <Smartphone className="h-5 w-5" />
-                  Máy tính bảng
-                </Link>
-                <a
-                  href="tel:18002097"
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/10 transition text-white"
-                >
-                  <Phone className="h-5 w-5" />
-                  Hotline hỗ trợ: 1800.2097
-                </a>
+              {/* Mobile Category Links (styled like the screenshot) */}
+              <nav className="flex flex-col w-full bg-white rounded-2xl p-2 shadow-sm">
+                {[
+                  { id: 1, name: 'Điện thoại di động', icon: <Smartphone className="h-4 w-4" />, link: '/products?category=phone' },
+                  { id: 2, name: 'Máy tính bảng (Tablet)', icon: <Tablet className="h-4 w-4" />, link: '/products?category=tablet' },
+                  { id: 3, name: 'Phụ kiện công nghệ', icon: <Headphones className="h-4 w-4" />, link: '/products?category=accessory' },
+                  { id: 4, name: 'Smartwatch (Đồng hồ)', icon: <Watch className="h-4 w-4" />, link: '/products' },
+                  { id: 5, name: 'Laptop & Màn hình', icon: <Laptop className="h-4 w-4" />, link: '/products' },
+                  { id: 6, name: 'Thiết bị âm thanh', icon: <Volume2 className="h-4 w-4" />, link: '/products?category=accessory' },
+                  { id: 7, name: 'Thu cũ đổi mới', icon: <RefreshCw className="h-4 w-4" />, link: '/trade-in' },
+                ].map((cat) => (
+                  <Link
+                    key={cat.id}
+                    href={cat.link}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-3 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 hover:text-primary transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-gray-400">{cat.icon}</span>
+                      <span>{cat.name}</span>
+                    </div>
+                    <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+                  </Link>
+                ))}
               </nav>
+
             </div>
           </motion.div>
         )}

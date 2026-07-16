@@ -3,10 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Star, ShoppingCart, Percent } from 'lucide-react';
+import { Star, ShoppingCart, Percent, Sparkles } from 'lucide-react';
 import { Product } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -22,6 +23,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   // Calculate discounted price
   const discountedPrice = Math.round(product.basePrice * (1 - product.discount / 100));
+
+  // Dynamic badge color
+  const getBadgeColor = (badge: string) => {
+    const text = badge.toLowerCase();
+    if (text.includes('trả góp')) return 'bg-blue-500';
+    if (text.includes('độc quyền') || text.includes('s-pen')) return 'bg-purple-500';
+    if (text.includes('bán chạy') || text.includes('chính hãng')) return 'bg-green-500';
+    if (text.includes('giá rẻ') || text.includes('mỏng')) return 'bg-orange-500';
+    return 'bg-brand-black';
+  };
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to detail page when clicking button
@@ -52,15 +63,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     >
       <Link href={`/products/${product.id}`} className="flex flex-col flex-1">
         {/* Top Badges */}
-        <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
-          {product.badge && (
-            <span className="bg-brand-black text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg tracking-wider uppercase shadow-sm">
-              {product.badge}
+        <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 items-start">
+          {product.discount > 0 && (
+            <span className="bg-gradient-to-r from-red-500 to-[#ff2b54] text-white text-[10px] font-bold px-2.5 py-1 rounded-tl-xl rounded-br-xl shadow-sm flex items-center gap-0.5">
+              <Percent className="h-2.5 w-2.5" /> Giảm {product.discount}%
             </span>
           )}
-          {product.discount > 0 && (
-            <span className="bg-primary text-white text-[10px] font-extrabold px-2 py-0.5 rounded-lg flex items-center gap-0.5 shadow-sm">
-              <Percent className="h-3 w-3" /> Giảm {product.discount}%
+          {product.badge && (
+            <span className={cn(getBadgeColor(product.badge), "text-white text-[10px] font-bold px-2.5 py-1 rounded-tl-xl rounded-br-xl shadow-sm")}>
+              {product.badge}
             </span>
           )}
         </div>
@@ -75,7 +86,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Brand */}
-        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1 block">
+        <span className="bg-black text-white text-[9px] font-bold uppercase tracking-wider mb-2 px-2 py-0.5 rounded-md w-fit inline-block">
           {product.brand}
         </span>
 
@@ -84,14 +95,30 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {product.name}
         </h3>
 
-        {/* High-end specs tag */}
-        <div className="flex flex-wrap gap-1 mb-3">
-          <span className="bg-gray-100 text-gray-600 text-[9px] font-semibold px-2 py-0.5 rounded-md">
-            RAM {product.specs.ram.split(' ')[0]}
-          </span>
-          <span className="bg-gray-100 text-gray-600 text-[9px] font-semibold px-2 py-0.5 rounded-md">
-            {product.specs.screen.split(',')[0]}
-          </span>
+        {/* Đặc điểm nổi bật */}
+        <div className="bg-[#f8f9fa] rounded-lg p-2.5 mb-3 flex-1">
+          <p className="text-[10px] font-bold text-gray-700 mb-1.5 flex items-center gap-1">
+            <Sparkles className="h-3 w-3 text-yellow-500" /> Đặc điểm nổi bật
+          </p>
+          <ul className="text-[9px] text-gray-600 space-y-1">
+            {['phone', 'tablet', 'laptop'].includes(product.category) ? (
+              <>
+                {product.specs.screen && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>{product.specs.screen}</li>}
+                {product.specs.cpu && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>Chip: {product.specs.cpu}</li>}
+                {product.specs.battery && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>Pin: {product.specs.battery}</li>}
+              </>
+            ) : ['accessory', 'audio'].includes(product.category) ? (
+              <>
+                {product.specs.accessoryType && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>Loại: {product.specs.accessoryType}</li>}
+                {product.specs.audioFeature && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>Âm thanh: {product.specs.audioFeature}</li>}
+                {product.specs.chargingPower && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>Công suất: {product.specs.chargingPower}</li>}
+                {product.specs.caseFeature && <li className="line-clamp-1"><span className="text-gray-400 mr-1">•</span>Tính năng: {product.specs.caseFeature}</li>}
+                {!product.specs.audioFeature && !product.specs.chargingPower && !product.specs.caseFeature && (
+                  <li className="line-clamp-2"><span className="text-gray-400 mr-1">•</span>Thiết kế cao cấp, độ bền vượt trội</li>
+                )}
+              </>
+            ) : null}
+          </ul>
         </div>
 
         {/* Ratings */}
@@ -125,10 +152,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Quick Add Button */}
           <button
             onClick={handleQuickAdd}
-            className="bg-brand-black hover:bg-primary text-white p-2.5 rounded-2xl transition-all duration-300 shrink-0 group/btn shadow-md active:scale-95"
+            className="text-primary hover:text-[#d70018f2] transition-all duration-300 shrink-0 group/btn active:scale-95 p-1 cursor-pointer"
             title="Thêm nhanh vào giỏ hàng"
           >
-            <ShoppingCart className="h-4 w-4 transition-transform group-hover/btn:rotate-12" />
+            <ShoppingCart className="h-5 w-5 transition-transform group-hover/btn:scale-110" />
           </button>
         </div>
       </Link>

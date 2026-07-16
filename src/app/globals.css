@@ -113,3 +113,13 @@ h6 {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Global cursor pointer for interactive elements and hover states */
+a,
+button,
+[role="button"],
+[class*="hover:"],
+[class*="group-hover:"],
+[class*="peer-hover:"] {
+  cursor: pointer;
+}

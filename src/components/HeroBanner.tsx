@@ -287,7 +287,7 @@ export const HeroBanner: React.FC = () => {
       id: 7,
       name: 'Thu cũ đổi mới',
       icon: <RefreshCw className="h-4 w-4" />,
-      link: '/products',
+      link: '/trade-in',
       megaMenu: [
         {
           title: 'Quy trình thu cũ',
@@ -309,7 +309,7 @@ export const HeroBanner: React.FC = () => {
   ];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <section className="mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
       <div
         className="relative grid grid-cols-1 lg:grid-cols-12 gap-4"
         onMouseLeave={() => setHoveredCategory(null)}
