@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { PRODUCTS } from '@/data/products';
+import { api } from '@/lib/api';
 import { ProductDetailClient } from './ProductDetailClient';
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 export default async function ProductDetailPage({ params }: Props) {
   const { id } = await params;
   
-  const product = PRODUCTS.find(p => p.id === id);
+  const product = await api.product(id).catch(() => null);
 
   if (!product) {
     notFound();

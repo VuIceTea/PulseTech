@@ -1,167 +1,74 @@
 'use client';
 
-import React, { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import { Mail, Lock, ShieldAlert, Sparkles, LogIn } from 'lucide-react';
+import { Lock, Mail, ShieldAlert, Eye, EyeOff } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
+import { AUTH_LIMITS, validateEmail, validatePassword } from '@/lib/auth-validation';
+
+type LoginErrors = { email?: string; password?: string; form?: string };
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, user } = useAuth();
-
-  // Form States
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<LoginErrors>({});
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsPageLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  useEffect(() => { if (user) router.replace('/'); }, [router, user]);
 
-  // Redirect if already logged in
-  if (user) {
-    router.push('/');
-    return null;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (password.length < 6) {
-      setError('Mật khẩu phải có ít nhất 6 ký tự.');
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    const nextErrors: LoginErrors = {
+      email: validateEmail(email),
+      password: validatePassword(password, false),
+    };
+    if (nextErrors.email || nextErrors.password) {
+      setErrors(nextErrors);
       return;
     }
 
+    setErrors({});
     setLoading(true);
-    try {
-      const success = await login(email, password);
-      if (success) {
-        router.push('/');
+    const result = await login(email.trim().toLowerCase(), password);
+    setLoading(false);
+    if (result.success) {
+      router.push('/');
+    } else {
+      let errorMsg = result.message ?? 'Đăng nhập thất bại.';
+      const lowerMsg = errorMsg.toLowerCase();
+      if (lowerMsg.includes('bad credentials') || lowerMsg.includes('unauthorized') || lowerMsg.includes('not found') || lowerMsg.includes('incorrect') || lowerMsg.includes('wrong') || lowerMsg.includes('401')) {
+        errorMsg = 'Email hoặc mật khẩu không chính xác.';
+      } else if (lowerMsg.includes('disabled') || lowerMsg.includes('verify') || lowerMsg.includes('active')) {
+        errorMsg = 'Tài khoản chưa được xác thực. Vui lòng kiểm tra email của bạn.';
       } else {
-        setError('Đăng nhập thất bại. Email hoặc mật khẩu không đúng.');
+        errorMsg = 'Đăng nhập thất bại. Vui lòng kiểm tra lại thông tin.';
       }
-    } catch (err) {
-      setError('Đã có lỗi xảy ra. Vui lòng thử lại.');
-    } finally {
-      setLoading(false);
+      toast.error(errorMsg);
     }
   };
 
-  if (isPageLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center py-16 px-4 bg-[#f8f9fa] font-semibold animate-pulse">
-        <div className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col gap-6 h-[400px]">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mx-auto" />
-          <div className="h-4 bg-gray-150 rounded w-2/3 mx-auto" />
-          <div className="space-y-4 mt-6">
-            <div className="h-10 bg-gray-200 rounded-2xl w-full" />
-            <div className="h-10 bg-gray-200 rounded-2xl w-full" />
-          </div>
-          <div className="h-12 bg-gray-200 rounded-2xl w-full mt-6" />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex-1 flex items-center justify-center py-16 px-4 bg-[#f8f9fa] font-semibold">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="w-full max-w-md bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden"
-      >
-        {/* Glow styling */}
-        <div className="absolute -top-16 -left-16 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
-
-        {/* Heading */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 group mb-3">
-            <span className="font-display font-extrabold text-lg tracking-wider uppercase">
-              Pulse<span className="text-brand-black">Tech</span>
-            </span>
+    <main className="flex flex-1 items-center justify-center bg-[#f8f9fa] px-4 py-16">
+      <motion.section initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-7 shadow-2xl">
+        <div className="mb-7 text-center">
+          <Link href="/" className="inline-block rounded-xl bg-[#d70018f2] px-4 py-2 font-display text-xl font-extrabold uppercase tracking-wider text-white shadow-md transition-transform hover:scale-105">
+            Pulse<span className="text-brand-black">Tech</span>
           </Link>
-          <h2 className="font-display font-extrabold text-xl sm:text-2xl text-brand-black">ĐĂNG NHẬP TÀI KHOẢN</h2>
-          <p className="text-xs text-gray-500 mt-1.5 font-semibold">Mua sắm thiết bị di động với ưu đãi thành viên</p>
+          <h1 className="mt-5 text-2xl font-extrabold text-brand-black">Đăng nhập tài khoản</h1>
         </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-
-          {/* Email */}
-          <div>
-            <label className="text-xs font-bold text-gray-500 block mb-1">Địa chỉ Email</label>
-            <div className="relative">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="example@gmail.com"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pl-10 text-xs focus:outline-none focus:border-primary text-brand-black"
-              />
-              <Mail className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-xs font-bold text-gray-500">Mật khẩu</label>
-              <a href="#" className="text-[10px] text-primary hover:underline">Quên mật khẩu?</a>
-            </div>
-            <div className="relative">
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Tối thiểu 6 ký tự"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 pl-10 text-xs focus:outline-none focus:border-primary text-brand-black"
-              />
-              <Lock className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-            </div>
-          </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border border-red-100 rounded-xl px-3 py-2 text-[10px] text-primary font-bold flex items-center gap-1.5 animate-shake">
-              <ShieldAlert className="h-4 w-4 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex items-center justify-center gap-1.5"
-          >
-            {loading ? (
-              <div className="w-4.5 h-4.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <LogIn className="h-4.5 w-4.5" /> Đăng Nhập
-              </>
-            )}
-          </button>
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <label className="block text-xs font-bold text-gray-700">Địa chỉ email<span className="relative mt-1 block"><input required type="email" autoComplete="email" maxLength={AUTH_LIMITS.emailMax} value={email} onChange={(event) => { setEmail(event.target.value); setErrors((current) => ({ ...current, email: undefined, form: undefined })); }} aria-invalid={!!errors.email} className={`w-full rounded-xl border bg-gray-50 py-2.5 pl-10 pr-4 text-xs text-brand-black outline-none transition-colors ${errors.email ? 'border-primary' : 'border-gray-200 focus:border-primary focus:bg-white'}`} placeholder="example@gmail.com" /><Mail className="absolute left-3.5 top-2.5 text-gray-400" size={16} /></span>{errors.email && <span className="mt-1.5 block text-[11px] text-primary">{errors.email}</span>}</label>
+          <label className="block text-xs font-bold text-gray-700">Mật khẩu<span className="relative mt-1 block"><input required type={showPassword ? 'text' : 'password'} autoComplete="current-password" minLength={AUTH_LIMITS.passwordMin} maxLength={AUTH_LIMITS.passwordMax} value={password} onChange={(event) => { setPassword(event.target.value); setErrors((current) => ({ ...current, password: undefined, form: undefined })); }} aria-invalid={!!errors.password} className={`w-full rounded-xl border bg-gray-50 py-2.5 pl-10 pr-10 text-xs text-brand-black outline-none transition-colors ${errors.password ? 'border-primary' : 'border-gray-200 focus:border-primary focus:bg-white'}`} placeholder="Từ 8 đến 72 ký tự" /><Lock className="absolute left-3.5 top-2.5 text-gray-400" size={16} /><button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-2.5 text-gray-400 hover:text-brand-black">{showPassword ? <EyeOff size={16} /> : <Eye size={16} />}</button></span>{errors.password && <span className="mt-1.5 block text-[11px] text-primary">{errors.password}</span>}</label>
+          <button type="submit" disabled={loading} className="w-full rounded-xl bg-primary py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 transition-colors">{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</button>
         </form>
-
-        {/* Footnote */}
-        <p className="text-xs text-gray-500 font-semibold text-center mt-6">
-          Chưa có tài khoản?{' '}
-          <Link href="/register" className="text-primary font-bold hover:underline">
-            Đăng ký ngay
-          </Link>
-        </p>
-
-      </motion.div>
-    </div>
+        <p className="mt-6 text-center text-xs font-semibold text-gray-600">Chưa có tài khoản? <Link href="/register" className="font-bold text-primary hover:underline">Đăng ký ngay</Link></p>
+      </motion.section>
+    </main>
   );
 }

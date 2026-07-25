@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Star, Flame, Truck, ChevronLeft, ChevronRight } from 'lucide-react';
-import { PRODUCTS } from '@/data/products';
+import { useProducts } from '@/hooks/useProducts';
 
 export const FlashSale: React.FC = () => {
-  const dealProducts = PRODUCTS.filter(p => p.discount > 0).slice(0, 5);
+  const { products } = useProducts();
+  const dealProducts = products.filter(p => p.discount > 0).slice(0, 5);
 
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 2, minutes: 11, seconds: 54 });
 
