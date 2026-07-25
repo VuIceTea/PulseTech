@@ -9,12 +9,12 @@ const POLICIES = [
   {
     id: 'warranty',
     title: 'Quy định bảo hành',
-    icon: <ShieldCheck className="h-5 w-5" />,
+    icon: <img src="https://img.icons8.com/fluency/48/approval.png" alt="Bảo hành" className="h-5 w-5 object-contain" />,
     content: (
       <div className="prose max-w-none text-gray-600">
         <h2 className="text-2xl font-bold text-brand-black mb-6">Chính Sách & Quy Định Bảo Hành</h2>
         <p className="mb-4">PulseTech cam kết mang đến những sản phẩm công nghệ chính hãng với chất lượng tốt nhất cùng chính sách bảo hành minh bạch, bảo vệ tối đa quyền lợi của khách hàng.</p>
-        
+
         <h3 className="text-lg font-bold text-brand-black mt-8 mb-4">1. Thời hạn bảo hành</h3>
         <ul className="list-disc pl-5 space-y-2 mb-6">
           <li><strong>Điện thoại, Máy tính bảng, Laptop:</strong> Bảo hành chính hãng 12 tháng kể từ ngày mua hàng.</li>
@@ -35,7 +35,7 @@ const POLICIES = [
           <li>Sử dụng sai điện áp quy định gây chập cháy.</li>
           <li>Sản phẩm đã bị can thiệp phần cứng hoặc phần mềm (Root, Jailbreak) bởi các bên không được ủy quyền.</li>
         </ul>
-        
+
         <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 mt-8">
           <p className="text-blue-800 font-medium m-0">
             <strong>Lưu ý:</strong> Quý khách vui lòng sao lưu toàn bộ dữ liệu cá nhân trước khi mang máy đến trung tâm bảo hành. PulseTech không chịu trách nhiệm đối với bất kỳ mất mát dữ liệu nào trong quá trình xử lý.
@@ -47,12 +47,12 @@ const POLICIES = [
   {
     id: 'shipping',
     title: 'Giao hàng & thanh toán',
-    icon: <Truck className="h-5 w-5" />,
+    icon: <img src="https://img.icons8.com/fluency/48/delivery.png" alt="Giao hàng" className="h-5 w-5 object-contain" />,
     content: (
       <div className="prose max-w-none text-gray-600">
         <h2 className="text-2xl font-bold text-brand-black mb-6">Chính Sách Giao Hàng & Thanh Toán</h2>
         <p className="mb-4">Nhằm mang lại trải nghiệm mua sắm tiện lợi nhất, PulseTech cung cấp dịch vụ giao hàng tận nơi trên toàn quốc với thời gian siêu tốc và đa dạng phương thức thanh toán.</p>
-        
+
         <h3 className="text-lg font-bold text-brand-black mt-8 mb-4">1. Chính sách giao hàng</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
@@ -83,12 +83,12 @@ const POLICIES = [
   {
     id: 'return',
     title: 'Đổi trả sản phẩm lỗi',
-    icon: <RefreshCcw className="h-5 w-5" />,
+    icon: <img src="https://img.icons8.com/fluency/48/refresh.png" alt="Đổi trả" className="h-5 w-5 object-contain" />,
     content: (
       <div className="prose max-w-none text-gray-600">
         <h2 className="text-2xl font-bold text-brand-black mb-6">Chính Sách Đổi Trả Miễn Phí 30 Ngày</h2>
         <p className="mb-6">PulseTech tự hào áp dụng chính sách <strong>"Lỗi là đổi mới"</strong> trong 30 ngày đầu tiên, giúp khách hàng hoàn toàn an tâm khi mua sắm các thiết bị công nghệ đắt tiền.</p>
-        
+
         <div className="bg-red-50 p-6 rounded-2xl border border-red-100 mb-8">
           <h3 className="text-lg font-bold text-red-700 mt-0 mb-3">Điều kiện áp dụng 1 ĐỔI 1</h3>
           <ul className="list-disc pl-5 space-y-2 text-red-900 m-0">
@@ -111,12 +111,12 @@ const POLICIES = [
   {
     id: 'terms',
     title: 'Điều khoản dịch vụ',
-    icon: <FileText className="h-5 w-5" />,
+    icon: <img src="https://img.icons8.com/fluency/48/task.png" alt="Điều khoản" className="h-5 w-5 object-contain" />,
     content: (
       <div className="prose max-w-none text-gray-600">
         <h2 className="text-2xl font-bold text-brand-black mb-6">Điều Khoản & Điều Kiện Giao Dịch</h2>
         <p className="mb-4">Chào mừng quý khách đến với website thương mại điện tử PulseTech. Khi quý khách truy cập và mua sắm tại website của chúng tôi, đồng nghĩa với việc quý khách đã đồng ý với các điều khoản dưới đây.</p>
-        
+
         <h3 className="text-lg font-bold text-brand-black mt-8 mb-4">1. Quyền lợi và trách nhiệm của khách hàng</h3>
         <ul className="list-disc pl-5 space-y-2 mb-6">
           <li>Cung cấp thông tin cá nhân (Tên, SĐT, Địa chỉ) chính xác để chúng tôi thực hiện giao hàng.</li>
@@ -137,7 +137,7 @@ const POLICIES = [
 export default function PoliciesPage() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type');
-  
+
   const [activeTab, setActiveTab] = useState('warranty');
 
   // Sync state with URL param on mount and when param changes
@@ -157,7 +157,7 @@ export default function PoliciesPage() {
           <h1 className="text-3xl md:text-4xl font-display font-extrabold text-white tracking-wide uppercase mb-4">
             Trung Tâm Hỗ Trợ & Chính Sách
           </h1>
-          <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
+          <p className="text-gray-100 text-sm md:text-base max-w-2xl mx-auto">
             Cam kết minh bạch trong mọi giao dịch. Tìm hiểu các quy định, chính sách bảo hành, đổi trả và giao hàng tại PulseTech.
           </p>
         </div>
@@ -165,7 +165,7 @@ export default function PoliciesPage() {
 
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
-          
+
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8">
             <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
@@ -174,7 +174,7 @@ export default function PoliciesPage() {
           </div>
 
           <div className="flex flex-col md:flex-row gap-8 items-start">
-            
+
             {/* Sidebar Menu */}
             <div className="w-full md:w-1/3 lg:w-1/4 bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden sticky top-24">
               <div className="p-6 border-b border-gray-100 bg-gray-50/50">
@@ -185,11 +185,10 @@ export default function PoliciesPage() {
                   <button
                     key={policy.id}
                     onClick={() => setActiveTab(policy.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm transition-all duration-300 text-left mb-1 ${
-                      activeTab === policy.id 
-                        ? 'bg-red-50 text-red-600' 
+                    className={`w-full flex items-center gap-3 px-4 py-4 rounded-2xl font-semibold text-sm transition-all duration-300 text-left mb-1 ${activeTab === policy.id
+                        ? 'bg-red-50 text-red-600'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-brand-black'
-                    }`}
+                      }`}
                   >
                     <span className={`${activeTab === policy.id ? 'text-red-500' : 'text-gray-400'}`}>
                       {policy.icon}

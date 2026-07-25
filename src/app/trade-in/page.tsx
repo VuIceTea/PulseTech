@@ -2,19 +2,19 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  RefreshCw, 
-  Smartphone, 
-  Search, 
-  CheckCircle2, 
-  CreditCard, 
-  Store, 
-  Laptop, 
+import {
+  RefreshCw,
+  Smartphone,
+  Search,
+  CheckCircle2,
+  CreditCard,
+  Store,
+  Laptop,
   Watch,
   Volume2,
   ChevronRight
 } from 'lucide-react';
-import { CATEGORIES, BRANDS } from '@/data/products';
+import { CATEGORIES, BRANDS } from '@/config/catalog';
 
 export default function TradeInPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('phone');
@@ -30,17 +30,17 @@ export default function TradeInPage() {
     { id: 6, name: 'AirPods Pro 2', category: 'audio', brand: 'Apple', priceType1: 3000000, priceType2: 2500000, priceType3: 18000000, img: 'https://images.unsplash.com/photo-1606220838315-056192d5e927?q=80&w=800&auto=format&fit=crop' },
   ];
 
-  const filteredDevices = tradeInDevices.filter(d => 
-    d.category === selectedCategory && 
+  const filteredDevices = tradeInDevices.filter(d =>
+    d.category === selectedCategory &&
     d.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
-      
-      <main className="flex-1 pt-24 pb-20">
+
+      <main className="flex-1 pt-3 pb-20">
         <div className="container mx-auto px-4 max-w-7xl">
-          
+
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
@@ -54,7 +54,7 @@ export default function TradeInPage() {
             <div className="relative z-10 px-6 py-12 md:py-20 md:px-16 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="text-white max-w-2xl">
                 <h1 className="text-3xl md:text-5xl font-display font-extrabold mb-4 uppercase tracking-tight">
-                  Thu Cũ Đổi Mới <br/>
+                  Thu Cũ Đổi Mới <br />
                   <span className="text-yellow-400">Trợ Giá Lên Đời Đến 3 Triệu</span>
                 </h1>
                 <p className="text-red-100 text-lg md:text-xl font-medium mb-8 leading-relaxed">
@@ -81,12 +81,12 @@ export default function TradeInPage() {
                 { icon: <Store className="h-8 w-8" />, title: '2. Kiểm tra máy tại shop', desc: 'Mang máy ra cửa hàng gần nhất để kỹ thuật viên kiểm tra tình trạng thực tế.' },
                 { icon: <CheckCircle2 className="h-8 w-8" />, title: '3. Chốt giá & Đổi máy', desc: 'Thanh toán khoản chênh lệch và rinh ngay siêu phẩm mới về nhà.' },
               ].map((step, idx) => (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.1 }}
-                  key={idx} 
+                  key={idx}
                   className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden group"
                 >
                   <div className="absolute top-0 left-0 w-full h-1 bg-red-100 group-hover:bg-red-500 transition-colors"></div>
@@ -118,11 +118,10 @@ export default function TradeInPage() {
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`flex items-center gap-2 px-6 py-3 rounded-t-xl font-semibold whitespace-nowrap transition-colors ${
-                    selectedCategory === cat.id 
-                      ? 'bg-red-50 text-red-600 border-b-2 border-red-600' 
-                      : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
-                  }`}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-t-xl font-semibold whitespace-nowrap transition-colors ${selectedCategory === cat.id
+                    ? 'bg-red-50 text-red-600 border-b-2 border-red-600'
+                    : 'text-gray-500 hover:text-gray-800 hover:bg-gray-50'
+                    }`}
                 >
                   {cat.icon} {cat.name}
                 </button>
@@ -132,8 +131,8 @@ export default function TradeInPage() {
             {/* Search */}
             <div className="relative mb-8 max-w-2xl mx-auto">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Nhập tên thiết bị bạn muốn bán (VD: iPhone 13 Pro Max...)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

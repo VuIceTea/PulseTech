@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Star, ShoppingCart, Percent, Sparkles } from 'lucide-react';
-import { Product } from '@/data/products';
+import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';

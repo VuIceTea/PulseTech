@@ -1,18 +1,17 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 
-export interface User {
-  name: string;
-  email: string;
-}
-
+export interface User { name: string; email: string; }
+interface AuthResult { success: boolean; message?: string; }
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<AuthResult>;
+  register: (name: string, email: string, password: string) => Promise<AuthResult>;
   logout: () => void;
   isAuthenticated: boolean;
+  isLoaded: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,52 +23,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const storedUser = localStorage.getItem('pulsetech_user');
     if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error('Failed to parse user storage', error);
-      }
+      try { setUser(JSON.parse(storedUser)); }
+      catch { localStorage.removeItem('pulsetech_user'); }
     }
     setIsLoaded(true);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Simple mockup check: any password with 6+ characters passes
-    if (email && password.length >= 6) {
-      // Extract name from email as a fallback
-      const mockName = email.split('@')[0];
-      const displayName = mockName.charAt(0).toUpperCase() + mockName.slice(1);
-      
-      const loggedUser = {
-        name: displayName,
-        email: email
-      };
-      
+  const login = async (email: string, password: string): Promise<AuthResult> => {
+    try {
+      const loggedUser = await api.login(email, password);
       setUser(loggedUser);
       localStorage.setItem('pulsetech_user', JSON.stringify(loggedUser));
-      return true;
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error instanceof Error ? error.message : 'Đăng nhập thất bại' };
     }
-    return false;
   };
 
-  const register = async (name: string, email: string, password: string): Promise<boolean> => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    if (name && email && password.length >= 6) {
-      const newUser = {
-        name,
-        email
-      };
-      
-      setUser(newUser);
-      localStorage.setItem('pulsetech_user', JSON.stringify(newUser));
-      return true;
+  const register = async (name: string, email: string, password: string): Promise<AuthResult> => {
+    try {
+      const response = await api.register(name, email, password);
+      return { success: true, message: response.message };
+    } catch (error) {
+      return { success: false, message: error instanceof Error ? error.message : 'Đăng ký thất bại' };
     }
-    return false;
   };
 
   const logout = () => {
@@ -77,19 +54,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('pulsetech_user');
   };
 
-  const isAuthenticated = !!user;
-
-  return (
-    <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: !!user, isLoaded }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider');
   return context;
 };

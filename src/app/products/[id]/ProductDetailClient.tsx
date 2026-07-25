@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Product, ColorVariant, StorageVariant } from '@/data/products';
+import { Product, ColorVariant, StorageVariant } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { 
   Star, 

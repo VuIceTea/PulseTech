@@ -4,13 +4,13 @@ import Link from "next/link";
 import { Phone, HelpCircle, ArrowRight, ShieldCheck } from "lucide-react";
 
 const paymentMethods = [
-  { name: "Visa", src: "/icons/visa.svg" },
+  { name: "Visa", src: "/icons/visa.png" },
   { name: "Mastercard", src: "/icons/mastercard.svg" },
   { name: "VNPay", src: "/icons/v-vnpay.svg" },
-  { name: "COD", label: "COD" }, // không có logo thì giữ chữ
-  { name: "MoMo", src: "/icons/momo.svg" },
-  { name: "JCB", src: "/icons/jcb.svg" },
-  { name: "ShopeePay", src: "/icons/shopeepay.svg" },
+  { name: "COD", label: "COD" },
+  { name: "MoMo", src: "/icons/momo.png" },
+  { name: "JCB", src: "/icons/jcb.png" },
+  { name: "ShopeePay", src: "/icons/shopeepay.png" },
   { name: "Apple Pay", src: "/icons/applepay.svg" },
 ];
 
@@ -20,43 +20,56 @@ export const Footer: React.FC = () => {
       {/* Top Banner section */}
       <div className="border-b border-brand-dark/80 bg-brand-dark/20 py-8">
         <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 items-center">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-2xl text-primary shrink-0">
-                <ShieldCheck className="h-6 w-6" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-cente shadow-sm">
+                <img src="https://img.icons8.com/fluency/48/approval.png" alt="Chính hãng" className="h-10 w-10 object-contain" />
               </div>
               <div>
                 <h4 className="font-bold text-white text-base">
                   Sản phẩm chính hãng
                 </h4>
-                <p className="text-xs text-gray-300">
+                <p className="text-[11px] text-gray-300">
                   Bảo hành 12 tháng chính hãng quốc tế
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-2xl text-primary shrink-0">
-                <Phone className="h-6 w-6" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center shadow-sm">
+                <img src="https://img.icons8.com/fluency/48/headset.png" alt="Hotline" className="h-10 w-10 object-contain" />
               </div>
               <div>
                 <h4 className="font-bold text-white text-base">
                   Hotline hỗ trợ miễn phí
                 </h4>
-                <p className="text-xs text-gray-300">
+                <p className="text-[11px] text-gray-300">
                   Gọi 1800.2097 để được tư vấn (7:30 - 22:00)
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 rounded-2xl text-primary shrink-0">
-                <HelpCircle className="h-6 w-6" />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center shadow-sm">
+                <img src="https://img.icons8.com/fluency/48/delivery.png" alt="Giao hàng" className="h-10 w-10 object-contain" />
               </div>
               <div>
                 <h4 className="font-bold text-white text-base">
                   Giao hàng siêu tốc
                 </h4>
-                <p className="text-xs text-gray-300">
+                <p className="text-[11px] text-gray-300">
                   Miễn phí giao hàng toàn quốc từ 500k
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center shadow-sm">
+                <img src="https://img.icons8.com/fluency/48/task.png" alt="Chính sách" className="h-10 w-10 object-contain" />
+              </div>
+              <div>
+                <h4 className="font-bold text-white text-base">
+                  Danh mục chính sách
+                </h4>
+                <p className="text-[11px] text-gray-300">
+                  Thông tin rõ ràng và minh bạch
                 </p>
               </div>
             </div>
@@ -152,22 +165,21 @@ export const Footer: React.FC = () => {
             <h3 className="font-display font-bold text-white text-base mb-4 tracking-wider uppercase">
               PHƯƠNG THỨC THANH TOÁN
             </h3>
-            <div className="grid grid-cols-4 gap-2 mb-4">
+            <div className="grid grid-cols-4 gap-4 mb-4">
               {paymentMethods.map((method) => (
                 <div
                   key={method.name}
-                  className="bg-white border border-brand-dark rounded-xl h-10 flex items-center justify-center p-2"
+                  className="flex items-center justify-start"
                 >
                   {method.src ? (
-                    <Image
+                    <img
                       src={method.src}
                       alt={method.name}
-                      width={50}
-                      height={22}
-                      className="max-h-6 w-auto object-contain"
+                      className={`w-auto object-contain ${method.name === "VNPay" ? "max-h-14 scale-125 origin-left" : "max-h-10"}`}
+                      style={{ width: 'auto', height: 'auto' }}
                     />
                   ) : (
-                    <span className="font-bold text-xs text-gray-700">
+                    <span className="font-bold text-base text-white">
                       {method.label}
                     </span>
                   )}

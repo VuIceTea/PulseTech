@@ -5,17 +5,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { 
-  Trash2, 
-  ShoppingBag, 
-  ArrowLeft, 
-  Ticket, 
-  Sparkles, 
+import {
+  Trash2,
+  ShoppingBag,
+  ArrowLeft,
+  Ticket,
+  Sparkles,
   CreditCard,
   CheckCircle,
   Truck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '@/lib/api';
 
 export default function CartPage() {
   const router = useRouter();
@@ -37,6 +38,9 @@ export default function CartPage() {
   // Checkout modal state
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrderFinished, setIsOrderFinished] = useState(false);
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
   // Form checkout fields
   const [fullName, setFullName] = useState(user?.name || '');
@@ -69,13 +73,32 @@ export default function CartPage() {
   const finalTotal = cartTotal - discountAmount + shippingFee;
 
   // Handle Checkout submit
-  const handleConfirmOrder = (e: React.FormEvent) => {
+  const handleConfirmOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (fullName && phoneNumber && shippingAddress) {
+    if (!fullName || !phoneNumber || !shippingAddress || isSubmittingOrder) return;
+    setIsSubmittingOrder(true);
+    setCheckoutError(null);
+    try {
+      const order = await api.createOrder({
+        customerName: fullName,
+        customerPhone: phoneNumber,
+        address: shippingAddress,
+        paymentMethod,
+        couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
+        items: cart.map(item => ({
+          productId: item.productId,
+          color: item.color,
+          storage: item.storage,
+          quantity: item.quantity,
+        })),
+      });
+      setCreatedOrderId(order.id);
       setIsOrderFinished(true);
-      setTimeout(() => {
-        clearCart();
-      }, 500);
+      clearCart();
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : 'Không thể tạo đơn hàng');
+    } finally {
+      setIsSubmittingOrder(false);
     }
   };
 
@@ -121,18 +144,17 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold">
-      
+
       {/* Page Header */}
       <div className="border-b border-gray-200 pb-5 mb-8">
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-brand-black flex items-center gap-2.5">
-          <ShoppingBag className="h-7 w-7 text-primary" /> Giỏ Hàng Của Bạn
+          <img src="https://img.icons8.com/fluency/48/shopping-cart.png" alt="Cart" className="h-8 w-8 object-contain" /> Giỏ Hàng Của Bạn
         </h1>
       </div>
 
       {cart.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* LEFT: Items List (8 Cols) */}
+
           <div className="lg:col-span-8 flex flex-col gap-4">
             {cart.map((item) => (
               <motion.div
@@ -173,7 +195,7 @@ export default function CartPage() {
                   <div className="flex items-center gap-3.5">
                     {/* Quantity Controls */}
                     <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-gray-50 h-8">
-                      <button 
+                      <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="px-2.5 font-bold text-xs text-gray-500 hover:bg-gray-100"
                       >
@@ -182,7 +204,7 @@ export default function CartPage() {
                       <span className="px-2.5 text-xs text-brand-black text-center min-w-[30px] bg-white">
                         {item.quantity}
                       </span>
-                      <button 
+                      <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="px-2.5 font-bold text-xs text-gray-500 hover:bg-gray-100"
                       >
@@ -204,8 +226,8 @@ export default function CartPage() {
               </motion.div>
             ))}
 
-            <Link 
-              href="/products" 
+            <Link
+              href="/products"
               className="text-xs text-gray-500 font-bold hover:text-primary flex items-center gap-1.5 self-start pt-2 transition group"
             >
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Tiếp tục mua sắm
@@ -214,7 +236,7 @@ export default function CartPage() {
 
           {/* RIGHT: Order Summary (4 Cols) */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-            
+
             {/* Promo Code Coupon Box */}
             <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
               <span className="text-xs font-bold text-gray-500 block mb-3 uppercase tracking-wider">MÃ GIẢM GIÁ</span>
@@ -241,7 +263,7 @@ export default function CartPage() {
               {couponApplied && (
                 <div className="text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 mt-2 flex items-center justify-between">
                   <span>Áp dụng thành công (Giảm 10% đơn hàng)</span>
-                  <button 
+                  <button
                     onClick={() => {
                       setCouponApplied(false);
                       setDiscountPercent(0);
@@ -263,19 +285,19 @@ export default function CartPage() {
               <span className="text-xs font-bold text-gray-500 border-b border-gray-100 pb-3 uppercase tracking-wider mb-2">
                 TÓM TẮT ĐƠN HÀNG
               </span>
-              
+
               <div className="flex justify-between text-xs text-gray-500">
                 <span>Tạm tính</span>
                 <span className="text-brand-black">{formatPrice(cartTotal)}</span>
               </div>
-              
+
               {discountPercent > 0 && (
                 <div className="flex justify-between text-xs text-green-600">
                   <span>Chiết khấu ({discountPercent}%)</span>
                   <span>-{formatPrice(discountAmount)}</span>
                 </div>
               )}
-              
+
               <div className="flex justify-between text-xs text-gray-500">
                 <span>Phí vận chuyển</span>
                 <span className="text-brand-black">
@@ -288,7 +310,7 @@ export default function CartPage() {
                   <Truck className="h-3.5 w-3.5 shrink-0" /> Mua thêm {formatPrice(5000000 - cartTotal)} để được Miễn phí giao hàng.
                 </span>
               )}
-              
+
               <div className="flex justify-between font-display font-extrabold text-base text-brand-black border-t border-gray-100 pt-4 mt-2">
                 <span>Tổng cộng</span>
                 <span className="text-primary text-xl">{formatPrice(finalTotal)}</span>
@@ -307,7 +329,7 @@ export default function CartPage() {
         </div>
       ) : (
         /* Empty Cart State */
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white border border-gray-100 rounded-3xl p-12 text-center flex flex-col items-center justify-center min-h-[420px]"
@@ -351,7 +373,7 @@ export default function CartPage() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="fixed inset-0 m-auto w-full max-w-lg h-fit bg-white rounded-3xl shadow-2xl p-6 sm:p-8 z-50 overflow-hidden flex flex-col max-h-[90vh]"
             >
-              
+
               {!isOrderFinished ? (
                 /* Checkout Form */
                 <form onSubmit={handleConfirmOrder} className="space-y-5 flex-1 overflow-y-auto pr-1">
@@ -359,8 +381,8 @@ export default function CartPage() {
                     <h3 className="font-display font-extrabold text-brand-black text-lg flex items-center gap-2">
                       <CreditCard className="h-5 w-5 text-primary" /> Thông tin thanh toán
                     </h3>
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => setIsCheckoutOpen(false)}
                       className="bg-gray-150 text-gray-500 hover:bg-gray-200 font-bold p-1 rounded-full text-xs transition"
                     >
@@ -415,11 +437,10 @@ export default function CartPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('cod')}
-                        className={`p-3 border rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
-                          paymentMethod === 'cod' 
-                            ? 'border-primary bg-primary-light text-primary' 
+                        className={`p-3 border rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${paymentMethod === 'cod'
+                            ? 'border-primary bg-primary-light text-primary'
                             : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
+                          }`}
                       >
                         <span>Thanh toán COD</span>
                         <CheckCircle className={`h-4 w-4 shrink-0 ${paymentMethod === 'cod' ? 'text-primary' : 'text-gray-300'}`} />
@@ -428,11 +449,10 @@ export default function CartPage() {
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('vnpay')}
-                        className={`p-3 border rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${
-                          paymentMethod === 'vnpay' 
-                            ? 'border-primary bg-primary-light text-primary' 
+                        className={`p-3 border rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${paymentMethod === 'vnpay'
+                            ? 'border-primary bg-primary-light text-primary'
                             : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
+                          }`}
                       >
                         <span>Cổng VNPay-QR</span>
                         <CheckCircle className={`h-4 w-4 shrink-0 ${paymentMethod === 'vnpay' ? 'text-primary' : 'text-gray-300'}`} />
@@ -446,16 +466,19 @@ export default function CartPage() {
                     <span className="text-primary text-base font-display font-extrabold">{formatPrice(finalTotal)}</span>
                   </div>
 
+                  {checkoutError && <p className="text-xs font-semibold text-red-500">{checkoutError}</p>}
+
                   <button
                     type="submit"
+                    disabled={isSubmittingOrder}
                     className="w-full bg-primary hover:bg-primary-hover text-white py-3.5 rounded-2xl text-xs font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition"
                   >
-                    Xác Nhận Đặt Hàng
+                    {isSubmittingOrder ? 'Đang tạo đơn...' : 'Xác Nhận Đặt Hàng'}
                   </button>
                 </form>
               ) : (
                 /* Success animation and feedback */
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center py-6 space-y-5"
@@ -478,7 +501,7 @@ export default function CartPage() {
                   <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-left text-[11px] font-bold text-gray-500 space-y-2.5 max-w-xs mx-auto">
                     <div className="flex justify-between">
                       <span>Mã đơn hàng:</span>
-                      <span className="text-brand-black tracking-wider font-extrabold uppercase">PT{Math.floor(100000 + Math.random() * 900000)}</span>
+                      <span className="text-brand-black tracking-wider font-extrabold uppercase">{createdOrderId}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tổng tiền đơn:</span>

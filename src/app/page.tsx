@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { HeroBanner } from "@/components/HeroBanner";
 import { FlashSale } from "@/components/FlashSale";
-import { PRODUCTS } from "@/data/products";
+import { useProducts } from "@/hooks/useProducts";
 import {
   Smartphone,
   Tablet,
@@ -30,17 +30,22 @@ import {
   ScrollRevealItem,
 } from "@/components/ScrollReveal";
 
+let hasInitialLoaded = false;
+
 export default function Home() {
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(!hasInitialLoaded);
+  const { products, isLoading: isProductsLoading } = useProducts();
 
   useEffect(() => {
+    if (hasInitialLoaded) return;
     const timer = setTimeout(() => {
+      hasInitialLoaded = true;
       setIsPageLoading(false);
     }, 1200);
     return () => clearTimeout(timer);
   }, []);
 
-  if (isPageLoading) {
+  if (isPageLoading || isProductsLoading) {
     return (
       <div className="flex-1 min-h-[65vh] flex flex-col items-center justify-center bg-[#f8f9fa] transition-opacity duration-300">
         <div className="flex flex-col items-center gap-4">
@@ -54,9 +59,16 @@ export default function Home() {
   }
 
   // Phụ kiện, thiết bị điện thoại
-  const newAccessories = PRODUCTS.filter(p => p.category === 'accessory').slice(0, 2);
-  const recentlyAdded = PRODUCTS.filter(p => p.category === 'phone' || p.category === 'accessory').slice(2, 8);
-  const hotSummerProducts = PRODUCTS.filter(p => p.category === 'accessory').slice(2, 6);
+  const newAccessories = products.filter(p => p.category === 'accessory').slice(0, 2);
+  const newAccessoryIds = new Set(newAccessories.map(p => p.id));
+  
+  const recentlyAdded = products
+    .filter(p => (p.category === 'phone' || p.category === 'accessory') && !newAccessoryIds.has(p.id))
+    .slice(0, 6);
+    
+  const hotSummerProducts = products
+    .filter(p => p.category === 'accessory' && !newAccessoryIds.has(p.id))
+    .slice(0, 4);
 
   // Thẻ sản phẩm thu gọn cho phần Hot Summer (Bên phải)
   const SmallProductCard = ({ product }: { product: any }) => {

@@ -15,7 +15,8 @@ import {
   ClipboardList,
   RefreshCw
 } from 'lucide-react';
-import Image from 'next/image';
+import Link from 'next/link';
+import { api, type Order } from '@/lib/api';
 
 export default function OrderTrackingPage() {
   const [orderId, setOrderId] = useState('');
@@ -23,50 +24,23 @@ export default function OrderTrackingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [searchStatus, setSearchStatus] = useState<'idle' | 'found' | 'not-found'>('idle');
 
-  // Mock order data
-  const mockOrder = {
-    id: 'PT123456',
-    status: 2, // 0: Đặt hàng, 1: Đã xác nhận, 2: Đang giao, 3: Đã giao
-    customerName: 'Nguyễn Văn A',
-    customerPhone: '0987654321',
-    address: '123 Đường Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-    paymentMethod: 'Thanh toán khi nhận hàng (COD)',
-    createdAt: '15/07/2026 14:30',
-    totalPrice: 22490000,
-    items: [
-      {
-        id: '1',
-        name: 'iPhone 15 Pro Max 256GB - Titan Tự Nhiên',
-        price: 21990000,
-        qty: 1,
-        image: 'https://images.unsplash.com/photo-1616348436168-de43ad0db179?q=80&w=200&auto=format&fit=crop'
-      },
-      {
-        id: '2',
-        name: 'Ốp lưng MagSafe trong suốt',
-        price: 500000,
-        qty: 1,
-        image: '/accessories/op-lung-iphone-15-pro-trong-suot-magsafe.png'
-      }
-    ]
-  };
+  const [order, setOrder] = useState<Order | null>(null);
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderId || !phone) return;
-
     setIsLoading(true);
     setSearchStatus('idle');
-
-    // Simulate API Call
-    setTimeout(() => {
+    try {
+      const data = await api.trackOrder(orderId, phone);
+      setOrder(data);
+      setSearchStatus('found');
+    } catch {
+      setOrder(null);
+      setSearchStatus('not-found');
+    } finally {
       setIsLoading(false);
-      if (orderId.toUpperCase() === 'PT123456') {
-        setSearchStatus('found');
-      } else {
-        setSearchStatus('not-found');
-      }
-    }, 1500);
+    }
   };
 
   const timelineSteps = [
@@ -102,12 +76,12 @@ export default function OrderTrackingPage() {
         </div>
       </div>
 
-      <main className="flex-1 py-12">
+      <main className="flex-1 pt-3 pb-12">
         <div className="container mx-auto px-4 max-w-5xl">
 
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8 justify-start">
-            <a href="/" className="hover:text-primary transition-colors">Trang chủ</a>
+            <Link href="/" className="hover:text-primary transition-colors">Trang chủ</Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-gray-900 font-medium">Tra cứu đơn hàng</span>
           </div>
@@ -149,8 +123,8 @@ export default function OrderTrackingPage() {
                 )}
               </button>
             </form>
-            <p className="text-center text-xs text-gray-400 mt-4">
-              * Mẹo: Nhập mã <strong className="text-brand-black">PT123456</strong> để xem dữ liệu mô phỏng.
+            <p className="text-center text-sm text-gray-400 mt-4">
+              <span className='text-red-500 text-sm'>*</span> Mẹo: Nhập mã <strong className="text-brand-black">PT123456</strong> để xem dữ liệu mô phỏng.
             </p>
           </div>
 
@@ -173,9 +147,9 @@ export default function OrderTrackingPage() {
                 {/* Timeline Box */}
                 <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-10">
                   <div className="flex items-center justify-between border-b border-gray-100 pb-4 mb-8">
-                    <h2 className="text-xl font-display font-bold text-brand-black">Đơn hàng #{mockOrder.id}</h2>
+                    <h2 className="text-xl font-display font-bold text-brand-black">Đơn hàng #{order!.id}</h2>
                     <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-bold">
-                      Đang giao hàng
+                      {['Đã đặt hàng', 'Đã xác nhận', 'Đang giao hàng', 'Đã giao hàng'][order!.status] ?? 'Đang xử lý'}
                     </span>
                   </div>
 
@@ -186,13 +160,13 @@ export default function OrderTrackingPage() {
                     {/* Active Line */}
                     <div
                       className="absolute top-6 left-10 h-1 rounded-full hidden sm:block transition-all duration-1000 ease-in-out animate-shimmer-sweep"
-                      style={{ width: `${(mockOrder.status / (timelineSteps.length - 1)) * 100}%` }}
+                      style={{ width: `${(order!.status / (timelineSteps.length - 1)) * 100}%` }}
                     ></div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 sm:gap-0 relative z-10">
                       {timelineSteps.map((step, idx) => {
-                        const isCompleted = idx <= mockOrder.status;
-                        const isActive = idx === mockOrder.status;
+                        const isCompleted = idx <= order!.status;
+                        const isActive = idx === order!.status;
                         return (
                           <div key={idx} className="flex flex-row sm:flex-col items-center sm:text-center gap-4 sm:gap-3">
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-4 transition-colors duration-500 ${isCompleted ? 'bg-green-500 text-white border-green-100' : 'bg-white text-gray-300 border-gray-100'
@@ -223,28 +197,28 @@ export default function OrderTrackingPage() {
                         <User className="w-5 h-5 text-gray-400 shrink-0" />
                         <div>
                           <p className="text-gray-500 text-xs">Người nhận</p>
-                          <p className="font-semibold text-brand-black">{mockOrder.customerName}</p>
+                          <p className="font-semibold text-brand-black">{order!.customerName}</p>
                         </div>
                       </div>
                       <div className="flex gap-3">
                         <Phone className="w-5 h-5 text-gray-400 shrink-0" />
                         <div>
                           <p className="text-gray-500 text-xs">Số điện thoại</p>
-                          <p className="font-semibold text-brand-black">{mockOrder.customerPhone}</p>
+                          <p className="font-semibold text-brand-black">{order!.customerPhone}</p>
                         </div>
                       </div>
                       <div className="flex gap-3">
                         <MapPin className="w-5 h-5 text-gray-400 shrink-0" />
                         <div>
                           <p className="text-gray-500 text-xs">Địa chỉ giao hàng</p>
-                          <p className="font-semibold text-brand-black leading-relaxed">{mockOrder.address}</p>
+                          <p className="font-semibold text-brand-black leading-relaxed">{order!.address}</p>
                         </div>
                       </div>
                       <div className="flex gap-3">
                         <CreditCard className="w-5 h-5 text-gray-400 shrink-0" />
                         <div>
                           <p className="text-gray-500 text-xs">Thanh toán</p>
-                          <p className="font-semibold text-brand-black">{mockOrder.paymentMethod}</p>
+                          <p className="font-semibold text-brand-black">{order!.paymentMethod}</p>
                         </div>
                       </div>
                     </div>
@@ -254,7 +228,7 @@ export default function OrderTrackingPage() {
                   <div className="md:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col">
                     <h3 className="font-display font-bold text-brand-black mb-4 border-b border-gray-100 pb-3">Sản phẩm đã đặt</h3>
                     <div className="flex-1 overflow-y-auto pr-2 space-y-4">
-                      {mockOrder.items.map(item => (
+                      {order!.items.map(item => (
                         <div key={item.id} className="flex items-center gap-4">
                           <div className="w-16 h-16 bg-gray-50 rounded-xl overflow-hidden shrink-0">
                             <img src={item.image} alt={item.name} className="w-full h-full object-contain mix-blend-multiply" />
@@ -274,7 +248,7 @@ export default function OrderTrackingPage() {
                     <div className="mt-4 pt-4 border-t border-gray-100 space-y-2">
                       <div className="flex justify-between text-sm text-gray-500">
                         <span>Tạm tính</span>
-                        <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(mockOrder.totalPrice)}</span>
+                        <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order!.totalPrice)}</span>
                       </div>
                       <div className="flex justify-between text-sm text-gray-500">
                         <span>Phí vận chuyển</span>
@@ -282,7 +256,7 @@ export default function OrderTrackingPage() {
                       </div>
                       <div className="flex justify-between font-bold text-lg text-brand-black pt-2">
                         <span>Tổng tiền</span>
-                        <span className="text-primary">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(mockOrder.totalPrice)}</span>
+                        <span className="text-primary">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order!.totalPrice)}</span>
                       </div>
                     </div>
 

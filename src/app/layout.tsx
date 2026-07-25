@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { Providers } from "@/context/Providers";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
 // Khởi tạo Geist font, gán vào biến --font-geist-sans
 const geist = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
     <html lang="vi" className={cn("h-full scroll-smooth", geist.variable)}>
       <body className="min-h-full flex flex-col bg-brand-light text-brand-black selection:bg-primary selection:text-white font-sans">
         <Providers>
+          <Toaster position="top-center" richColors toastOptions={{ style: { marginTop: '70px' } }} />
           <Header />
           <main className="flex-1 flex flex-col">{children}</main>
           <Footer />

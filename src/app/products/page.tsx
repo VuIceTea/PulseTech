@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { PRODUCTS, BRANDS, CATEGORIES } from '@/data/products';
+import { BRANDS, CATEGORIES } from '@/config/catalog';
+import { useProducts } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { FlashSale } from '@/components/FlashSale';
 import {
@@ -53,6 +54,7 @@ const FILTER_CRITERIA = [
 ];
 
 function ProductsListContent() {
+  const { products, isLoading: isProductsLoading } = useProducts();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -119,7 +121,7 @@ function ProductsListContent() {
 
   // --- DATA LỌC & SẮP XẾP ---
 
-  const filteredProducts = PRODUCTS.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     if (selectedCategory && product.category !== selectedCategory) return false;
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
@@ -389,7 +391,7 @@ function ProductsListContent() {
 
       {/* DANH SÁCH SẢN PHẨM */}
       <section>
-        {isPageLoading ? (
+        {isPageLoading || isProductsLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div
