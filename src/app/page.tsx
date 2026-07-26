@@ -4,6 +4,9 @@ import Link from "next/link";
 import { HeroBanner } from "@/components/HeroBanner";
 import { FlashSale } from "@/components/FlashSale";
 import { useProducts } from "@/hooks/useProducts";
+import { useWishlist } from "@/context/WishlistContext";
+import { useCart } from "@/context/CartContext";
+import { motion } from "framer-motion";
 import {
   Smartphone,
   Tablet,
@@ -22,7 +25,8 @@ import {
   ArrowRight,
   Watch,
   Laptop,
-  Wallet
+  Wallet,
+  Check
 } from "lucide-react";
 import {
   ScrollReveal,
@@ -37,12 +41,7 @@ export default function Home() {
   const { products, isLoading: isProductsLoading } = useProducts();
 
   useEffect(() => {
-    if (hasInitialLoaded) return;
-    const timer = setTimeout(() => {
-      hasInitialLoaded = true;
-      setIsPageLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
+    setIsPageLoading(false);
   }, []);
 
   if (isPageLoading || isProductsLoading) {
@@ -115,6 +114,30 @@ export default function Home() {
   // Thẻ sản phẩm dọc tiêu chuẩn
   const VerticalProductCard = ({ product }: { product: any }) => {
     const salePrice = Math.round(product.basePrice * (1 - product.discount / 100));
+    const { isInWishlist, toggleWishlist } = useWishlist();
+    const { addToCart } = useCart();
+    
+    const isWished = isInWishlist(product.id);
+
+    const handleWishlist = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleWishlist(product);
+    };
+
+    const [isAdded, setIsAdded] = React.useState(false);
+
+    const handleAddToCart = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const defaultColor = product.colors?.[0]?.name || 'Mặc định';
+      const defaultStorage = product.storages?.[0]?.name || 'Mặc định';
+      addToCart(product, defaultColor, defaultStorage, 1);
+      
+      setIsAdded(true);
+      setTimeout(() => setIsAdded(false), 2000);
+    };
+
     return (
       <div className="group relative bg-white rounded-xl border border-gray-100 border-b-[3px] hover:border-b-primary p-3 transition-all duration-300 flex flex-col h-full cursor-pointer">
         <div className="absolute top-3 left-0 z-10">
@@ -123,7 +146,10 @@ export default function Home() {
           </span>
         </div>
         <div className="flex justify-end items-start mb-2 relative z-10">
-          <button className="text-gray-300 hover:text-primary transition-colors cursor-pointer">
+          <button 
+            onClick={handleWishlist}
+            className={`${isWished ? 'text-[#ff3b60]' : 'text-gray-300 hover:text-primary'} transition-colors cursor-pointer`}
+          >
             <Heart className="h-4 w-4 fill-current" />
           </button>
         </div>
@@ -142,8 +168,10 @@ export default function Home() {
             <div className="absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2.5 items-center justify-center w-full pb-2">
               <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Shuffle className="h-4 w-4" /></button>
               <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Eye className="h-4 w-4" /></button>
-              <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Heart className="h-4 w-4" /></button>
-              <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-primary hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><ShoppingBag className="h-4 w-4" /></button>
+              <button className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 ${isWished ? 'bg-[#ff3b60] text-white border-[#ff3b60]' : 'bg-white text-gray-500 hover:bg-primary hover:text-white hover:border-primary'}`} onClick={handleWishlist}><Heart className="h-4 w-4 fill-current" /></button>
+              <button disabled={isAdded} className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer ${isAdded ? 'bg-green-500 text-white' : 'bg-white text-primary hover:bg-primary hover:text-white hover:border-primary hover:scale-110 active:scale-95'}`} onClick={handleAddToCart}>
+                {isAdded ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
+              </button>
             </div>
           </div>
           <div className="flex flex-col mt-auto text-left">
@@ -171,10 +199,19 @@ export default function Home() {
               </div>
 
               <button
-                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                className="text-primary text-[11px] font-bold border border-primary/30 rounded-full py-1 px-3 hover:bg-primary hover:text-white transition-all cursor-pointer flex items-center gap-1.5 opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 duration-300"
+                onClick={handleAddToCart}
+                disabled={isAdded}
+                className={`text-[11px] font-bold border rounded-full py-1 px-3 transition-all cursor-pointer flex items-center gap-1.5 opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 duration-300 ${isAdded ? 'bg-green-500 text-white border-green-500 shadow-md shadow-green-500/20' : 'text-primary border-primary/30 hover:bg-primary hover:text-white'}`}
               >
-                <ShoppingBag className="w-3 h-3" /> Thêm
+                {isAdded ? (
+                  <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Đã thêm
+                  </motion.div>
+                ) : (
+                  <>
+                    <ShoppingBag className="w-3 h-3" /> Thêm
+                  </>
+                )}
               </button>
             </div>
           </div>

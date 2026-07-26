@@ -90,10 +90,7 @@ function ProductsListContent() {
       setSelectedCriteria(prev => ({ ...prev, accessory_type: urlAccessoryType }));
     }
 
-    // Reset page loading when URL search params change
-    setIsPageLoading(true);
-    const timer = setTimeout(() => setIsPageLoading(false), 800);
-    return () => clearTimeout(timer);
+    setIsPageLoading(false);
   }, [urlCategory, urlBrand, urlSearch, urlAccessoryType]);
 
   const priceRanges = [

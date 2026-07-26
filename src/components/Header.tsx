@@ -31,7 +31,7 @@ export const Header = () => {
 
   return (
     <header className="glass-header sticky top-0 z-50 w-full text-white shadow-md">
-      <div className="mx-auto max-w-[1400px] px-4 py-2 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-4 py-2 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between gap-4">
           <Link href="/" className="shrink-0 font-display text-lg font-extrabold uppercase tracking-wider sm:text-2xl">Pulse<span className="text-brand-black">Tech</span></Link>
 
@@ -44,7 +44,7 @@ export const Header = () => {
           <nav className="hidden items-center gap-2 text-xs font-semibold lg:flex">
             <a href="tel:18002097" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><Phone className="h-4 w-4" /><span>1800.2097</span></a>
             <Link href="/products" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><MapPin className="h-4 w-4" /><span>Cửa hàng</span></Link>
-            <Link href="/order-tracking" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><FileText className="h-4 w-4" /><span>Đơn hàng</span></Link>
+            <Link href={user ? "/orders" : "/order-tracking"} className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><FileText className="h-4 w-4" /><span>Đơn hàng</span></Link>
           </nav>
 
           <div className="flex shrink-0 items-center gap-2 text-xs font-semibold sm:gap-3">
@@ -75,7 +75,7 @@ export const Header = () => {
                 <Link onClick={() => setMobileOpen(false)} href="/products?category=phone" className="rounded-xl px-3 py-3 hover:bg-gray-50">Điện thoại</Link>
                 <Link onClick={() => setMobileOpen(false)} href="/products?category=tablet" className="rounded-xl px-3 py-3 hover:bg-gray-50">Máy tính bảng</Link>
                 <Link onClick={() => setMobileOpen(false)} href="/products?category=accessory" className="rounded-xl px-3 py-3 hover:bg-gray-50">Phụ kiện</Link>
-                <Link onClick={() => setMobileOpen(false)} href="/order-tracking" className="rounded-xl px-3 py-3 hover:bg-gray-50">Tra cứu đơn hàng</Link>
+                <Link onClick={() => setMobileOpen(false)} href={user ? "/orders" : "/order-tracking"} className="rounded-xl px-3 py-3 hover:bg-gray-50">{user ? "Lịch sử đơn hàng" : "Tra cứu đơn hàng"}</Link>
                 {user && <Link onClick={() => setMobileOpen(false)} href="/profile" className="rounded-xl px-3 py-3 text-primary hover:bg-red-50">Hồ sơ của tôi</Link>}
               </nav>
             </div>

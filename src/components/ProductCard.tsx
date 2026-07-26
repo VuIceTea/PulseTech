@@ -3,9 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Star, ShoppingCart, Percent, Sparkles } from 'lucide-react';
+import { Star, ShoppingCart, Percent, Sparkles, Heart, Check } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +16,9 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const isWished = isInWishlist(product.id);
+  const [isAdded, setIsAdded] = React.useState(false);
 
   // Format price helper
   const formatPrice = (price: number) => {
@@ -42,14 +46,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     addToCart(product, defaultColor, defaultStorage, 1);
     
     // Quick notification / visual cue
-    const btn = e.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '✓ Đã thêm';
-    btn.classList.add('bg-green-600');
+    setIsAdded(true);
     setTimeout(() => {
-      btn.innerHTML = originalText;
-      btn.classList.remove('bg-green-600');
-    }, 1200);
+      setIsAdded(false);
+    }, 2000);
   };
 
   return (
@@ -61,6 +61,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       transition={{ duration: 0.3 }}
       className="relative flex flex-col justify-between overflow-hidden bg-white border border-gray-100 rounded-3xl p-4 transition-all duration-300 group select-none cursor-pointer h-full"
     >
+      <button 
+        onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
+        className={`absolute top-4 right-4 z-20 transition-colors ${isWished ? 'text-[#ff3b60]' : 'text-gray-300 hover:text-primary'}`}
+      >
+        <Heart className="h-5 w-5 fill-current" />
+      </button>
+
       <Link href={`/products/${product.id}`} className="flex flex-col flex-1">
         {/* Top Badges */}
         <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 items-start">
@@ -152,10 +159,27 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Quick Add Button */}
           <button
             onClick={handleQuickAdd}
-            className="text-primary hover:text-[#d70018f2] transition-all duration-300 shrink-0 group/btn active:scale-95 p-1 cursor-pointer"
+            disabled={isAdded}
+            className={cn(
+              "transition-all duration-300 shrink-0 group/btn active:scale-95 flex items-center justify-center overflow-hidden rounded-full h-8",
+              isAdded 
+                ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20" 
+                : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8"
+            )}
             title="Thêm nhanh vào giỏ hàng"
           >
-            <ShoppingCart className="h-5 w-5 transition-transform group-hover/btn:scale-110" />
+            {isAdded ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-1.5"
+              >
+                <Check className="h-4 w-4" />
+                <span className="text-sm font-bold whitespace-nowrap">Đã thêm</span>
+              </motion.div>
+            ) : (
+              <ShoppingCart className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
+            )}
           </button>
         </div>
       </Link>

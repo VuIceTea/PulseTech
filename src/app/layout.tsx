@@ -33,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi" className={cn("h-full scroll-smooth", geist.variable)}>
-      <body className="min-h-full flex flex-col bg-brand-light text-brand-black selection:bg-primary selection:text-white font-sans">
+    <html lang="vi" className={cn("h-full w-full scroll-smooth", geist.variable)}>
+      <body className="min-h-screen w-full flex flex-col bg-brand-light text-brand-black selection:bg-primary selection:text-white font-sans">
         <Providers>
           <Toaster position="top-center" richColors toastOptions={{ style: { marginTop: '70px' } }} />
           <Header />

@@ -32,6 +32,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<AuthResult> => {
     try {
       const loggedUser = await api.login(email, password);
+      
+      const guestId = localStorage.getItem('guest_id');
+      if (guestId) {
+        try {
+          await api.mergeCarts(guestId, loggedUser.email);
+        } catch (err) {
+          console.error('Failed to merge cart', err);
+        }
+      }
+      
       setUser(loggedUser);
       localStorage.setItem('pulsetech_user', JSON.stringify(loggedUser));
       return { success: true };
@@ -49,7 +59,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (user) {
+      const guestId = localStorage.getItem('guest_id');
+      if (guestId) {
+        try {
+          const userCart = await api.getCart(user.email);
+          if (userCart && userCart.items && userCart.items.length > 0) {
+            for (const item of userCart.items) {
+              await api.updateCartItem(guestId, item);
+            }
+          }
+        } catch (e) {
+          console.error('Failed to sync cart on logout', e);
+        }
+      }
+    }
     setUser(null);
     localStorage.removeItem('pulsetech_user');
   };
