@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -17,17 +17,13 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api } from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
   const { user } = useAuth();
-  const [isPageLoading, setIsPageLoading] = useState(true);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsPageLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
@@ -38,19 +34,54 @@ export default function CartPage() {
   // Checkout modal state
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrderFinished, setIsOrderFinished] = useState(false);
+  const [isClearConfirmOpen, setIsClearConfirmOpen] = useState(false);
   const [createdOrderId, setCreatedOrderId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [isSubmittingOrder, setIsSubmittingOrder] = useState(false);
 
   // Form checkout fields
   const [fullName, setFullName] = useState(user?.name || '');
+  const [customerEmail, setCustomerEmail] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [lastOrderInfo, setLastOrderInfo] = useState<{ customerName: string, totalPrice: number, paymentMethod: string } | null>(null);
 
   const formatPrice = (price: number) => {
     return price.toLocaleString('vi-VN') + '₫';
   };
+
+  const hasCleared = React.useRef(false);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentSuccess = urlParams.get('payment_success');
+      if (paymentSuccess === 'true') {
+        setIsOrderFinished(true);
+        setIsCheckoutOpen(true);
+        setCreatedOrderId(urlParams.get('orderId') || 'VNPay');
+
+        try {
+          const storedInfo = localStorage.getItem('last_order_info');
+          if (storedInfo) {
+            setLastOrderInfo(JSON.parse(storedInfo));
+          }
+        } catch (e) {
+          console.error("Failed to parse last_order_info", e);
+        }
+
+        if (!hasCleared.current) {
+          hasCleared.current = true;
+          setTimeout(() => clearCart(), 300);
+        }
+        window.history.replaceState({}, '', '/cart');
+      } else if (paymentSuccess === 'false') {
+        toast.error('Thanh toán thất bại hoặc chữ ký không hợp lệ!');
+        window.history.replaceState({}, '', '/cart');
+      }
+    }
+  }, [clearCart]);
 
   // Apply Coupon logic
   const handleApplyCoupon = (e: React.FormEvent) => {
@@ -81,20 +112,25 @@ export default function CartPage() {
     try {
       const order = await api.createOrder({
         customerName: fullName,
+        customerEmail: customerEmail || `${phoneNumber}@example.com`,
         customerPhone: phoneNumber,
         address: shippingAddress,
         paymentMethod,
         couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
         items: cart.map(item => ({
-          productId: item.productId,
+          productId: item.id,
           color: item.color,
           storage: item.storage,
           quantity: item.quantity,
         })),
       });
-      setCreatedOrderId(order.id);
-      setIsOrderFinished(true);
-      clearCart();
+      if (order.paymentUrl) {
+        window.location.href = order.paymentUrl;
+      } else {
+        setCreatedOrderId(order.id);
+        setIsOrderFinished(true);
+        clearCart();
+      }
     } catch (error) {
       setCheckoutError(error instanceof Error ? error.message : 'Không thể tạo đơn hàng');
     } finally {
@@ -146,10 +182,18 @@ export default function CartPage() {
     <div className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8 flex-1 flex flex-col font-semibold">
 
       {/* Page Header */}
-      <div className="border-b border-gray-200 pb-5 mb-8">
+      <div className="border-b border-gray-200 pb-5 mb-8 flex items-center justify-between">
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-brand-black flex items-center gap-2.5">
           <img src="https://img.icons8.com/fluency/48/shopping-cart.png" alt="Cart" className="h-8 w-8 object-contain" /> Giỏ Hàng Của Bạn
         </h1>
+        {cart.length > 0 && (
+          <button
+            onClick={() => setIsClearConfirmOpen(true)}
+            className="text-red-500 hover:text-red-500 text-sm font-bold flex items-center gap-1.5 transition-colors active:scale-95"
+          >
+            <Trash2 className="w-4 h-4" /> Xóa tất cả
+          </button>
+        )}
       </div>
 
       {cart.length > 0 ? (
@@ -158,7 +202,7 @@ export default function CartPage() {
           <div className="lg:col-span-8 flex flex-col gap-4">
             {cart.map((item) => (
               <motion.div
-                key={item.id}
+                key={`${item.id}-${item.color}-${item.storage}`}
                 layout
                 exit={{ opacity: 0, x: -100 }}
                 className="bg-white border border-gray-100 rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row gap-4 items-center justify-between transition hover:border-gray-200"
@@ -196,7 +240,7 @@ export default function CartPage() {
                     {/* Quantity Controls */}
                     <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden bg-gray-50 h-8">
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.color, item.storage, item.quantity - 1, item.price, item.image, item.name)}
                         className="px-2.5 font-bold text-xs text-gray-500 hover:bg-gray-100"
                       >
                         -
@@ -205,7 +249,7 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.color, item.storage, item.quantity + 1, item.price, item.image, item.name)}
                         className="px-2.5 font-bold text-xs text-gray-500 hover:bg-gray-100"
                       >
                         +
@@ -214,7 +258,7 @@ export default function CartPage() {
 
                     {/* Delete Item */}
                     <button
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.id, item.color, item.storage)}
                       className="text-gray-400 hover:text-primary p-2 hover:bg-red-50 rounded-xl transition"
                       title="Xóa sản phẩm"
                     >
@@ -317,7 +361,13 @@ export default function CartPage() {
               </div>
 
               <button
-                onClick={() => setIsCheckoutOpen(true)}
+                onClick={() => {
+                  if (!user) {
+                    toast.error('Vui lòng đăng nhập để tiến hành thanh toán');
+                  } else {
+                    router.push('/checkout');
+                  }
+                }}
                 className="w-full bg-primary hover:bg-primary-hover text-white py-3.5 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition mt-4"
               >
                 Tiến Hành Thanh Toán
@@ -405,6 +455,17 @@ export default function CartPage() {
                     </div>
 
                     <div>
+                      <label className="text-xs font-bold text-gray-500 block mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={customerEmail}
+                        onChange={(e) => setCustomerEmail(e.target.value)}
+                        placeholder="nguyenvana@example.com"
+                        className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-primary"
+                      />
+                    </div>
+
+                    <div>
                       <label className="text-xs font-bold text-gray-500 block mb-1">Số điện thoại *</label>
                       <input
                         type="tel"
@@ -438,8 +499,8 @@ export default function CartPage() {
                         type="button"
                         onClick={() => setPaymentMethod('cod')}
                         className={`p-3 border rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${paymentMethod === 'cod'
-                            ? 'border-primary bg-primary-light text-primary'
-                            : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                          ? 'border-primary bg-primary-light text-primary'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                           }`}
                       >
                         <span>Thanh toán COD</span>
@@ -450,8 +511,8 @@ export default function CartPage() {
                         type="button"
                         onClick={() => setPaymentMethod('vnpay')}
                         className={`p-3 border rounded-xl text-left flex items-center justify-between text-xs font-bold transition ${paymentMethod === 'vnpay'
-                            ? 'border-primary bg-primary-light text-primary'
-                            : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                          ? 'border-primary bg-primary-light text-primary'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50'
                           }`}
                       >
                         <span>Cổng VNPay-QR</span>
@@ -484,36 +545,40 @@ export default function CartPage() {
                   className="text-center py-6 space-y-5"
                 >
                   <div className="flex items-center justify-center">
-                    <div className="w-16 h-16 rounded-full bg-green-50 text-green-500 flex items-center justify-center text-4xl shadow-inner animate-bounce">
-                      ✓
-                    </div>
+                    <img width="80" height="80" src="https://img.icons8.com/color/96/ok--v1.png" alt="ok--v1" className="drop-shadow-sm" />
                   </div>
-                  <div className="space-y-2">
-                    <h3 className="font-display font-extrabold text-xl text-brand-black uppercase tracking-wide">
+                  <div className="space-y-3">
+                    <h3 className="font-display font-extrabold text-3xl text-brand-black uppercase tracking-wide">
                       Đặt hàng thành công!
                     </h3>
-                    <p className="text-xs text-gray-500 max-w-sm mx-auto font-semibold">
-                      Cảm ơn bạn <strong className="text-brand-black">{fullName}</strong> đã tin dùng sản phẩm của PulseTech. Nhân viên chúng tôi sẽ gọi điện xác nhận đơn hàng trong vòng 10 phút.
+                    <p className="text-sm text-gray-500 max-w-md mx-auto font-semibold">
+                      Cảm ơn bạn {lastOrderInfo?.customerName ? <strong className="text-brand-black">{lastOrderInfo.customerName}</strong> : ''} đã tin dùng sản phẩm của PulseTech. Nhân viên chúng tôi sẽ gọi điện xác nhận đơn hàng trong vòng 10 phút.
                     </p>
                   </div>
 
                   {/* Order review details */}
-                  <div className="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-left text-[11px] font-bold text-gray-500 space-y-2.5 max-w-xs mx-auto">
+                  <div className="bg-gray-50 border border-gray-100 p-6 rounded-2xl text-left text-sm font-bold text-gray-500 space-y-4 max-w-md mx-auto">
                     <div className="flex justify-between">
                       <span>Mã đơn hàng:</span>
                       <span className="text-brand-black tracking-wider font-extrabold uppercase">{createdOrderId}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Tổng tiền đơn:</span>
-                      <span className="text-primary font-display font-extrabold">{formatPrice(finalTotal)}</span>
+                    <div className="flex justify-between items-center">
+                      <span>Tổng tiền:</span>
+                      <span className="text-primary font-display font-extrabold text-xl">
+                        {lastOrderInfo ? formatPrice(lastOrderInfo.totalPrice) : formatPrice(finalTotal)}
+                      </span>
                     </div>
+                    {lastOrderInfo?.customerName && (
+                      <div className="flex justify-between">
+                        <span>Người nhận:</span>
+                        <span className="text-brand-black">{lastOrderInfo.customerName}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
-                      <span>Người nhận:</span>
-                      <span className="text-brand-black">{fullName}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Hình thức nhận:</span>
-                      <span className="text-brand-black">Giao tận nơi (COD)</span>
+                      <span>Hình thức thanh toán:</span>
+                      <span className="text-brand-black">
+                        {lastOrderInfo ? lastOrderInfo.paymentMethod : 'Giao tận nơi (COD)'}
+                      </span>
                     </div>
                   </div>
 
@@ -524,13 +589,59 @@ export default function CartPage() {
                       setIsOrderFinished(false);
                       router.push('/');
                     }}
-                    className="bg-brand-black hover:bg-gray-900 text-white text-xs font-bold px-8 py-3 rounded-2xl shadow-md transition hover:scale-105 active:scale-95"
+                    className="bg-brand-black hover:bg-gray-900 text-white text-sm font-bold px-10 py-4 rounded-2xl shadow-md transition hover:scale-105 active:scale-95"
                   >
                     Về Trang Chủ
                   </button>
                 </motion.div>
               )}
 
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Clear Cart Confirmation Modal */}
+      <AnimatePresence>
+        {isClearConfirmOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsClearConfirmOpen(false)}
+              className="fixed inset-0 bg-black z-50 flex items-center justify-center"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="fixed inset-0 m-auto w-[90%] max-w-sm h-fit bg-white rounded-3xl shadow-2xl p-6 z-50 overflow-hidden flex flex-col text-center"
+            >
+              <div className="w-16 h-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8" />
+              </div>
+              <h3 className="font-display font-extrabold text-lg text-brand-black mb-2">Xóa tất cả sản phẩm?</h3>
+              <p className="text-xs font-semibold text-gray-500 mb-6">
+                Bạn có chắc chắn muốn xóa toàn bộ sản phẩm khỏi giỏ hàng không? Hành động này không thể hoàn tác.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setIsClearConfirmOpen(false)}
+                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs py-3 rounded-xl transition"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  onClick={() => {
+                    clearCart();
+                    setIsClearConfirmOpen(false);
+                  }}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold text-xs py-3 rounded-xl transition shadow-md"
+                >
+                  Xóa tất cả
+                </button>
+              </div>
             </motion.div>
           </>
         )}

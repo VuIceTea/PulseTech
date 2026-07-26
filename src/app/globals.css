@@ -75,6 +75,11 @@
 }
 
 /* ==================== CUSTOM UTILITIES ==================== */
+html, body {
+  overflow-x: clip;
+  width: 100%;
+}
+
 body {
   /* Sử dụng biến font-sans (Geist) */
   font-family: var(--font-sans);
@@ -122,4 +127,25 @@ button,
 [class*="group-hover:"],
 [class*="peer-hover:"] {
   cursor: pointer;
+}
+
+/* Animated Striped Progress Bar */
+.progress-stripes {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.3) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0.3) 75%,
+    transparent 75%,
+    transparent
+  );
+  background-size: 2rem 2rem;
+  animation: move-stripes 1.5s linear infinite;
+}
+
+@keyframes move-stripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 2rem 0; }
 }

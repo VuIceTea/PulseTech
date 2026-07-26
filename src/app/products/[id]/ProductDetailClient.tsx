@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Product, ColorVariant, StorageVariant } from '@/types/product';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { 
   Star, 
   ShoppingCart, 
@@ -26,23 +27,17 @@ interface ProductDetailClientProps {
 export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ product }) => {
   const router = useRouter();
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   // State managers
   const [selectedColor, setSelectedColor] = useState<ColorVariant>(product.colors[0]);
   const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(product.storages[0]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [liked, setLiked] = useState(false);
+  const liked = isInWishlist(product.id);
   const [showFullSpecs, setShowFullSpecs] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   // Update selected color image sync
   const handleColorSelect = (color: ColorVariant) => {
@@ -67,7 +62,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const handleAddToCart = (redirect = false) => {
     addToCart(product, selectedColor.name, selectedStorage.name, quantity);
     if (redirect) {
-      router.push('/cart');
+      router.push('/checkout');
     }
   };
 
@@ -187,7 +182,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
           </div>
 
           <button 
-            onClick={() => setLiked(!liked)}
+            onClick={() => toggleWishlist(product)}
             className={`flex items-center gap-1.5 px-4 py-2 border rounded-2xl text-xs font-bold transition shadow-sm bg-white ${
               liked ? 'text-primary border-primary/30 bg-red-50' : 'text-gray-500 border-gray-200 hover:bg-gray-50'
             }`}
