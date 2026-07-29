@@ -342,16 +342,33 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               {/* Quantity Select */}
               <div className="mb-6 pt-2 border-t border-gray-50 flex items-center justify-between gap-4">
                 <span className="text-xs font-bold text-gray-500">SỐ LƯỢNG MUA</span>
-                <div className="flex items-center border border-gray-250 rounded-2xl overflow-hidden shadow-sm bg-gray-50">
+                <div className="flex items-center rounded-2xl overflow-hidden shadow-sm bg-gray-50">
                   <button 
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition"
                   >
                     -
                   </button>
-                  <span className="px-4 py-2 text-xs font-bold text-brand-black text-center min-w-[40px] bg-white">
-                    {quantity}
-                  </span>
+                  <input
+  type="number"
+  min={1}
+  max={product.stock}
+  value={quantity}
+  onChange={(event) => {
+    const value = event.target.valueAsNumber;
+
+    if (!Number.isNaN(value)) {
+      setQuantity(
+        Math.min(product.stock, Math.max(1, Math.trunc(value)))
+      );
+    }
+  }}
+  className="w-14 bg-white px-2 py-2 text-center text-xs font-bold
+             text-brand-black border-0 outline-none
+             [appearance:textfield]
+             [&::-webkit-inner-spin-button]:appearance-none
+             [&::-webkit-outer-spin-button]:appearance-none"
+/>
                   <button 
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition"
@@ -372,7 +389,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                 </button>
                 <button
                   onClick={() => handleAddToCart(false)}
-                  className="px-6 bg-gray-100 hover:bg-gray-200 text-brand-black py-3 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex items-center justify-center gap-2"
+                  className="px-6 bg-brand-black hover:bg-gray-800 text-white py-3 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex items-center justify-center gap-2"
                 >
                   <ShoppingCart className="h-4.5 w-4.5" /> Thêm Vào Giỏ
                 </button>
