@@ -92,11 +92,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
         </div>
 
-        {/* Brand */}
-        <span className="bg-black text-white text-[9px] font-bold uppercase tracking-wider mb-2 px-2 py-0.5 rounded-md w-fit inline-block">
-          {product.brand}
-        </span>
-
         {/* Product Name */}
         <h3 className="font-display font-bold text-sm text-brand-black group-hover:text-primary transition-colors line-clamp-2 mb-2 leading-tight">
           {product.name}

@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { api, Store } from '@/lib/api';
 import { MapPin, Phone, Clock } from 'lucide-react';
