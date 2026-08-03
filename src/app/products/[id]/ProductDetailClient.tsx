@@ -29,9 +29,16 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
 
+  // Safe defaults for arrays/objects that might be undefined in API response
+  const colors = (product.colors && product.colors.length > 0) ? product.colors : [{ name: 'Mặc định', hex: '#000', image: product.image }];
+  const storages = (product.storages && product.storages.length > 0) ? product.storages : [{ name: 'Mặc định', priceOffset: 0 }];
+  const images = (product.images && product.images.length > 0) ? product.images : (product.image ? [product.image] : []);
+  const reviews = product.reviews || [];
+  const specs = product.specs || {};
+
   // State managers
-  const [selectedColor, setSelectedColor] = useState<ColorVariant>(product.colors[0]);
-  const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(product.storages[0]);
+  const [selectedColor, setSelectedColor] = useState<ColorVariant>(colors[0]);
+  const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(storages[0]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const liked = isInWishlist(product.id);
@@ -43,14 +50,14 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const handleColorSelect = (color: ColorVariant) => {
     setSelectedColor(color);
     // Find index of color image in gallery if it exists
-    const imgIndex = product.images.findIndex(img => img === color.image);
+    const imgIndex = images.findIndex(img => img === color.image);
     if (imgIndex !== -1) {
       setActiveImageIndex(imgIndex);
     }
   };
 
   // Pricing calculations
-  const discountedBasePrice = Math.round(product.basePrice * (1 - product.discount / 100));
+  const discountedBasePrice = product.basePrice;
   const currentPrice = discountedBasePrice + selectedStorage.priceOffset;
   const originalPrice = product.originalPrice + selectedStorage.priceOffset;
 
@@ -213,9 +220,9 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
             </div>
 
             {/* Thumbnail selector */}
-            {product.images.length > 1 && (
+            {images.length > 1 && (
               <div className="flex gap-3 overflow-x-auto no-scrollbar py-1">
-                {product.images.map((img, idx) => (
+                {images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
@@ -289,7 +296,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               <div className="mb-4">
                 <span className="text-xs font-bold text-gray-500 block mb-2">MÀU SẮC: {selectedColor.name}</span>
                 <div className="flex flex-wrap gap-2.5">
-                  {product.colors.map((color) => (
+                  {colors.map((color) => (
                     <button
                       key={color.name}
                       onClick={() => handleColorSelect(color)}
@@ -315,11 +322,11 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               </div>
 
               {/* Storage Variants Options */}
-              {product.storages.length > 1 && (
+              {storages.length > 1 && (
                 <div className="mb-4 pt-2 border-t border-gray-50">
                   <span className="text-xs font-bold text-gray-500 block mb-2">PHIÊN BẢN BỘ NHỚ</span>
                   <div className="flex flex-wrap gap-2">
-                    {product.storages.map((storage) => (
+                    {storages.map((storage) => (
                       <button
                         key={storage.name}
                         onClick={() => setSelectedStorage(storage)}
@@ -439,7 +446,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               <p className="text-base text-gray-700 font-semibold">{product.description}</p>
               
               <div className="w-full rounded-2xl overflow-hidden my-6 border border-gray-100 bg-white flex items-center justify-center p-4 shadow-sm">
-                <img src={product.images[0] || product.image} alt={product.name} className="w-2/3 md:w-1/2 h-auto object-contain mix-blend-multiply transition-transform hover:scale-105 duration-500" />
+                <img src={(images || [])[0] || product.image} alt={product.name} className="w-2/3 md:w-1/2 h-auto object-contain mix-blend-multiply transition-transform hover:scale-105 duration-500" />
               </div>
 
               {['phone', 'tablet', 'laptop'].includes(product.category) ? (
@@ -447,41 +454,41 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   <h4 className="text-brand-black text-lg font-bold mt-8 mb-3">Thiết kế sang trọng, thời thượng và đẳng cấp</h4>
                   <p>Sự kết hợp hoàn hảo giữa vật liệu cao cấp và sự tinh tế trong ngôn ngữ thiết kế đã kiến tạo nên một diện mạo đầy sức hút. Mọi góc cạnh, đường viền của <strong>{product.name}</strong> đều được vát cong và xử lý tỉ mỉ bởi công nghệ cắt khắc tiên tiến nhất, không chỉ mang lại vẻ đẹp bóng bẩy, sang trọng mà còn tạo cảm giác cầm nắm đầm tay, vô cùng thoải mái khi sử dụng liên tục trong nhiều giờ. Phần mặt lưng được phủ một lớp hoàn thiện cao cấp giúp chống bám mồ hôi và dấu vân tay, duy trì vẻ ngoài sạch sẽ, mới mẻ. Sự đa dạng về tùy chọn màu sắc cũng giúp người dùng tự do thể hiện cá tính riêng, biến chiếc máy không chỉ là một công cụ liên lạc mà còn là một món đồ trang sức công nghệ dẫn đầu xu hướng.</p>
 
-                  {product.images.length > 1 && (
+                  {(images || []).length > 1 && (
                     <div className="w-full rounded-2xl overflow-hidden my-6 shadow-sm border border-gray-100">
-                      <img src={product.images[1]} alt="Thiết kế và trải nghiệm" className="w-full h-[350px] object-cover hover:scale-105 transition-transform duration-700" />
+                      <img src={images[1]} alt="Thiết kế và trải nghiệm" className="w-full h-[350px] object-cover hover:scale-105 transition-transform duration-700" />
                     </div>
                   )}
 
                   <h4 className="text-brand-black text-lg font-bold mt-8 mb-3">Hiệu năng mạnh mẽ, thách thức mọi giới hạn</h4>
-                  <p>Nằm sâu bên trong bộ khung tuyệt đẹp là một nguồn sức mạnh khổng lồ được cung cấp bởi vi xử lý <strong>{product.specs.cpu || 'thế hệ mới nhất'}</strong>. Với tiến trình sản xuất hiện đại và kiến trúc lõi được tối ưu hoá, thiết bị không chỉ xử lý mượt mà mọi thao tác vuốt chạm thông thường mà còn dễ dàng "cân" mọi tựa game đồ họa 3D nặng nhất hiện nay. Mức dung lượng RAM <strong>{product.specs.ram || 'lớn'}</strong> cho phép bạn thoải mái mở hàng chục ứng dụng chạy ngầm cùng lúc mà không hề xảy ra hiện tượng giật lag hay phải chờ tải lại. Bên cạnh đó, hệ thống tản nhiệt tiên tiến giúp máy luôn hoạt động ở nhiệt độ lý tưởng. Dung lượng pin ấn tượng <strong>{product.specs.battery || 'bền bỉ'}</strong> kết hợp cùng công nghệ quản lý điện năng bằng trí tuệ nhân tạo (AI) sẽ đồng hành cùng bạn suốt cả một ngày dài năng động mà không phải lo lắng về việc gián đoạn trải nghiệm.</p>
+                  <p>Nằm sâu bên trong bộ khung tuyệt đẹp là một nguồn sức mạnh khổng lồ được cung cấp bởi vi xử lý <strong>{(specs || {}).cpu || 'thế hệ mới nhất'}</strong>. Với tiến trình sản xuất hiện đại và kiến trúc lõi được tối ưu hoá, thiết bị không chỉ xử lý mượt mà mọi thao tác vuốt chạm thông thường mà còn dễ dàng "cân" mọi tựa game đồ họa 3D nặng nhất hiện nay. Mức dung lượng RAM <strong>{(specs || {}).ram || 'lớn'}</strong> cho phép bạn thoải mái mở hàng chục ứng dụng chạy ngầm cùng lúc mà không hề xảy ra hiện tượng giật lag hay phải chờ tải lại. Bên cạnh đó, hệ thống tản nhiệt tiên tiến giúp máy luôn hoạt động ở nhiệt độ lý tưởng. Dung lượng pin ấn tượng <strong>{(specs || {}).battery || 'bền bỉ'}</strong> kết hợp cùng công nghệ quản lý điện năng bằng trí tuệ nhân tạo (AI) sẽ đồng hành cùng bạn suốt cả một ngày dài năng động mà không phải lo lắng về việc gián đoạn trải nghiệm.</p>
 
-                  {product.images.length > 2 && (
+                  {(images || []).length > 2 && (
                     <div className="w-full rounded-2xl overflow-hidden my-6 shadow-sm border border-gray-100 bg-white flex items-center justify-center">
-                      <img src={product.images[2]} alt="Công nghệ màn hình và camera" className="w-full h-[350px] object-cover hover:scale-105 transition-transform duration-700" />
+                      <img src={images[2]} alt="Công nghệ màn hình và camera" className="w-full h-[350px] object-cover hover:scale-105 transition-transform duration-700" />
                     </div>
                   )}
 
                   <h4 className="text-brand-black text-lg font-bold mt-8 mb-3">Nâng tầm trải nghiệm thị giác và nhiếp ảnh chuyên nghiệp</h4>
-                  <p>Điểm nhấn không thể bỏ qua chính là không gian hiển thị đỉnh cao thông qua màn hình <strong>{product.specs.screen || 'siêu sắc nét'}</strong>. Tấm nền cao cấp mang lại dải màu sắc rực rỡ, độ tương phản tuyệt đối và độ sáng vượt trội, cho phép bạn thưởng thức các bộ phim điện ảnh hay thiết kế đồ họa một cách chuẩn xác ngay cả dưới ánh nắng gắt. Hơn thế nữa, hệ thống camera <strong>{product.specs.camera || 'chuyên nghiệp'}</strong> được tích hợp hàng loạt cảm biến kích thước lớn, kết hợp thuật toán xử lý ảnh tiên tiến giúp tối ưu hóa ánh sáng và chi tiết trong từng khung hình. Dù bạn chụp ảnh phong cảnh, chụp chân dung xóa phông nghệ thuật hay quay video chống rung trong môi trường thiếu sáng, <strong>{product.name}</strong> đều tự tin mang lại những tác phẩm nghệ thuật sống động và chân thực đến từng điểm ảnh.</p>
+                  <p>Màn hình của thiết bị có kích thước <strong>{(specs || {}).screen || 'lớn, độ phân giải cao'}</strong> được trang bị những công nghệ hiển thị tối tân, mang đến chất lượng hình ảnh sống động, độ tương phản tuyệt đối và dải màu siêu rộng. Nhờ tần số quét cao, mọi chuyển động, cuộn trang hay hiệu ứng đồ họa đều diễn ra vô cùng mượt mà. Hệ thống camera sau <strong>{(specs || {}).camera || 'chất lượng'}</strong> tích hợp chống rung quang học cùng vô số thuật toán xử lý ảnh bằng AI giúp bạn bắt trọn mọi khoảnh khắc trong cuộc sống với độ chi tiết kinh ngạc, kể cả trong điều kiện thiếu sáng. Camera trước <strong>{(specs || {}).frontCamera || 'sắc nét'}</strong> sẽ làm hài lòng những tín đồ chụp ảnh chân dung hoặc liên lạc qua video với chất lượng tinh khiết nhất.</p>
                 </>
               ) : (
                 <>
                   <h4 className="text-brand-black text-lg font-bold mt-8 mb-3">Chất lượng hoàn thiện cao cấp và bền bỉ vượt thời gian</h4>
                   <p>Dòng sản phẩm <strong>{product.name}</strong> luôn được giới mộ điệu đánh giá cao nhờ quy trình sản xuất đáp ứng những tiêu chuẩn khắt khe nhất của ngành công nghiệp phụ kiện. Toàn bộ bề mặt ngoài và các cấu kiện bên trong đều được chế tác từ những vật liệu cao cấp siêu bền, mang lại khả năng chống chịu xuất sắc trước các tác động vật lý, sự thay đổi nhiệt độ và sự mài mòn theo thời gian. Mọi chi tiết gia công từ phím bấm, khớp nối cho đến lớp phủ tĩnh điện đều được xử lý vô cùng tinh xảo, tuyệt đối không có bất kì chi tiết thừa nào. Sự chăm chút này không chỉ giúp thiết bị luôn duy trì vẻ đẹp thẩm mỹ đẳng cấp mà còn mang lại cảm giác an tâm tuyệt đối cho người dùng trong mọi điều kiện môi trường khắc nghiệt nhất.</p>
 
-                  {product.images.length > 1 && (
+                  {(images || []).length > 1 && (
                     <div className="w-full rounded-2xl overflow-hidden my-6 shadow-sm border border-gray-100 bg-white p-4 flex items-center justify-center">
-                      <img src={product.images[1]} alt="Thiết kế phụ kiện" className="w-2/3 h-auto object-contain hover:scale-105 transition-transform duration-700" />
+                      <img src={images[1]} alt="Thiết kế phụ kiện" className="w-2/3 h-auto object-contain hover:scale-105 transition-transform duration-700" />
                     </div>
                   )}
 
                   <h4 className="text-brand-black text-lg font-bold mt-8 mb-3">Tương thích hoàn hảo cùng công nghệ đột phá</h4>
                   <p>
                     Vượt xa khỏi giới hạn của một món phụ kiện thông thường, sản phẩm được nghiên cứu kĩ lưỡng để trở thành một mảnh ghép hoàn hảo, nâng tầm hệ sinh thái công nghệ của bạn. Sự tối ưu hóa về mặt phần cứng lẫn chip xử lý bên trong giúp nó kết nối tức thì và duy trì độ ổn định tuyệt đối với hầu hết các thiết bị thông minh hiện nay.
-                    {product.specs.chargingPower && ` Đáng chú ý nhất, công nghệ truyền tải năng lượng với công suất chạm ngưỡng ${product.specs.chargingPower} không chỉ rút ngắn tối đa thời gian sạc đầy mà còn sở hữu cơ chế bảo vệ dòng điện tự động, giúp thiết bị chủ luôn mát mẻ và kéo dài tuổi thọ pin một cách hiệu quả.`}
-                    {product.specs.audioFeature && ` Hệ thống vi mạch phân giải và công nghệ ${product.specs.audioFeature} kết hợp cùng cấu trúc buồng âm cao cấp sẽ tái tạo dải âm trầm sâu lắng và dải âm cao trong trẻo, mang bạn đắm chìm vào không gian âm nhạc sống động tựa như một buổi hòa nhạc thực thụ.`}
-                    {product.specs.caseFeature && ` Bên cạnh đó, lớp vật liệu đàn hồi chuyên dụng ${product.specs.caseFeature} áp dụng công nghệ phân tán lực thông minh sẽ hấp thụ phần lớn lực va đập khi vô tình làm rơi, tạo nên một "tấm khiên" vững chãi bảo vệ thiết bị yêu quý của bạn khỏi mọi rủi ro nứt vỡ.`}
+                    {(specs || {}).chargingPower && ` Đáng chú ý nhất, công nghệ truyền tải năng lượng với công suất chạm ngưỡng ${(specs || {}).chargingPower} không chỉ rút ngắn tối đa thời gian sạc đầy mà còn sở hữu cơ chế bảo vệ dòng điện tự động, giúp thiết bị chủ luôn mát mẻ và kéo dài tuổi thọ pin một cách hiệu quả.`}
+                    {(specs || {}).audioFeature && ` Hệ thống vi mạch phân giải và công nghệ ${(specs || {}).audioFeature} kết hợp cùng cấu trúc buồng âm cao cấp sẽ tái tạo dải âm trầm sâu lắng và dải âm cao trong trẻo, mang bạn đắm chìm vào không gian âm nhạc sống động tựa như một buổi hòa nhạc thực thụ.`}
+                    {(specs || {}).caseFeature && ` Bên cạnh đó, lớp vật liệu đàn hồi chuyên dụng ${(specs || {}).caseFeature} áp dụng công nghệ phân tán lực thông minh sẽ hấp thụ phần lớn lực va đập khi vô tình làm rơi, tạo nên một "tấm khiên" vững chãi bảo vệ thiết bị yêu quý của bạn khỏi mọi rủi ro nứt vỡ.`}
                   </p>
                   <p className="mt-4">Mọi sản phẩm do PulseTech cung cấp đều là hàng chính hãng 100%, vượt qua hàng loạt khâu kiểm định chất lượng nghiêm ngặt trước khi đến tay người tiêu dùng. Sự kết hợp giữa sự tiện dụng, thiết kế sang trọng và những công nghệ đột phá bên trong chắc chắn sẽ biến <strong>{product.name}</strong> trở thành trợ thủ đắc lực nhất của bạn.</p>
                 </>
@@ -509,14 +516,14 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
             </h3>
             <div className="flex flex-col text-xs font-semibold">
               {[
-                { name: 'Màn hình', value: product.specs.screen },
-                { name: 'Hệ điều hành', value: product.specs.os },
-                { name: 'Camera sau', value: product.specs.camera },
-                { name: 'Camera trước', value: product.specs.frontCamera },
-                { name: 'Vi xử lý (CPU)', value: product.specs.cpu },
-                { name: 'Dung lượng RAM', value: product.specs.ram },
+                { name: 'Màn hình', value: specs.screen },
+                { name: 'Hệ điều hành', value: specs.os },
+                { name: 'Camera sau', value: specs.camera },
+                { name: 'Camera trước', value: specs.frontCamera },
+                { name: 'Vi xử lý (CPU)', value: specs.cpu },
+                { name: 'Dung lượng RAM', value: specs.ram },
                 { name: 'Bộ nhớ trong', value: selectedStorage.name },
-                { name: 'Dung lượng Pin', value: product.specs.battery }
+                { name: 'Dung lượng Pin', value: specs.battery }
               ].map((spec, index) => (
                 <div 
                   key={spec.name} 
@@ -558,7 +565,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
         {/* CUSTOMER REVIEWS SECTION */}
         <section className="bg-white border border-gray-100 rounded-3xl p-6 sm:p-8 shadow-sm mt-12">
           <h3 className="font-display font-extrabold text-lg sm:text-xl text-brand-black border-b border-gray-150 pb-3 mb-6 uppercase tracking-wide">
-            Đánh giá khách hàng ({product.reviewsCount})
+            Đánh giá khách hàng ({product.reviewsCount || reviews.length})
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center border-b border-gray-100 pb-8 mb-8">
@@ -601,8 +608,8 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
 
           {/* Comments list */}
           <div className="space-y-6">
-            {product.reviews.length > 0 ? (
-              product.reviews.map((rev) => (
+            {reviews.length > 0 ? (
+              reviews.map((rev) => (
                 <div key={rev.id} className="border-b border-gray-50 pb-5 last:border-0 last:pb-0 font-semibold">
                   <div className="flex justify-between items-start gap-4 mb-2">
                     <div>

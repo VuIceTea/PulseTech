@@ -71,7 +71,7 @@ export default function Home() {
 
   // Thẻ sản phẩm thu gọn cho phần Hot Summer (Bên phải)
   const SmallProductCard = ({ product }: { product: any }) => {
-    const salePrice = Math.round(product.basePrice * (1 - product.discount / 100));
+    const salePrice = product.basePrice;
     return (
       <div className="group flex items-center p-3 bg-white border border-gray-100 border-b-[3px] hover:border-b-primary rounded-xl transition-all duration-300 cursor-pointer relative">
         {product.discount > 0 && (
@@ -87,9 +87,6 @@ export default function Home() {
           />
         </div>
         <div className="flex-1 min-w-0 flex flex-col justify-center ml-3 text-left">
-          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">
-            {product.brand}
-          </span>
           <h3 className="font-display font-bold text-sm text-brand-black truncate group-hover:text-primary transition-colors leading-snug">
             {product.name}
           </h3>
@@ -103,7 +100,7 @@ export default function Home() {
               {salePrice.toLocaleString("vi-VN")}đ
             </span>
             <span className="text-xs text-gray-400 line-through font-semibold">
-              {product.basePrice.toLocaleString("vi-VN")}đ
+              {product.originalPrice.toLocaleString("vi-VN")}đ
             </span>
           </div>
         </div>
@@ -113,7 +110,7 @@ export default function Home() {
 
   // Thẻ sản phẩm dọc tiêu chuẩn
   const VerticalProductCard = ({ product }: { product: any }) => {
-    const salePrice = Math.round(product.basePrice * (1 - product.discount / 100));
+    const salePrice = product.basePrice;
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { addToCart } = useCart();
     
@@ -175,9 +172,6 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col mt-auto text-left">
-            <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
-              {product.brand}
-            </span>
             <h3 className="font-display font-bold text-sm text-brand-black leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors duration-300">
               {product.name}
             </h3>
@@ -193,8 +187,8 @@ export default function Home() {
                 <span className="font-extrabold text-base text-primary leading-tight">
                   {salePrice.toLocaleString("vi-VN")}đ
                 </span>
-                <span className="text-xs text-gray-400 line-through font-semibold">
-                  {product.basePrice.toLocaleString("vi-VN")}đ
+                <span className="text-gray-400 text-xs line-through font-semibold mb-[2px]">
+                  {product.originalPrice.toLocaleString('vi-VN')}đ
                 </span>
               </div>
 

@@ -63,7 +63,7 @@ export const FlashSale: React.FC = () => {
         <div className="relative">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
             {dealProducts.map((product, idx) => {
-              const salePrice = Math.round(product.basePrice * (1 - product.discount / 100));
+              const salePrice = product.basePrice;
 
               return (
                 <div key={product.id} className="bg-white rounded-xl p-3 flex flex-col cursor-pointer relative hover:-translate-y-1 transition-transform duration-300 shadow-sm">
@@ -92,7 +92,7 @@ export const FlashSale: React.FC = () => {
                     {/* Info */}
                     <div className="flex flex-col flex-1">
                       <h3 className="font-bold text-[13px] text-brand-black leading-snug line-clamp-2 mb-2 hover:text-[#d70018] transition-colors">
-                        {product.name} {product.specs?.ram?.split(' ')[0]} {product.specs?.storage}
+                        {product.name}
                       </h3>
                       
                       <div className="flex items-end gap-2 mb-2">
@@ -100,7 +100,7 @@ export const FlashSale: React.FC = () => {
                           {salePrice.toLocaleString('vi-VN')}đ
                         </span>
                         <span className="text-sm text-gray-400 line-through font-semibold mb-[1px]">
-                          {product.basePrice.toLocaleString('vi-VN')}đ
+                          {product.originalPrice.toLocaleString('vi-VN')}đ
                         </span>
                       </div>
 

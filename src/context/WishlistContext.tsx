@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '@/types/product';
+import { userApi, api } from '@/lib/api';
+import { useAuth } from './AuthContext';
 
 export interface WishlistItem {
   id: string; // product id
@@ -9,6 +11,7 @@ export interface WishlistItem {
   brand: string;
   image: string;
   basePrice: number;
+  originalPrice: number;
   discount: number;
   category: string;
 }
@@ -24,28 +27,74 @@ interface WishlistContextType {
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage on mount
+  // Load from localStorage or API on mount / user change
   useEffect(() => {
-    const storedWishlist = localStorage.getItem('pulsetech_wishlist');
-    if (storedWishlist) {
-      try {
-        setWishlist(JSON.parse(storedWishlist));
-      } catch (error) {
-        console.error('Failed to parse wishlist storage', error);
+    const loadWishlist = async () => {
+      if (user) {
+        try {
+          const apiWishlist = await userApi.getWishlist(user.email);
+          if (apiWishlist && apiWishlist.productIds && apiWishlist.productIds.length > 0) {
+            // Fetch product details for each id
+            const items: WishlistItem[] = [];
+            for (const pid of apiWishlist.productIds) {
+              try {
+                const product = await api.product(pid);
+                items.push({
+                  id: product.id,
+                  name: product.name,
+                  brand: product.brand,
+                  image: product.image,
+                  basePrice: product.basePrice,
+                  originalPrice: product.originalPrice,
+                  discount: product.discount,
+                  category: product.category,
+                });
+              } catch (e) {
+                console.error('Failed to fetch wishlist product', pid, e);
+              }
+            }
+            setWishlist(items);
+          } else {
+            setWishlist([]); // Clear if empty on backend
+          }
+        } catch (error) {
+          console.error('Failed to load wishlist from API', error);
+        }
+      } else {
+        const storedWishlist = localStorage.getItem('pulsetech_wishlist');
+        if (storedWishlist) {
+          try {
+            setWishlist(JSON.parse(storedWishlist));
+          } catch (error) {
+            console.error('Failed to parse wishlist storage', error);
+          }
+        } else {
+          setWishlist([]);
+        }
       }
-    }
-    setIsLoaded(true);
-  }, []);
+      setIsLoaded(true);
+    };
 
-  // Save to localStorage when changed
+    loadWishlist();
+  }, [user]);
+
+  // Save to localStorage or API when changed
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('pulsetech_wishlist', JSON.stringify(wishlist));
+      if (user) {
+        userApi.saveWishlist({
+          id: user.email,
+          productIds: wishlist.map(item => item.id)
+        }).catch(console.error);
+      } else {
+        localStorage.setItem('pulsetech_wishlist', JSON.stringify(wishlist));
+      }
     }
-  }, [wishlist, isLoaded]);
+  }, [wishlist, isLoaded, user]);
 
   const addToWishlist = (product: Product) => {
     setWishlist(prev => {
@@ -56,6 +105,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         brand: product.brand,
         image: product.image,
         basePrice: product.basePrice,
+        originalPrice: product.originalPrice,
         discount: product.discount,
         category: product.category,
       }];

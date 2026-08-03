@@ -1,48 +1,11 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, Sparkles, Smartphone, Tablet, Headphones, Watch, Laptop, Volume2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Slide {
-  id: number;
-  title: string;
-  subtitle: string;
-  promoText: string;
-  image: string;
-  bgColor: string;
-  link: string;
-}
-
-const SLIDES: Slide[] = [
-  {
-    id: 1,
-    title: 'IPHONE 15 PRO MAX',
-    subtitle: 'Titan cực đỉnh - Hiệu năng vượt trội',
-    promoText: 'Trợ giá lên đời đến 2 triệu • Trả góp 0%',
-    image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=800&auto=format&fit=crop',
-    bgColor: 'from-zinc-900 to-zinc-800',
-    link: '/products/iphone-15-pro-max'
-  },
-  {
-    id: 2,
-    title: 'GALAXY S24 ULTRA',
-    subtitle: 'Quyền năng Galaxy AI trong tay bạn',
-    promoText: 'Giảm ngay 7 triệu • Tặng củ sạc nhanh 45W',
-    image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?q=80&w=800&auto=format&fit=crop',
-    bgColor: 'from-blue-950 to-indigo-950',
-    link: '/products/samsung-galaxy-s24-ultra'
-  },
-  {
-    id: 3,
-    title: 'IPAD PRO M4 (2024)',
-    subtitle: 'Đột phá siêu mỏng • Tandem OLED đỉnh cao',
-    promoText: 'Ưu đãi học sinh sinh viên giảm thêm 500k',
-    image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?q=80&w=800&auto=format&fit=crop',
-    bgColor: 'from-slate-900 to-slate-800',
-    link: '/products/ipad-pro-m4'
-  }
-];
+import { useProducts } from '@/hooks/useProducts';
+import { api, Banner } from '@/lib/api';
 
 interface SubCategoryLink {
   name: string;
@@ -55,24 +18,119 @@ interface MegaMenuColumn {
 }
 
 interface SidebarCategory {
-  id: number;
+  id: string;
   name: string;
   icon: React.ReactNode;
   link: string;
   megaMenu: MegaMenuColumn[];
 }
 
+const IconMap: Record<string, React.ReactNode> = {
+  Smartphone: <Smartphone className="h-4 w-4" />,
+  Tablet: <Tablet className="h-4 w-4" />,
+  Headphones: <Headphones className="h-4 w-4" />,
+  Watch: <Watch className="h-4 w-4" />,
+  Laptop: <Laptop className="h-4 w-4" />,
+  Volume2: <Volume2 className="h-4 w-4" />,
+  RefreshCw: <RefreshCw className="h-4 w-4" />
+};
+
+const DEFAULT_BANNERS: Banner[] = [
+  {
+    id: "ban-1",
+    imageUrl: "/hot-sale/iphone-15-pro-max.png",
+    title: "IPHONE 15 PRO MAX",
+    subtitle: "Titan cực đỉnh - Hiệu năng vượt trội",
+    promoText: "Trợ giá lên đời đến 2 triệu • Trả góp 0%",
+    bgColor: "from-zinc-900 to-zinc-800",
+    link: "/products/iphone-15-pro-max",
+    position: "main",
+    order: 1
+  },
+  {
+    id: "ban-2",
+    imageUrl: "/hot-sale/samsung-galaxy-s24-ultra.png",
+    title: "GALAXY S24 ULTRA",
+    subtitle: "Quyền năng Galaxy AI trong tay bạn",
+    promoText: "Giảm ngay 7 triệu • Tặng củ sạc nhanh 45W",
+    bgColor: "from-blue-950 to-indigo-950",
+    link: "/products/samsung-galaxy-s24-ultra",
+    position: "main",
+    order: 2
+  },
+  {
+    id: "ban-3",
+    imageUrl: "/tablet.png",
+    title: "IPAD PRO M4 (2024)",
+    subtitle: "Đột phá siêu mỏng • Tandem OLED đỉnh cao",
+    promoText: "Ưu đãi học sinh sinh viên giảm thêm 500k",
+    bgColor: "from-slate-900 to-slate-800",
+    link: "/products/ipad-pro-m4",
+    position: "main",
+    order: 3
+  }
+];
+
 export const HeroBanner: React.FC = () => {
+  const router = useRouter();
+  const { products } = useProducts();
+  const [slides, setSlides] = useState<Banner[]>(DEFAULT_BANNERS);
+  const [sidebarCategories, setSidebarCategories] = useState<SidebarCategory[]>([]);
+
+  useEffect(() => {
+    api.getBanners().then(data => {
+      if (data && data.length > 0) {
+        const mainBanners = data
+          .filter(b => b.position === 'main')
+          .sort((a, b) => a.order - b.order)
+          .map(b => {
+            if (b.imageUrl && b.imageUrl.includes('unsplash')) {
+              if (b.title.toUpperCase().includes('IPHONE')) return { ...b, imageUrl: '/hot-sale/iphone-15-pro-max.png' };
+              if (b.title.toUpperCase().includes('GALAXY')) return { ...b, imageUrl: '/hot-sale/samsung-galaxy-s24-ultra.png' };
+              if (b.title.toUpperCase().includes('IPAD') || b.title.toUpperCase().includes('TABLET')) return { ...b, imageUrl: '/tablet.png' };
+            }
+            return b;
+          });
+        if (mainBanners.length > 0) {
+          setSlides(mainBanners);
+        }
+      }
+    }).catch(() => {});
+    api.getMegaMenus().then(data => {
+      if (data && data.length > 0) {
+        setSidebarCategories(data.map(m => ({
+          id: m.id,
+          name: m.name,
+          icon: IconMap[m.icon] || <Sparkles className="h-4 w-4" />,
+          link: m.link,
+          megaMenu: m.sections.map(s => ({
+            title: s.title,
+            links: s.links
+          }))
+        })));
+      }
+    }).catch(() => {});
+  }, []);
+  
+  const xiaomi = products.find(p => p.id === 'xiaomi-14-ultra');
+  const xiaomiSalePrice = xiaomi ? xiaomi.basePrice : 28990000;
+  const xiaomiOriginalPrice = xiaomi ? xiaomi.originalPrice : 32990000;
+  
+  const airpods = products.find(p => p.id === 'tai-nghe-apple-airpods-pro-2');
+  const airpodsDiscount = airpods?.discount || 6;
+
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0); // -1: left, 1: right
-  const [hoveredCategory, setHoveredCategory] = useState<number | null>(null);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const resetTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      handleNext();
-    }, 5000);
+    if (slides.length > 0) {
+      timerRef.current = setInterval(() => {
+        handleNext();
+      }, 5000);
+    }
   };
 
   useEffect(() => {
@@ -80,16 +138,18 @@ export const HeroBanner: React.FC = () => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [current]);
+  }, [current, slides.length]);
 
   const handleNext = () => {
+    if (slides.length === 0) return;
     setDirection(1);
-    setCurrent((prev) => (prev + 1) % SLIDES.length);
+    setCurrent((prev) => (prev + 1) % slides.length);
   };
 
   const handlePrev = () => {
+    if (slides.length === 0) return;
     setDirection(-1);
-    setCurrent((prev) => (prev - 1 + SLIDES.length) % SLIDES.length);
+    setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const slideVariants = {
@@ -107,206 +167,7 @@ export const HeroBanner: React.FC = () => {
     })
   };
 
-  const SIDEBAR_CATEGORIES: SidebarCategory[] = [
-    {
-      id: 1,
-      name: 'Điện thoại di động',
-      icon: <Smartphone className="h-4 w-4" />,
-      link: '/products?category=phone',
-      megaMenu: [
-        {
-          title: 'Hãng sản xuất',
-          links: [
-            { name: 'iPhone (Apple)', link: '/products?brand=Apple' },
-            { name: 'Samsung Galaxy', link: '/products?brand=Samsung' },
-            { name: 'Xiaomi Redmi', link: '/products?brand=Xiaomi' },
-            { name: 'Oppo Reno', link: '/products?brand=Oppo' },
-            { name: 'Realme Series', link: '/products' },
-            { name: 'Vivo Series', link: '/products' }
-          ]
-        },
-        {
-          title: 'Phân khúc giá',
-          links: [
-            { name: 'Dưới 5 triệu', link: '/products?category=phone' },
-            { name: 'Từ 5 đến 10 triệu', link: '/products?category=phone' },
-            { name: 'Từ 10 đến 20 triệu', link: '/products?category=phone' },
-            { name: 'Trên 20 triệu', link: '/products?category=phone' }
-          ]
-        },
-        {
-          title: 'Dòng máy HOT nhất',
-          links: [
-            { name: 'iPhone 15 Pro Max', link: '/products/iphone-15-pro-max' },
-            { name: 'Galaxy S24 Ultra', link: '/products/samsung-galaxy-s24-ultra' },
-            { name: 'Xiaomi 14 Ultra', link: '/products/xiaomi-14-ultra' },
-            { name: 'Điện thoại gập AI', link: '/products?brand=Samsung' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Máy tính bảng (Tablet)',
-      icon: <Tablet className="h-4 w-4" />,
-      link: '/products?category=tablet',
-      megaMenu: [
-        {
-          title: 'Hãng máy tính bảng',
-          links: [
-            { name: 'Apple iPad', link: '/products?category=tablet&brand=Apple' },
-            { name: 'Samsung Galaxy Tab', link: '/products?category=tablet&brand=Samsung' },
-            { name: 'Xiaomi Pad', link: '/products?category=tablet' }
-          ]
-        },
-        {
-          title: 'Sản phẩm HOT',
-          links: [
-            { name: 'iPad Pro M4', link: '/products/ipad-pro-m4' },
-            { name: 'Galaxy Tab S9 FE', link: '/products/samsung-galaxy-tab-s9-fe' },
-            { name: 'iPad Air M2', link: '/products?category=tablet' }
-          ]
-        },
-        {
-          title: 'Phụ kiện đi kèm',
-          links: [
-            { name: 'Apple Pencil Pro', link: '/products' },
-            { name: 'Bao da bàn phím', link: '/products' },
-            { name: 'Kính cường lực', link: '/products' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 3,
-      name: 'Phụ kiện công nghệ',
-      icon: <Headphones className="h-4 w-4" />,
-      link: '/products?category=accessory',
-      megaMenu: [
-        {
-          title: 'Cáp sạc & Thiết bị sạc',
-          links: [
-            { name: 'Sạc nhanh Anker', link: '/products?category=accessory' },
-            { name: 'Cáp sạc Type-C', link: '/products?category=accessory' },
-            { name: 'Sạc dự phòng 20000mAh', link: '/products?category=accessory' }
-          ]
-        },
-        {
-          title: 'Bảo vệ máy',
-          links: [
-            { name: 'Ốp lưng UAG cao cấp', link: '/products' },
-            { name: 'Cường lực MIPOW', link: '/products' },
-            { name: 'Dán camera chống xước', link: '/products' }
-          ]
-        },
-        {
-          title: 'Thiết bị khác',
-          links: [
-            { name: 'Thẻ nhớ tốc độ cao', link: '/products' },
-            { name: 'Đế sạc không dây', link: '/products' },
-            { name: 'Gậy chụp ảnh tripod', link: '/products' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 4,
-      name: 'Smartwatch (Đồng hồ)',
-      icon: <Watch className="h-4 w-4" />,
-      link: '/products',
-      megaMenu: [
-        {
-          title: 'Thương hiệu đồng hồ',
-          links: [
-            { name: 'Apple Watch', link: '/products' },
-            { name: 'Samsung Galaxy Watch', link: '/products' },
-            { name: 'Đồng hồ Garmin', link: '/products' },
-            { name: 'Đồng hồ Xiaomi', link: '/products' }
-          ]
-        },
-        {
-          title: 'Dòng sản phẩm bán chạy',
-          links: [
-            { name: 'Apple Watch Ultra 2', link: '/products' },
-            { name: 'Galaxy Watch 6 Classic', link: '/products' },
-            { name: 'Garmin Venu 3', link: '/products' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 5,
-      name: 'Laptop & Màn hình',
-      icon: <Laptop className="h-4 w-4" />,
-      link: '/products?category=laptop',
-      megaMenu: [
-        {
-          title: 'Thương hiệu Laptop',
-          links: [
-            { name: 'MacBook (Apple)', link: '/products?category=laptop' },
-            { name: 'ASUS ROG (Gaming)', link: '/products?category=laptop' },
-            { name: 'Dell XPS (Văn phòng)', link: '/products?category=laptop' },
-            { name: 'Lenovo ThinkPad', link: '/products?category=laptop' }
-          ]
-        },
-        {
-          title: 'Màn hình máy tính',
-          links: [
-            { name: 'Màn hình ASUS ProArt', link: '/products?category=laptop' },
-            { name: 'Màn hình LG UltraFine', link: '/products?category=laptop' },
-            { name: 'Màn hình cong Samsung', link: '/products?category=laptop' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 6,
-      name: 'Thiết bị âm thanh',
-      icon: <Volume2 className="h-4 w-4" />,
-      link: '/products?category=audio',
-      megaMenu: [
-        {
-          title: 'Tai nghe Bluetooth',
-          links: [
-            { name: 'AirPods Pro 2', link: '/products/tai-nghe-apple-airpods-pro-2' },
-            { name: 'Sony WF-1000XM5', link: '/products?category=audio' },
-            { name: 'Tai nghe chụp tai Sony WH', link: '/products?category=audio' }
-          ]
-        },
-        {
-          title: 'Loa không dây di động',
-          links: [
-            { name: 'Loa Marshall Emberton', link: '/products' },
-            { name: 'Loa JBL Charge 5', link: '/products' },
-            { name: 'Loa Harman Kardon', link: '/products' }
-          ]
-        }
-      ]
-    },
-    {
-      id: 7,
-      name: 'Thu cũ đổi mới',
-      icon: <RefreshCw className="h-4 w-4" />,
-      link: '/trade-in',
-      megaMenu: [
-        {
-          title: 'Quy trình thu cũ',
-          links: [
-            { name: 'Định giá online 3 phút', link: '/products' },
-            { name: 'Trợ giá lên đời máy mới', link: '/products' },
-            { name: 'Bảo mật dữ liệu cũ', link: '/products' }
-          ]
-        },
-        {
-          title: 'Mức trợ giá HOT',
-          links: [
-            { name: 'Trợ giá iPhone đến 2 triệu', link: '/products' },
-            { name: 'Trợ giá Samsung Galaxy', link: '/products' }
-          ]
-        }
-      ]
-    }
-  ];
+
 
   return (
     <section className="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
@@ -318,7 +179,7 @@ export const HeroBanner: React.FC = () => {
         {/* LEFT: Left Sidebar (3 Cols) */}
         <div className="hidden lg:flex lg:col-span-3 flex-col bg-white border border-gray-100 rounded-3xl p-3.5 shadow-sm h-[380px] justify-between relative z-20">
           <div className="flex flex-col gap-1 w-full">
-            {SIDEBAR_CATEGORIES.map((cat) => (
+            {sidebarCategories.map((cat) => (
               <Link
                 key={cat.id}
                 href={cat.link}
@@ -351,42 +212,52 @@ export const HeroBanner: React.FC = () => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.4, ease: 'easeInOut' }}
-              className={`absolute inset-0 bg-linear-to-r ${SLIDES[current].bgColor} flex flex-col sm:flex-row justify-between p-6 sm:p-10 text-white h-full`}
+              onClick={() => slides.length > 0 && router.push(slides[current].link)}
+              className={`absolute inset-0 bg-linear-to-r cursor-pointer ${slides.length > 0 && slides[current].bgColor ? slides[current].bgColor : 'from-zinc-900 to-zinc-800'} flex flex-col sm:flex-row justify-between p-6 sm:p-10 text-white h-full`}
             >
-              {/* Content left */}
-              <div className="flex flex-col justify-center space-y-2 sm:space-y-4 max-w-[280px] sm:max-w-md z-10">
-                <span className="bg-primary/20 text-primary border border-primary/30 text-[10px] font-bold tracking-wider px-3 py-1 rounded-full w-fit uppercase flex items-center gap-1">
-                  <Sparkles className="h-3 w-3 animate-spin" /> Hot Deal Tuần Này
-                </span>
-                <h2 className="font-display font-extrabold text-xl sm:text-3xl leading-tight">
-                  {SLIDES[current].title}
-                </h2>
-                <p className="text-gray-300 text-[10px] sm:text-sm font-medium">
-                  {SLIDES[current].subtitle}
-                </p>
-                <div className="text-[10px] sm:text-xs text-yellow-400 font-semibold bg-white/5 border border-white/10 px-3 py-2 rounded-xl w-fit">
-                  {SLIDES[current].promoText}
-                </div>
-                <Link
-                  href={SLIDES[current].link}
-                  className="bg-primary hover:bg-primary-hover text-white text-[10px] sm:text-xs font-bold px-5 py-2.5 rounded-2xl w-fit transition shadow-md hover:scale-105 active:scale-95 animate-pulse"
-                >
-                  Mua Ngay
-                </Link>
-              </div>
+              {slides.length > 0 && (
+                <>
+                  {/* Content left */}
+                  <div className="flex flex-col justify-center space-y-2 sm:space-y-4 max-w-[280px] sm:max-w-md z-10">
+                    <span className="bg-primary/20 text-primary text-[10px] font-bold tracking-wider px-3 py-1 rounded-full w-fit uppercase flex items-center gap-1">
+                      <img src="https://img.icons8.com/fluency/48/fire-element.png" alt="Hot Deal" className="h-4 w-4 object-contain" /> Hot Deal Tuần Này
+                    </span>
+                    <h2 className="font-display font-extrabold text-xl sm:text-3xl leading-tight">
+                      {slides[current].title}
+                    </h2>
+                    {slides[current].subtitle && (
+                      <p className="text-gray-300 text-[10px] sm:text-sm font-medium">
+                        {slides[current].subtitle}
+                      </p>
+                    )}
+                    {slides[current].promoText && (
+                      <div className="text-[10px] sm:text-xs text-yellow-400 font-semibold bg-white/5 px-3 py-2 rounded-xl w-fit">
+                        {slides[current].promoText}
+                      </div>
+                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(slides[current].link);
+                      }}
+                      className="bg-primary hover:bg-primary-hover text-white text-[10px] sm:text-xs font-bold px-5 py-2.5 rounded-2xl w-fit transition shadow-md"
+                    >
+                      Mua Ngay
+                    </button>
+                  </div>
 
-              {/* Image right */}
-              <div className="hidden sm:flex items-center justify-center relative w-1/2 h-full z-10">
-                <img
-                  src={SLIDES[current].image}
-                  alt={SLIDES[current].title}
-                  className="object-cover w-full h-4/5 rounded-2xl shadow-2xl border border-white/10"
-                />
-              </div>
-
-              {/* Visual background glows */}
-              <div className="absolute top-1/4 right-1/4 w-40 h-40 bg-primary/20 rounded-full blur-3xl" />
-              <div className="absolute bottom-1/4 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl" />
+                  {/* Image right */}
+                  <div className="hidden sm:flex items-center justify-center relative w-1/2 h-full z-10">
+                    {slides[current].imageUrl && (
+                      <img
+                        src={slides[current].imageUrl}
+                        alt={slides[current].title}
+                        className="object-contain w-full h-[95%] drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                      />
+                    )}
+                  </div>
+                </>
+              )}
             </motion.div>
           </AnimatePresence>
 
@@ -406,7 +277,7 @@ export const HeroBanner: React.FC = () => {
 
           {/* Indicators */}
           <div className="absolute bottom-4 left-6 flex gap-1.5 z-20">
-            {SLIDES.map((_, index) => (
+            {slides.map((_, index) => (
               <button
                 key={index}
                 onClick={() => {
@@ -423,36 +294,41 @@ export const HeroBanner: React.FC = () => {
         {/* RIGHT: Side Banners (3 Cols) */}
         <div className="hidden lg:flex flex-col gap-4 lg:col-span-3 z-10">
           {/* Banner 1 */}
-          <div className="relative flex-1 rounded-3xl overflow-hidden bg-brand-black border border-brand-dark flex items-center justify-between p-6 text-white group shadow-md cursor-pointer">
+          <div className="relative flex-1 rounded-3xl overflow-hidden bg-brand-black flex items-center justify-between p-6 text-white group shadow-md cursor-pointer">
             <div className="flex flex-col justify-center space-y-1.5 z-10">
               <span className="text-yellow-400 text-[10px] font-extrabold tracking-widest uppercase">Độc Quyền Leica</span>
               <h3 className="font-display font-bold text-sm leading-tight">Xiaomi 14 Ultra</h3>
-              <p className="text-gray-400 text-xs font-semibold">28.990.000₫</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-white text-xs font-bold">{xiaomiSalePrice.toLocaleString("vi-VN")}₫</p>
+                {(!xiaomi || xiaomi.discount > 0) && (
+                  <p className="text-gray-500 text-[10px] line-through">{xiaomiOriginalPrice.toLocaleString("vi-VN")}₫</p>
+                )}
+              </div>
               <Link href="/products/xiaomi-14-ultra" className="text-primary hover:text-white font-bold text-xs flex items-center gap-1 pt-1 transition">
                 Săn ngay <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1598327105666-5b89351aff97?q=80&w=400&auto=format&fit=crop"
+              src="/hot-sale/xiaomi-14-ultra.png"
               alt="Xiaomi 14 Ultra"
-              className="w-[90px] h-[90px] object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300 shadow-md"
+              className="w-[90px] h-[90px] object-contain rounded-2xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg"
             />
           </div>
 
           {/* Banner 2 */}
-          <div className="relative flex-1 rounded-3xl overflow-hidden bg-white border border-gray-100 flex items-center justify-between p-6 text-brand-black group shadow-md cursor-pointer">
+          <div className="relative flex-1 rounded-3xl overflow-hidden bg-white flex items-center justify-between p-6 text-brand-black group shadow-md cursor-pointer">
             <div className="flex flex-col justify-center space-y-1.5 z-10">
               <span className="text-primary text-[10px] font-extrabold tracking-widest uppercase">Ưu Đãi Phụ Kiện</span>
               <h3 className="font-display font-bold text-sm leading-tight">Âm Thanh Cực Chất</h3>
-              <p className="text-gray-500 text-xs font-semibold">AirPods Pro 2 giảm 6%</p>
+              <p className="text-gray-500 text-xs font-semibold">AirPods Pro 2 giảm {airpodsDiscount}%</p>
               <Link href="/products/tai-nghe-apple-airpods-pro-2" className="text-primary hover:text-primary-dark font-bold text-xs flex items-center gap-1 pt-1 transition">
                 Mua ngay <ChevronRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?q=80&w=400&auto=format&fit=crop"
+              src="/accessories/airpod-pro-gen2.png"
               alt="AirPods Pro 2"
-              className="w-[90px] h-[90px] object-cover rounded-2xl group-hover:scale-105 transition-transform duration-300 shadow-md"
+              className="w-[90px] h-[90px] object-contain rounded-2xl group-hover:scale-105 transition-transform duration-300 drop-shadow-lg"
             />
           </div>
         </div>
@@ -469,7 +345,7 @@ export const HeroBanner: React.FC = () => {
               className="absolute top-0 left-[25%] right-0 bottom-0 bg-white rounded-3xl shadow-2xl z-30 p-8 flex gap-8 overflow-y-auto"
             >
               {/* Load columns dynamically based on hover state */}
-              {SIDEBAR_CATEGORIES.find(c => c.id === hoveredCategory)?.megaMenu.map((column, colIdx) => (
+              {sidebarCategories.find(c => c.id === hoveredCategory)?.megaMenu.map((column, colIdx) => (
                 <div key={colIdx} className="flex-1 space-y-4 min-w-[150px]">
                   <h4 className="font-display font-extrabold text-sm text-brand-black border-b border-gray-100 pb-2 uppercase tracking-wider">
                     {column.title}

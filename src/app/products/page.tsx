@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { BRANDS, CATEGORIES } from '@/config/catalog';
 import { useProducts } from '@/hooks/useProducts';
 import { ProductCard } from '@/components/ProductCard';
 import { FlashSale } from '@/components/FlashSale';
+import { api, Category, Filter } from '@/lib/api';
 import {
   SlidersHorizontal, RotateCcw, ChevronDown, Check, X, Star,
   ArrowUpDown, ArrowUp, ArrowDown
@@ -18,45 +18,24 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-const FILTER_CRITERIA = [
-  { id: 'usage', name: 'Nhu cầu sử dụng', options: ['Học tập - Văn phòng', 'Giải trí', 'Đồ họa - Sáng tạo', 'Chơi game', 'Cho trẻ em'], categories: ['tablet', 'laptop'] },
-  { id: 'os', name: 'Hệ điều hành', options: ['iPadOS', 'Android', 'HarmonyOS', 'iOS'], categories: ['phone', 'tablet'] },
-  { id: 'screen', name: 'Kích thước màn hình', options: ['Khoảng 7 - 8 inch', 'Từ 10 đến 11 inch', '11 inch', '12 inch', 'Từ 12 inch trở lên', '9 inch', '8 inch'], categories: ['phone', 'tablet', 'laptop'] },
-  { id: 'ram', name: 'RAM', options: ['4 GB', '6 GB', '4 - 6GB', '8 - 12GB', '8 GB', '12 GB'], categories: ['phone', 'tablet', 'laptop'] },
-  { id: 'storage', name: 'Bộ nhớ trong', options: ['32GB và 64GB', '128 GB', '128GB và 256GB', '256 GB', '512GB', '1 TB', '2 TB', '64 GB'], categories: ['phone', 'tablet', 'laptop'] },
-  { id: 'hz', name: 'Tần số quét', options: ['60 Hz', '90 Hz', '120 Hz', '144 Hz', '165 Hz'], categories: ['phone', 'tablet', 'laptop'] },
-  { id: 'chipset', name: 'Chipset', options: ['Apple A-series', 'Snapdragon', 'Exynos', 'MediaTek'], categories: ['phone', 'tablet'] },
-  { id: 'special', name: 'Tính năng đặc biệt', options: ['Sạc nhanh', 'Chống nước', 'Hỗ trợ 5G', 'Bảo mật vân tay', 'Nhận diện khuôn mặt'], categories: ['phone', 'tablet', 'watch'] },
-  { id: 'accessory_type', name: 'Loại phụ kiện', options: ['Tai nghe', 'Cáp sạc', 'Củ sạc', 'Ốp lưng', 'Đồng hồ'], categories: ['accessory'] },
-  { id: 'headphone_type', name: 'Loại tai nghe', options: ['In-ear', 'Over-ear', 'True Wireless'], categories: ['accessory_Tai nghe'] },
-  { id: 'audio_feature', name: 'Tính năng âm thanh', options: ['Chống ồn ANC', 'Xuyên âm'], categories: ['accessory_Tai nghe'] },
-  // Cáp sạc
-  { id: 'cable_brand', name: 'Thương hiệu', options: ['Apple', 'Samsung', 'Anker', 'Belkin', 'Baseus', 'Ugreen', 'Mophie'], categories: ['accessory_Cáp sạc'] },
-  { id: 'connection_type', name: 'Loại cáp', options: ['Type-C to Type-C', 'Type-C to Lightning', 'USB to Type-C', 'USB to Lightning', 'Cáp đa năng'], categories: ['accessory_Cáp sạc'] },
-  { id: 'cable_length', name: 'Chiều dài', options: ['Dưới 1m', '1m - 1.2m', '2m', 'Trên 2m'], categories: ['accessory_Cáp sạc'] },
-  { id: 'cable_material', name: 'Chất liệu', options: ['Bọc dù chống gập', 'Nhựa TPE', 'Bọc da', 'Silicon'], categories: ['accessory_Cáp sạc'] },
-  { id: 'cable_feature', name: 'Tính năng', options: ['Sạc siêu nhanh (100W+)', 'Sạc nhanh (20W-65W)', 'Chứng nhận MFi', 'Tích hợp màn hình LED', 'Chống rối'], categories: ['accessory_Cáp sạc'] },
-
-  // Đồng hồ
-  { id: 'watch_brand', name: 'Thương hiệu', options: ['Apple', 'Samsung', 'Garmin', 'Huawei', 'Amazfit', 'Xiaomi', 'Coros'], categories: ['accessory_Đồng hồ'] },
-  { id: 'watch_size', name: 'Kích thước mặt', options: ['Dưới 40mm', '40mm', '41mm', '42mm', '44mm', '45mm', '49mm'], categories: ['accessory_Đồng hồ'] },
-  { id: 'watch_material', name: 'Chất liệu viền', options: ['Nhôm', 'Thép không gỉ', 'Titanium', 'Nhựa/Polymer'], categories: ['accessory_Đồng hồ'] },
-  { id: 'watch_health', name: 'Tính năng sức khỏe', options: ['Đo nhịp tim', 'Đo SpO2', 'Đo huyết áp', 'Điện tâm đồ ECG', 'Theo dõi giấc ngủ', 'Theo dõi chu kỳ kinh nguyệt', 'Phân tích thành phần cơ thể'], categories: ['accessory_Đồng hồ'] },
-  { id: 'watch_smart', name: 'Tính năng thông minh', options: ['Nghe gọi trên đồng hồ (eSIM)', 'Nghe gọi qua Bluetooth', 'Định vị GPS độc lập', 'Phát nhạc độc lập', 'Trợ lý ảo', 'Màn hình Always-On'], categories: ['accessory_Đồng hồ'] },
-  { id: 'watch_battery', name: 'Thời lượng pin', options: ['Dưới 2 ngày', '2-7 ngày', '7-14 ngày', 'Trên 14 ngày'], categories: ['accessory_Đồng hồ'] },
-  { id: 'watch_water', name: 'Độ chịu nước', options: ['5 ATM', '10 ATM', 'IP68'], categories: ['accessory_Đồng hồ'] },
-  { id: 'charging_power', name: 'Công suất sạc', options: ['20W', '25W', '65W'], categories: ['accessory_Cáp sạc'] },
-  { id: 'charging_ports', name: 'Số cổng', options: ['1 cổng Type-C', '2 cổng Type-C'], categories: ['accessory_Cáp sạc'] },
-  { id: 'case_type', name: 'Phân loại ốp', options: ['Chống sốc', 'Ốp trong', 'Ốp nhựa cứng', 'Bao da', 'Ốp dẻo', 'Bao da kiêm bàn phím', 'Ví kẹp thẻ', 'Ốp bảo vệ camera', 'Ốp kính'], categories: ['accessory_Ốp lưng'] },
-  { id: 'case_feature', name: 'Tính năng', options: ['Hỗ trợ sạc MagSafe', 'Hỗ trợ sạc không dây', 'Có chân đứng', 'Siêu mỏng', 'Chống sốc, va đập', 'Có trackpad', 'Bàn phím có đèn nền', 'Chống trầy xước', 'Chống ngả màu', 'Hiển thị thông báo'], categories: ['accessory_Ốp lưng'] },
-  { id: 'case_iphone', name: 'Dòng iPhone', options: ['iPhone 17 Pro Max', 'iPhone 17 Pro', 'iPhone 17e', 'iPhone 17', 'iPhone Air', 'iPhone 16 Pro Max', 'iPhone 16 Pro', 'iPhone 16 Plus', 'iPhone 16e', 'iPhone 16', 'iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14', 'iPhone 13 Pro Max', 'iPhone 13 Pro', 'iPhone 13', 'iPhone 12 Pro Max', 'iPhone 12 Pro', 'iPhone 12', 'iPhone 11 Pro Max', 'iPhone 11'], categories: ['accessory_Ốp lưng'] },
-  { id: 'case_samsung', name: 'Dòng Samsung', options: ['Galaxy S26 Ultra', 'Galaxy S26 Plus', 'Galaxy S26', 'Galaxy S25 Ultra', 'Galaxy S25 Plus', 'Galaxy S25 FE', 'Galaxy S25', 'Galaxy S24 Ultra', 'Galaxy S24 FE', 'Galaxy S24 Plus', 'Galaxy S24', 'Galaxy S23 Ultra', 'Galaxy S23 Plus', 'Galaxy S23', 'Galaxy S22 Plus', 'Galaxy S22'], categories: ['accessory_Ốp lưng'] },
-];
 
 function ProductsListContent() {
   const { products, isLoading: isProductsLoading } = useProducts();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filterCriteria, setFilterCriteria] = useState<Filter[]>([]);
+
+  useEffect(() => {
+    Promise.all([
+      api.getCategories(),
+      api.getFilters()
+    ]).then(([catData, filterData]) => {
+      if (catData) setCategories(catData);
+      if (filterData) setFilterCriteria(filterData);
+    }).catch(() => {});
+  }, []);
 
   // Lấy params từ URL
   const urlCategory = searchParams.get('category') || '';
@@ -104,6 +83,18 @@ function ProductsListContent() {
 
   // --- XỬ LÝ LỌC ---
 
+  const handleCriterionSelect = (filterId: string, option: string) => {
+    setSelectedCriteria(prev => {
+      const newCriteria = { ...prev };
+      if (newCriteria[filterId] === option) {
+        delete newCriteria[filterId];
+      } else {
+        newCriteria[filterId] = option;
+      }
+      return newCriteria;
+    });
+  };
+
   const handleResetFilters = () => {
     setSelectedCategory('');
     setSelectedBrand('');
@@ -122,7 +113,7 @@ function ProductsListContent() {
     if (selectedCategory && product.category !== selectedCategory) return false;
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
-    const discountedPrice = Math.round(product.basePrice * (1 - product.discount / 100));
+    const discountedPrice = product.basePrice;
     if (selectedPriceRange) {
       const activeRange = priceRanges.find(r => r.id === selectedPriceRange);
       if (activeRange) {
@@ -149,8 +140,8 @@ function ProductsListContent() {
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = Math.round(a.basePrice * (1 - a.discount / 100));
-    const priceB = Math.round(b.basePrice * (1 - b.discount / 100));
+    const priceA = a.basePrice;
+    const priceB = b.basePrice;
 
     if (sortBy === 'price-asc') return priceA - priceB;
     if (sortBy === 'price-desc') return priceB - priceA;
@@ -160,11 +151,11 @@ function ProductsListContent() {
   });
 
   const activeFilterCriteria = (selectedCategory 
-    ? FILTER_CRITERIA.filter(c => 
+    ? filterCriteria.filter(c => 
         c.categories.includes(selectedCategory) || 
         (selectedCriteria['accessory_type'] && c.categories.includes(`${selectedCategory}_${selectedCriteria['accessory_type']}`))
       )
-    : FILTER_CRITERIA).filter(c => c.id !== 'accessory_type');
+    : filterCriteria).filter(c => c.filterId !== 'accessory_type');
 
   // --- CONFIG CHO POPOVER BỘ LỌC ---
   const FilterContent = () => (
@@ -185,10 +176,10 @@ function ProductsListContent() {
                       }));
                     }}
                     className={cn(
-                      "cursor-pointer text-xs px-3 py-1.5 rounded-full border transition",
+                      "cursor-pointer text-xs px-3 py-1.5 rounded-full transition",
                       selectedCriteria[criteria.id] === option
-                        ? "border-primary bg-primary-light text-primary font-bold"
-                        : "border-gray-200 text-gray-600 hover:border-primary/50"
+                        ? "bg-primary text-white font-bold shadow-sm"
+                        : "bg-white text-gray-600 shadow-sm hover:bg-gray-50"
                     )}
                   >
                     {option}
@@ -218,7 +209,7 @@ function ProductsListContent() {
       {/* HEADER TIÊU ĐỀ */}
       <div className="mb-5">
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-brand-black">
-          {selectedCategory ? CATEGORIES.find(c => c.id === selectedCategory)?.name : 'Tất Cả Sản Phẩm'}
+          {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name : 'Tất Cả Sản Phẩm'}
         </h1>
         <p className="text-gray-500 text-xs sm:text-sm font-semibold mt-1">
           Hiển thị <strong className="text-[#d70018f2]">{sortedProducts.length}</strong> sản phẩm phù hợp
@@ -226,7 +217,7 @@ function ProductsListContent() {
       </div>
 
       {/* FILTER BAR (TOP) - Mới */}
-      <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-6 mb-6 flex flex-col gap-4 relative z-10">
+      <div className="p-4 sm:p-6 mb-6 flex flex-col gap-4 relative z-10">
         
         {/* Tiêu chí lọc */}
         <div>
@@ -236,7 +227,7 @@ function ProductsListContent() {
             {/* Nút Bộ Lọc Mega Menu */}
             <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="cursor-pointer flex items-center gap-2 h-9 px-4 text-xs font-bold border-primary text-primary hover:bg-primary-light rounded-xl">
+                <Button className="cursor-pointer flex items-center gap-2 h-9 px-4 text-xs font-bold border-none text-primary hover:bg-primary-light bg-white shadow-sm rounded-xl">
                   <SlidersHorizontal className="h-4 w-4" />
                   Bộ lọc
                   {(() => {
@@ -250,94 +241,72 @@ function ProductsListContent() {
               </PopoverContent>
             </Popover>
 
-            <Button 
-              variant="outline" 
-              className={cn("cursor-pointer h-9 px-4 text-xs font-bold rounded-xl transition", inStock ? "border-primary text-primary bg-primary-light" : "border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100")}
-              onClick={() => setInStock(!inStock)}
-            >
-              Sẵn hàng
-            </Button>
-            <Button 
-              variant="outline" 
-              className={cn("cursor-pointer h-9 px-4 text-xs font-bold rounded-xl transition", newArrival ? "border-primary text-primary bg-primary-light" : "border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100")}
-              onClick={() => setNewArrival(!newArrival)}
-            >
-              Hàng mới về
-            </Button>
-            
-            <Popover open={activePopover === 'price'} onOpenChange={(open) => setActivePopover(open ? 'price' : null)}>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className={cn(
-                  "cursor-pointer h-9 px-4 text-xs font-bold rounded-xl transition flex items-center gap-1.5 focus:outline-none focus:ring-0 focus-visible:ring-0",
-                  selectedPriceRange ? "border-primary text-primary bg-primary-light" : "border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100"
-                )}>
-                  {selectedPriceRange ? priceRanges.find(p => p.id === selectedPriceRange)?.name : 'Xem theo giá'}
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[320px] p-4 shadow-xl rounded-2xl border-gray-100" align="start">
-                <div className="flex flex-wrap gap-2">
-                  {priceRanges.map(price => (
-                    <button
-                      key={price.id}
-                      onClick={() => {
-                        setSelectedPriceRange(prev => prev === price.id ? '' : price.id);
-                        setActivePopover(null);
-                      }}
+            {activeFilterCriteria.map((filter) => {
+              const hasSelection = !!selectedCriteria[filter.filterId];
+              return (
+                <Popover key={filter.filterId}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
                       className={cn(
-                        "px-3 py-1.5 text-xs font-medium rounded-lg border transition",
-                        selectedPriceRange === price.id
-                          ? "border-primary text-primary bg-primary-light"
-                          : "border-gray-200 text-gray-600 bg-white hover:border-primary hover:text-primary"
+                        "h-8 rounded-full px-4 text-xs font-medium border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 whitespace-nowrap shadow-sm transition-all",
+                        hasSelection && "border-primary bg-primary/5 text-primary hover:bg-primary/10"
                       )}
                     >
-                      {price.name}
-                    </button>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            {/* Dynamic Criteria Buttons */}
-            {activeFilterCriteria.map(criteria => (
-              <Popover key={criteria.id} open={activePopover === criteria.id} onOpenChange={(open) => setActivePopover(open ? criteria.id : null)}>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn(
-                    "cursor-pointer flex items-center gap-1.5 h-9 px-4 text-xs font-bold rounded-xl transition focus:outline-none focus:ring-0 focus-visible:ring-0",
-                    selectedCriteria[criteria.id] 
-                      ? "border-primary text-primary bg-primary-light" 
-                      : "border-gray-200 text-gray-700 bg-gray-50 hover:bg-gray-100"
-                  )}>
-                    {selectedCriteria[criteria.id] || criteria.name}
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className={cn("p-4 shadow-xl rounded-2xl border-gray-100", criteria.options.length > 12 ? 'w-[600px] max-w-[95vw]' : 'w-[320px] max-w-[90vw]')} align="start">
-                  <div className="flex flex-wrap gap-2">
-                    {criteria.options.map(option => (
-                      <button
-                        key={option}
-                        onClick={() => {
-                          setSelectedCriteria(prev => ({
-                            ...prev,
-                            [criteria.id]: prev[criteria.id] === option ? '' : option
-                          }));
-                          setActivePopover(null);
-                        }}
-                        className={cn(
-                          "cursor-pointer text-xs px-3 py-1.5 rounded-full border transition",
-                          selectedCriteria[criteria.id] === option
-                            ? "border-primary bg-primary-light text-primary font-bold"
-                            : "border-gray-200 text-gray-600 hover:border-primary/50"
+                      {hasSelection ? (
+                        <span className="flex items-center gap-1.5">
+                          {filter.name}: {selectedCriteria[filter.filterId]}
+                          <X
+                            className="h-3.5 w-3.5 hover:text-red-500 hover:scale-110 transition-transform cursor-pointer ml-0.5"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCriterionSelect(filter.filterId, selectedCriteria[filter.filterId]);
+                            }}
+                          />
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          {filter.name}
+                          <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+                        </span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64 p-3 rounded-2xl shadow-xl border-gray-100" align="start">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between pb-2 mb-2 border-b border-gray-50">
+                        <span className="text-xs font-bold text-gray-900">{filter.name}</span>
+                        {hasSelection && (
+                          <span
+                            className="text-[10px] text-primary cursor-pointer hover:underline font-semibold"
+                            onClick={() => handleCriterionSelect(filter.filterId, selectedCriteria[filter.filterId])}
+                          >
+                            Bỏ chọn
+                          </span>
                         )}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
+                      </div>
+                      <div className="max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
+                        {filter.options.map((option) => (
+                          <label
+                            key={option}
+                            className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
+                          >
+                            <Checkbox
+                              checked={selectedCriteria[filter.filterId] === option}
+                              onCheckedChange={() => handleCriterionSelect(filter.filterId, option)}
+                              className="h-4 w-4 rounded-[4px] border-gray-300 text-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            />
+                            <span className="text-[13px] text-gray-700 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                              {option}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
                 </PopoverContent>
               </Popover>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -368,10 +337,10 @@ function ProductsListContent() {
                 key={sort.id}
                 onClick={() => setSortBy(sort.id)}
                 className={cn(
-                  "flex items-center px-4 py-2 rounded-xl text-xs font-bold transition border",
+                  "flex items-center px-4 py-2 rounded-xl text-xs font-bold transition border-none",
                   sortBy === sort.id 
-                    ? 'border-blue-500 bg-blue-50 text-blue-600' 
-                    : 'border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100'
+                    ? 'bg-blue-500 text-white shadow-sm' 
+                    : 'text-gray-600 bg-white shadow-sm hover:bg-gray-50'
                 )}
               >
                 {sort.icon}

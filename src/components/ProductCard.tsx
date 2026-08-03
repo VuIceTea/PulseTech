@@ -26,7 +26,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   // Calculate discounted price
-  const discountedPrice = Math.round(product.basePrice * (1 - product.discount / 100));
+  const discountedPrice = product.basePrice;
 
   // Dynamic badge color
   const getBadgeColor = (badge: string) => {
@@ -91,11 +91,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             className="object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ease-out"
           />
         </div>
-
-        {/* Brand */}
-        <span className="bg-black text-white text-[9px] font-bold uppercase tracking-wider mb-2 px-2 py-0.5 rounded-md w-fit inline-block">
-          {product.brand}
-        </span>
 
         {/* Product Name */}
         <h3 className="font-display font-bold text-sm text-brand-black group-hover:text-primary transition-colors line-clamp-2 mb-2 leading-tight">

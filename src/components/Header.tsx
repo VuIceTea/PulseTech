@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FileText, MapPin, Menu, Phone, Search, ShoppingCart, X } from 'lucide-react';
@@ -14,6 +14,15 @@ export const Header = () => {
   const { user, isLoaded } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [navigations, setNavigations] = useState<{id: string, title: string, href: string}[]>([]);
+
+  useEffect(() => {
+    import('@/lib/api').then(({ api }) => {
+      api.getNavigation().then(data => {
+        if (data) setNavigations(data);
+      }).catch(() => {});
+    });
+  }, []);
 
   const handleSearch = (event: FormEvent) => {
     event.preventDefault();
@@ -72,10 +81,10 @@ export const Header = () => {
             <div className="space-y-3 px-4 py-4">
               <form onSubmit={handleSearch} className="relative md:hidden"><input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Tìm sản phẩm..." className="w-full rounded-xl bg-white py-2.5 pl-10 pr-4 text-sm text-brand-black outline-none" /><Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /></form>
               <nav className="grid gap-1 rounded-2xl bg-white p-2 text-sm font-bold text-gray-600">
-                <Link onClick={() => setMobileOpen(false)} href="/products?category=phone" className="rounded-xl px-3 py-3 hover:bg-gray-50">Điện thoại</Link>
-                <Link onClick={() => setMobileOpen(false)} href="/products?category=tablet" className="rounded-xl px-3 py-3 hover:bg-gray-50">Máy tính bảng</Link>
-                <Link onClick={() => setMobileOpen(false)} href="/products?category=accessory" className="rounded-xl px-3 py-3 hover:bg-gray-50">Phụ kiện</Link>
-                <Link onClick={() => setMobileOpen(false)} href={user ? "/orders" : "/order-tracking"} className="rounded-xl px-3 py-3 hover:bg-gray-50">{user ? "Lịch sử đơn hàng" : "Tra cứu đơn hàng"}</Link>
+                {navigations.map(nav => (
+                  <Link key={nav.id} onClick={() => setMobileOpen(false)} href={nav.href} className="rounded-xl px-3 py-3 hover:bg-gray-50">{nav.title}</Link>
+                ))}
+                <Link onClick={() => setMobileOpen(false)} href={user ? "/orders" : "/order-tracking"} className="rounded-xl px-3 py-3 hover:bg-gray-50 border-t border-gray-100">{user ? "Lịch sử đơn hàng" : "Tra cứu đơn hàng"}</Link>
                 {user && <Link onClick={() => setMobileOpen(false)} href="/profile" className="rounded-xl px-3 py-3 text-primary hover:bg-red-50">Hồ sơ của tôi</Link>}
               </nav>
             </div>

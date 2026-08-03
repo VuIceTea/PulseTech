@@ -63,7 +63,7 @@ export default function WishlistPage() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {wishlist.map(item => {
-            const salePrice = Math.round(item.basePrice * (1 - item.discount / 100));
+            const salePrice = item.basePrice;
             
             return (
               <div key={item.id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex flex-col group relative">
@@ -103,9 +103,9 @@ export default function WishlistPage() {
                       {formatPrice(salePrice)}
                     </span>
                     {item.discount > 0 && (
-                      <span className="text-xs text-gray-400 line-through font-semibold">
-                        {formatPrice(item.basePrice)}
-                      </span>
+                      <span className="text-gray-400 text-[11px] line-through font-semibold">
+                      {item.originalPrice.toLocaleString('vi-VN')}đ
+                    </span>
                     )}
                   </div>
                 </Link>
