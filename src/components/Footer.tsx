@@ -1,7 +1,10 @@
-import React from "react";
+'use client';
+
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Phone, HelpCircle, ArrowRight, ShieldCheck } from "lucide-react";
+import { api, FooterLink as FooterLinkType } from "@/lib/api";
 
 const paymentMethods = [
   { name: "Visa", src: "/icons/visa.png" },
@@ -15,6 +18,16 @@ const paymentMethods = [
 ];
 
 export const Footer: React.FC = () => {
+  const [footerLinks, setFooterLinks] = useState<FooterLinkType[]>([]);
+
+  useEffect(() => {
+    api.getFooterLinks().then(data => {
+      if (data && data.length > 0) {
+        setFooterLinks(data);
+      }
+    }).catch(console.error);
+  }, []);
+
   return (
     <footer className="bg-brand-black text-gray-400 text-sm border-t border-brand-dark mt-auto">
       {/* Top Banner section */}
@@ -80,85 +93,35 @@ export const Footer: React.FC = () => {
       {/* Main Footer columns */}
       <div className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
-          {/* Column 1 */}
-          <div>
-            <h3 className="font-display font-bold text-white text-base mb-4 tracking-wider uppercase">
-              TỔNG ĐÀI HỖ TRỢ
-            </h3>
-            <ul className="space-y-3 text-xs">
-              <li className="flex items-center justify-between">
-                <span className="text-gray-300">Gọi mua hàng:</span>
-                <a
-                  href="tel:18002097"
-                  className="text-primary font-bold hover:underline"
-                >
-                  1800.2097
-                </a>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-gray-300">Khiếu nại:</span>
-                <a
-                  href="tel:18002098"
-                  className="text-primary font-bold hover:underline"
-                >
-                  1800.2098
-                </a>
-              </li>
-              <li className="flex items-center justify-between">
-                <span className="text-gray-300">Bảo hành:</span>
-                <a
-                  href="tel:18002099"
-                  className="text-primary font-bold hover:underline"
-                >
-                  1800.2099
-                </a>
-              </li>
-              <li className="pt-2 text-gray-300">
-                Giờ phục vụ: 7:30 - 22:00 (Hàng ngày)
-              </li>
-            </ul>
-          </div>
-
-          {/* Column 2 */}
-          <div>
-            <h3 className="font-display font-bold text-white text-base mb-4 tracking-wider uppercase">
-              CHÍNH SÁCH MUA HÀNG
-            </h3>
-            <ul className="space-y-2 text-xs">
-              <li className="text-gray-300">
-                <Link
-                  href="/policies?type=warranty"
-                  className="hover:text-primary transition flex items-center gap-1"
-                >
-                  <ArrowRight className="h-3 w-3" /> Quy định bảo hành
-                </Link>
-              </li>
-              <li className="text-gray-300">
-                <Link
-                  href="/policies?type=shipping"
-                  className="hover:text-primary transition flex items-center gap-1"
-                >
-                  <ArrowRight className="h-3 w-3" /> Giao hàng & thanh toán
-                </Link>
-              </li>
-              <li className="text-gray-300">
-                <Link
-                  href="/policies?type=return"
-                  className="hover:text-primary transition flex items-center gap-1"
-                >
-                  <ArrowRight className="h-3 w-3" /> Đổi trả sản phẩm lỗi
-                </Link>
-              </li>
-              <li className="text-gray-300">
-                <Link
-                  href="/policies?type=terms"
-                  className="hover:text-primary transition flex items-center gap-1"
-                >
-                  <ArrowRight className="h-3 w-3" /> Điều khoản dịch vụ
-                </Link>
-              </li>
-            </ul>
-          </div>
+          {footerLinks.map(footerGroup => (
+            <div key={footerGroup.id}>
+              <h3 className="font-display font-bold text-white text-base mb-4 tracking-wider uppercase">
+                {footerGroup.title}
+              </h3>
+              <ul className="space-y-3 text-xs">
+                {footerGroup.links.map(link => (
+                  <li key={link.name} className="flex items-center justify-between">
+                    <span className="text-gray-300">
+                      {link.link.startsWith("tel:") ? link.name.split(':')[0] + ":" : ''}
+                    </span>
+                    {link.link.startsWith("tel:") ? (
+                      <a href={link.link} className="text-primary font-bold hover:underline">
+                        {link.name.includes(':') ? link.name.split(':')[1].trim() : link.name}
+                      </a>
+                    ) : link.link === "#" ? (
+                      <span className="text-gray-300 w-full justify-start">
+                        {link.name}
+                      </span>
+                    ) : (
+                      <Link href={link.link} className="hover:text-primary transition flex items-center gap-1 text-gray-300 w-full justify-start">
+                        <ArrowRight className="h-3 w-3" /> {link.name}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
 
           {/* Column 3 */}
           <div>

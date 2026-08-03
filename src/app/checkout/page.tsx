@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { api } from '@/lib/api';
-import { ArrowLeft, CreditCard, Wallet, Banknote, ShieldCheck, CheckCircle, AlertCircle } from 'lucide-react';
+import { api, userApi, orderApi, UserAddress, Coupon } from '@/lib/api';
+import { ArrowLeft, CreditCard, Wallet, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
@@ -23,11 +23,27 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState((user as any)?.address || '');
   const [paymentMethod, setPaymentMethod] = useState('COD'); // COD, VNPAY, MOMO, STRIPE
 
+  const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [couponError, setCouponError] = useState<string | null>(null);
+
   // Ensure client render
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (user) {
+      userApi.getAddresses(user.email).then(data => {
+        setSavedAddresses(data);
+        const defaultAddr = data.find(a => a.isDefault);
+        if (defaultAddr && !shippingAddress) {
+          setShippingAddress(`${defaultAddr.addressLine}, ${defaultAddr.ward}, ${defaultAddr.district}, ${defaultAddr.city}`);
+          setFullName(defaultAddr.fullName);
+          setPhoneNumber(defaultAddr.phone);
+        }
+      }).catch(console.error);
+    }
+  }, [user]);
 
   // Redirect to cart if it's empty (e.g. after successful checkout or direct access)
   useEffect(() => {
@@ -64,8 +80,35 @@ export default function CheckoutPage() {
     return price.toLocaleString('vi-VN') + '₫';
   };
 
+  const handleApplyCoupon = async () => {
+    setCouponError(null);
+    if (!couponCode) return;
+    try {
+      const coupon = await orderApi.validateCoupon(couponCode);
+      if (cartTotal < coupon.minOrderValue) {
+        setCouponError(`Đơn hàng tối thiểu ${formatPrice(coupon.minOrderValue)}`);
+      } else {
+        setAppliedCoupon(coupon);
+      }
+    } catch (e: any) {
+      setCouponError(e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+    }
+  };
+
+  let discountValue = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.discountPercent > 0) {
+      discountValue = (cartTotal * appliedCoupon.discountPercent) / 100;
+      if (appliedCoupon.maxDiscountValue > 0 && discountValue > appliedCoupon.maxDiscountValue) {
+        discountValue = appliedCoupon.maxDiscountValue;
+      }
+    } else {
+      discountValue = appliedCoupon.discountAmount;
+    }
+  }
+
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
-  const finalTotal = cartTotal + shippingFee;
+  const finalTotal = cartTotal + shippingFee - discountValue;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,6 +198,28 @@ export default function CheckoutPage() {
                 <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm">1</span>
                 Thông tin giao hàng
               </h2>
+
+              {savedAddresses.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Chọn địa chỉ đã lưu</label>
+                  <div className="grid gap-2">
+                    {savedAddresses.map(addr => (
+                      <div key={addr.id} onClick={() => {
+                        setShippingAddress(`${addr.addressLine}, ${addr.ward}, ${addr.district}, ${addr.city}`);
+                        setFullName(addr.fullName);
+                        setPhoneNumber(addr.phone);
+                      }} className="p-3 border border-gray-200 rounded-xl cursor-pointer hover:border-primary flex items-start gap-3">
+                        <MapPin className="w-4 h-4 text-primary shrink-0 mt-1" />
+                        <div>
+                          <p className="text-sm font-bold">{addr.fullName} - {addr.phone}</p>
+                          <p className="text-xs text-gray-500">{addr.addressLine}, {addr.ward}, {addr.district}, {addr.city}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">Họ và tên <span className="text-red-500">*</span></label>
@@ -286,6 +351,22 @@ export default function CheckoutPage() {
                   <span className="text-gray-500 font-medium">Phí vận chuyển</span>
                   <span className="font-bold text-brand-black">{shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-primary font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Mã giảm giá ({appliedCoupon.code})</span>
+                    <span className="font-bold text-primary">-{formatPrice(discountValue)}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Nhập mã giảm giá */}
+              <div className="mb-6">
+                <div className="flex gap-2">
+                  <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="Nhập mã giảm giá" className="flex-1 border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-primary focus:border-primary" />
+                  <button type="button" onClick={handleApplyCoupon} className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700">Áp dụng</button>
+                </div>
+                {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
+                {appliedCoupon && <p className="text-green-600 text-xs mt-1">Đã áp dụng mã {appliedCoupon.code}</p>}
               </div>
 
               <div className="border-t border-gray-100 pt-4 mb-6">

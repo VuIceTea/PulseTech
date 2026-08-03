@@ -50,7 +50,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   };
 
   // Pricing calculations
-  const discountedBasePrice = Math.round(product.basePrice * (1 - product.discount / 100));
+  const discountedBasePrice = product.basePrice;
   const currentPrice = discountedBasePrice + selectedStorage.priceOffset;
   const originalPrice = product.originalPrice + selectedStorage.priceOffset;
 

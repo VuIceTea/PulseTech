@@ -1,7 +1,7 @@
 import type { Product } from '@/types/product';
 
 const browserApiPrefix = '/backend-api';
-const serverApiPrefix = `${process.env.API_URL ?? 'http://localhost:8080'}/api`;
+const serverApiPrefix = `${process.env.API_URL ?? 'http://localhost:8081'}/api`;
 
 export interface ApiUser { id: string; name: string; email: string; }
 export interface RegisterResponse { email: string; message: string; }
@@ -19,6 +19,20 @@ export interface CartItem {
 export interface Cart {
   id: string; items: CartItem[];
 }
+
+export interface Category { id: string; name: string; englishName: string; order: number; priority: number; }
+export interface Brand { id: string; name: string; logoUrl: string; order: number; }
+export interface Banner { id: string; imageUrl: string; title: string; subtitle: string; promoText: string; bgColor: string; link: string; position: string; order: number; }
+export interface Filter { id: string; filterId: string; name: string; options: string[]; categories: string[]; }
+export interface Navigation { id: string; title: string; href: string; icon: string; order: number; }
+export interface MegaMenu { id: string; name: string; icon: string; link: string; sections: { title: string; links: { name: string; link: string; }[]; }[]; }
+export interface FooterLink { id: string; title: string; links: { name: string; link: string; }[]; }
+export interface Store { id: string; name: string; address: string; phone: string; mapUrl: string; openingHours: string; }
+export interface Article { id: string; title: string; slug: string; summary: string; content: string; imageUrl: string; author: string; publishedAt: string; category: string; viewCount: number; }
+export interface Policy { id: string; title: string; icon: string; contentHtml: string; orderIndex: number; }
+export interface Wishlist { id: string; productIds: string[]; }
+export interface UserAddress { id?: string; userId: string; fullName: string; phone: string; addressLine: string; ward: string; district: string; city: string; isDefault: boolean; }
+export interface Coupon { id: string; code: string; description: string; discountPercent: number; discountAmount: number; minOrderValue: number; maxDiscountValue: number; }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const prefix = typeof window === 'undefined' ? serverApiPrefix : browserApiPrefix;
@@ -56,4 +70,27 @@ export const api = {
   removeCartItem: (userId: string, productId: string, color: string, storage: string) => request<Cart>(`/orders/cart/items/${encodeURIComponent(productId)}?userId=${encodeURIComponent(userId)}&color=${encodeURIComponent(color)}&storage=${encodeURIComponent(storage)}`, { method: 'DELETE' }),
   clearCart: (userId: string) => request<Cart>(`/orders/cart?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' }),
   mergeCarts: (guestId: string, userId: string) => request<Cart>('/orders/cart/merge', { method: 'POST', body: JSON.stringify({ guestId, userId }) }),
+
+  // Content APIs
+  getCategories: () => request<Category[]>('/content/categories'),
+  getBrands: () => request<Brand[]>('/content/brands'),
+  getBanners: () => request<Banner[]>('/content/banners'),
+  getFilters: () => request<Filter[]>('/content/filters'),
+  getNavigation: () => request<Navigation[]>('/content/navigation'),
+  getMegaMenus: () => request<MegaMenu[]>('/content/mega-menus'),
+  getFooterLinks: () => request<FooterLink[]>('/content/footer-links'),
+  getStores: () => request<Store[]>('/content/stores'),
+  getArticles: () => request<Article[]>('/content/articles'),
+  getPolicies: () => request<Policy[]>('/content/policies'),
+};
+
+export const userApi = {
+  getWishlist: (userId: string) => request<Wishlist>(`/users/wishlist?userId=${encodeURIComponent(userId)}`),
+  saveWishlist: (wishlist: Wishlist) => request<Wishlist>('/users/wishlist', { method: 'POST', body: JSON.stringify(wishlist) }),
+  getAddresses: (userId: string) => request<UserAddress[]>(`/users/addresses?userId=${encodeURIComponent(userId)}`),
+  addAddress: (address: UserAddress) => request<UserAddress>('/users/addresses', { method: 'POST', body: JSON.stringify(address) })
+};
+
+export const orderApi = {
+  validateCoupon: (code: string) => request<Coupon>(`/orders/coupons/validate?code=${encodeURIComponent(code)}`)
 };

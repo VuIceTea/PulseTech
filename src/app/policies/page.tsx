@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ShieldCheck, Truck, RefreshCcw, FileText, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api, Policy } from '@/lib/api';
 
 const POLICIES = [
   {
@@ -138,16 +139,46 @@ export default function PoliciesPage() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get('type');
 
+  const [policies, setPolicies] = useState<any[]>(POLICIES);
   const [activeTab, setActiveTab] = useState('warranty');
+
+  useEffect(() => {
+    let isMounted = true;
+    api.getPolicies().then((data) => {
+      if (isMounted && data && data.length > 0) {
+        const mapped = data.map((p: Policy) => ({
+          id: p.id,
+          title: p.title,
+          icon: getPolicyIcon(p.icon, p.title),
+          content: <div dangerouslySetInnerHTML={{ __html: p.contentHtml }} />
+        }));
+        setPolicies(mapped);
+      }
+    }).catch(() => {
+      // fallback to static POLICIES
+    });
+    return () => { isMounted = false; };
+  }, []);
 
   // Sync state with URL param on mount and when param changes
   useEffect(() => {
-    if (typeParam && POLICIES.some(p => p.id === typeParam)) {
+    if (typeParam && policies.some(p => p.id === typeParam)) {
       setActiveTab(typeParam);
     }
-  }, [typeParam]);
+  }, [typeParam, policies]);
 
-  const activeContent = POLICIES.find(p => p.id === activeTab)?.content;
+  const activeContent = policies.find(p => p.id === activeTab)?.content;
+
+  function getPolicyIcon(iconName: string, title: string) {
+    const iconMap: Record<string, string> = {
+      approval: 'https://img.icons8.com/fluency/48/approval.png',
+      delivery: 'https://img.icons8.com/fluency/48/delivery.png',
+      refresh: 'https://img.icons8.com/fluency/48/refresh.png',
+      task: 'https://img.icons8.com/fluency/48/task.png',
+    };
+    const url = iconMap[iconName] || iconMap.task;
+    return <img src={url} alt={title} className="h-5 w-5 object-contain" />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
@@ -181,7 +212,7 @@ export default function PoliciesPage() {
                 <h3 className="font-display font-bold text-brand-black text-lg">Danh mục chính sách</h3>
               </div>
               <div className="p-3">
-                {POLICIES.map((policy) => (
+                {policies.map((policy) => (
                   <button
                     key={policy.id}
                     onClick={() => setActiveTab(policy.id)}
