@@ -1,88 +1,91 @@
 # PulseTech Frontend
 
-> Giao diện người dùng cho nền tảng thương mại điện tử **PulseTech** — xây dựng với **Next.js 16**, **React 19** và **TypeScript**.
+> Customer-facing storefront for the **PulseTech** e-commerce platform — built with **Next.js 16**, **React 19**, and **TypeScript**.
 
 🌐 **Live:** https://pulse-tech-beryl.vercel.app
 
 ---
 
-## Mục lục
+## Table of Contents
 
-- [Tổng quan](#tổng-quan)
+- [Overview](#overview)
 - [Tech Stack](#tech-stack)
-- [Cấu trúc project](#cấu-trúc-project)
-- [Yêu cầu hệ thống](#yêu-cầu-hệ-thống)
-- [Cài đặt và chạy local](#cài-đặt-và-chạy-local)
-- [Biến môi trường](#biến-môi-trường)
-- [Các trang (Routes)](#các-trang-routes)
-- [Deploy lên Vercel](#deploy-lên-vercel)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Local Development](#local-development)
+- [Environment Variables](#environment-variables)
+- [Pages & Routes](#pages--routes)
+- [Deploying to Vercel](#deploying-to-vercel)
+- [Development Notes](#development-notes)
 
 ---
 
-## Tổng quan
+## Overview
 
-PulseTech Frontend là một ứng dụng **Next.js App Router** với đầy đủ tính năng của một trang thương mại điện tử hiện đại:
+PulseTech Frontend is a full-featured **Next.js App Router** application for a modern technology e-commerce store, including:
 
-- 🛍️ Duyệt và tìm kiếm sản phẩm công nghệ
-- 🛒 Giỏ hàng và thanh toán trực tuyến
-- 🔐 Đăng ký / đăng nhập với xác thực email
-- ❤️ Danh sách yêu thích (Wishlist)
-- 📦 Tra cứu và theo dõi đơn hàng
-- 👤 Quản lý hồ sơ và sổ địa chỉ
-- 📱 Giao diện responsive, hỗ trợ mobile đầy đủ
+- 🛍️ Product browsing, search, and filtering
+- 🛒 Shopping cart and online checkout
+- 🔐 User registration and login with email verification
+- ❤️ Wishlist management
+- 📦 Order placement, history, and tracking
+- 👤 User profile and address book management
+- 💳 VNPay payment integration
+- 📱 Fully responsive — mobile-first design
 
-Mọi request API đều được proxy qua đường dẫn `/backend-api/*` đến **API Gateway** của backend, giúp ẩn hoàn toàn địa chỉ service thực sự khỏi client.
+All API requests are proxied through the `/backend-api/*` path to the backend **API Gateway**, keeping backend service URLs completely hidden from the client.
 
 ---
 
 ## Tech Stack
 
-| Thành phần       | Công nghệ                                     |
-|------------------|-----------------------------------------------|
-| Framework        | Next.js 16 (App Router)                       |
-| UI Library       | React 19                                      |
-| Ngôn ngữ         | TypeScript 5                                  |
-| Styling          | Tailwind CSS v4                               |
-| Components       | shadcn/ui + Radix UI                          |
-| Animations       | Framer Motion                                 |
-| Icons            | Lucide React + React Icons                    |
-| Notifications    | Sonner (toast)                                |
-| QR Code          | react-qr-code                                 |
-| Linting          | ESLint (eslint-config-next)                   |
-| Cloud Deploy     | Vercel                                        |
+| Component        | Technology                              |
+|------------------|-----------------------------------------|
+| Framework        | Next.js 16 (App Router)                 |
+| UI Library       | React 19                                |
+| Language         | TypeScript 5                            |
+| Styling          | Tailwind CSS v4                         |
+| Component Library| shadcn/ui + Radix UI                    |
+| Animations       | Framer Motion                           |
+| Icons            | Lucide React + React Icons              |
+| Notifications    | Sonner (toast notifications)            |
+| QR Code          | react-qr-code                           |
+| Linting          | ESLint (eslint-config-next)             |
+| Cloud Hosting    | Vercel                                  |
 
 ---
 
-## Cấu trúc project
+## Project Structure
 
 ```
 frontend/
 ├── src/
-│   ├── app/                  # App Router — các trang (route segments)
-│   │   ├── page.tsx          # Trang chủ
+│   ├── app/                  # App Router — all pages (route segments)
+│   │   ├── page.tsx          # Home page
 │   │   ├── layout.tsx        # Root layout
-│   │   ├── login/            # Trang đăng nhập
-│   │   ├── register/         # Trang đăng ký
-│   │   ├── verify-email/     # Xác thực email qua link
-│   │   ├── products/         # Danh sách & chi tiết sản phẩm
-│   │   ├── cart/             # Giỏ hàng
-│   │   ├── checkout/         # Thanh toán
-│   │   ├── orders/           # Lịch sử đơn hàng
-│   │   ├── order-tracking/   # Tra cứu đơn hàng
-│   │   ├── wishlist/         # Danh sách yêu thích
-│   │   ├── profile/          # Hồ sơ người dùng
-│   │   ├── blog/             # Bài viết / tin tức
-│   │   ├── stores/           # Hệ thống cửa hàng
-│   │   ├── trade-in/         # Thu cũ đổi mới
-│   │   └── policies/         # Chính sách
-│   ├── components/           # Reusable UI components
-│   ├── context/              # React Context (Auth, Cart, v.v.)
-│   ├── hooks/                # Custom hooks
-│   ├── lib/                  # API client, utilities
-│   ├── types/                # TypeScript type definitions
-│   └── config/               # Cấu hình ứng dụng
-├── public/                   # Static assets (images, fonts)
-├── next.config.ts            # Next.js config + API proxy rewrites
+│   │   ├── loading.tsx       # Global loading UI
+│   │   ├── login/            # Login page
+│   │   ├── register/         # Registration page
+│   │   ├── verify-email/     # Email verification callback
+│   │   ├── products/         # Product listing & detail pages
+│   │   ├── cart/             # Shopping cart
+│   │   ├── checkout/         # Checkout flow
+│   │   ├── orders/           # Order history
+│   │   ├── order-tracking/   # Order tracking by ID + phone
+│   │   ├── wishlist/         # Saved items
+│   │   ├── profile/          # User profile & address book
+│   │   ├── blog/             # Blog / news articles
+│   │   ├── stores/           # Store locator
+│   │   ├── trade-in/         # Device trade-in program
+│   │   └── policies/         # Store policies
+│   ├── components/           # Shared, reusable UI components
+│   ├── context/              # React Context providers (Auth, Cart, etc.)
+│   ├── hooks/                # Custom React hooks
+│   ├── lib/                  # API client and utility functions
+│   ├── types/                # Global TypeScript type definitions
+│   └── config/               # Application-level configuration
+├── public/                   # Static assets (images, icons, fonts)
+├── next.config.ts            # Next.js config with API proxy rewrites
 ├── package.json
 ├── tsconfig.json
 ├── Dockerfile
@@ -91,129 +94,135 @@ frontend/
 
 ---
 
-## Yêu cầu hệ thống
+## Prerequisites
 
 - **Node.js** ≥ 20
-- **npm** ≥ 10 *(hoặc yarn, pnpm, bun)*
-- Backend PulseTech đang chạy (local hoặc trên Render)
+- **npm** ≥ 10 *(or yarn / pnpm / bun)*
+- A running instance of the PulseTech backend (local or on Render)
 
 ---
 
-## Cài đặt và chạy local
+## Local Development
 
-### 1. Clone project
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/VuIceTea/PulseTech.git
 cd PulseTech
 ```
 
-### 2. Cài đặt dependencies
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Cấu hình biến môi trường
+### 3. Configure environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-Nội dung `.env`:
+Update `.env` with your backend URL:
 
 ```env
-# URL của API Gateway backend (local hoặc Render)
+# URL of the backend API Gateway
 API_URL=http://localhost:8080
 ```
 
-> Khi chạy local với Docker Compose từ thư mục `backend/`, biến `API_URL` sẽ được truyền tự động — không cần cấu hình thêm.
+> When running alongside the backend via Docker Compose (`d:\backend`), `API_URL` is automatically injected — no manual configuration needed.
 
-### 4. Khởi động development server
+### 4. Start the development server
 
 ```bash
 npm run dev
 ```
 
-Truy cập tại: **http://localhost:3000**
+Open **http://localhost:3000** in your browser.
 
-### Các lệnh khác
+### Available Scripts
 
-| Lệnh              | Mô tả                              |
-|-------------------|------------------------------------|
-| `npm run dev`     | Chạy development server            |
-| `npm run build`   | Build production                   |
-| `npm run start`   | Chạy production build              |
-| `npm run lint`    | Kiểm tra linting                   |
-
----
-
-## Biến môi trường
-
-| Biến      | Bắt buộc | Mặc định               | Mô tả                                             |
-|-----------|----------|------------------------|---------------------------------------------------|
-| `API_URL` | ✅        | `http://localhost:8080` | URL của API Gateway backend                       |
-
-> **Cách hoạt động:** `next.config.ts` tự động tạo proxy rule:
-> `GET /backend-api/<path>` → `${API_URL}/api/<path>`
->
-> Nhờ đó, mọi request từ frontend chỉ cần gọi `/backend-api/...` mà không cần biết địa chỉ thực của backend.
+| Command           | Description                            |
+|-------------------|----------------------------------------|
+| `npm run dev`     | Start the development server with HMR  |
+| `npm run build`   | Build the optimized production bundle  |
+| `npm run start`   | Serve the production build locally     |
+| `npm run lint`    | Run ESLint across the codebase         |
 
 ---
 
-## Các trang (Routes)
+## Environment Variables
 
-| Route               | Mô tả                              | Auth cần thiết |
-|---------------------|------------------------------------|----------------|
-| `/`                 | Trang chủ                          | ❌              |
-| `/products`         | Danh sách sản phẩm                 | ❌              |
-| `/products/[id]`    | Chi tiết sản phẩm                  | ❌              |
-| `/login`            | Đăng nhập                          | ❌              |
-| `/register`         | Đăng ký tài khoản                  | ❌              |
-| `/verify-email`     | Xác thực email qua link            | ❌              |
-| `/cart`             | Giỏ hàng                           | ❌              |
-| `/checkout`         | Thanh toán                         | ❌              |
-| `/order-tracking`   | Tra cứu đơn hàng                   | ❌              |
-| `/orders`           | Lịch sử đơn hàng                   | ✅              |
-| `/wishlist`         | Danh sách yêu thích                | ✅              |
-| `/profile`          | Hồ sơ người dùng                   | ✅              |
-| `/blog`             | Bài viết / tin tức                 | ❌              |
-| `/stores`           | Hệ thống cửa hàng                  | ❌              |
-| `/trade-in`         | Thu cũ đổi mới                     | ❌              |
-| `/policies`         | Chính sách mua hàng                | ❌              |
+| Variable  | Required | Default                  | Description                                        |
+|-----------|----------|--------------------------|----------------------------------------------------|
+| `API_URL` | ✅        | `http://localhost:8080`  | Base URL of the backend API Gateway                |
+
+### How the API proxy works
+
+`next.config.ts` defines a rewrite rule at build time:
+
+```
+/backend-api/<path>  →  ${API_URL}/api/<path>
+```
+
+This means all frontend API calls use `/backend-api/...` — the actual backend address is never exposed to the browser. This approach also allows seamlessly switching between local and cloud backends by simply changing `API_URL`.
 
 ---
 
-## Deploy lên Vercel
+## Pages & Routes
 
-### Cách 1: Vercel Dashboard (khuyến nghị)
+| Route               | Description                              | Auth Required |
+|---------------------|------------------------------------------|:-------------:|
+| `/`                 | Home page (featured products, banners)   | ❌            |
+| `/products`         | Product listing with filters             | ❌            |
+| `/products/[id]`    | Product detail page with reviews         | ❌            |
+| `/login`            | User login                               | ❌            |
+| `/register`         | New account registration                 | ❌            |
+| `/verify-email`     | Email verification callback page         | ❌            |
+| `/cart`             | Shopping cart                            | ❌            |
+| `/checkout`         | Checkout and payment                     | ❌            |
+| `/order-tracking`   | Track order by ID and phone number       | ❌            |
+| `/orders`           | Order history                            | ✅            |
+| `/wishlist`         | Saved / favorite products                | ✅            |
+| `/profile`          | User profile and address book            | ✅            |
+| `/blog`             | Blog articles and tech news              | ❌            |
+| `/stores`           | Physical store locator                   | ❌            |
+| `/trade-in`         | Device trade-in program                  | ❌            |
+| `/policies`         | Return, warranty, and store policies     | ❌            |
 
-1. Push code lên GitHub.
-2. Vào [vercel.com](https://vercel.com) → **Add New Project** → chọn repository.
-3. Vercel tự nhận Next.js — không cần cấu hình build.
-4. Thêm **Environment Variable:**
+---
+
+## Deploying to Vercel
+
+### Option 1: Vercel Dashboard *(recommended)*
+
+1. Push your code to GitHub.
+2. Go to [vercel.com](https://vercel.com) → **Add New Project** → select the repository.
+3. Vercel auto-detects Next.js — no build configuration needed.
+4. Add the following **Environment Variable:**
    ```
    API_URL = https://<your-api-gateway>.onrender.com
    ```
-5. Nhấn **Deploy**.
+5. Click **Deploy**.
 
-### Cách 2: Vercel CLI
+### Option 2: Vercel CLI
 
 ```bash
 npm install -g vercel
 vercel --prod
 ```
 
-### Sau khi deploy
+### After deployment
 
-- Mỗi khi push code lên nhánh `main`, Vercel tự động **rebuild và deploy** phiên bản mới.
-- Kiểm tra trạng thái deploy tại tab **Deployments** trên Vercel Dashboard.
-- Nếu thay đổi biến môi trường, cần bấm **Redeploy** (bỏ chọn "Use existing Build Cache") để áp dụng.
+- Every push to the `main` branch triggers an automatic **rebuild and redeploy** on Vercel.
+- Monitor deployments in the **Deployments** tab of the Vercel Dashboard.
+- If you change an environment variable, click **Redeploy** (uncheck *"Use existing Build Cache"*) to apply the new value.
 
 ---
 
-## Lưu ý phát triển
+## Development Notes
 
-- **Nhánh chính:** `main` (deploy tự động lên Vercel)
-- **Nhánh phát triển:** `VuDev` (merge vào `main` sau khi hoàn thành)
-- Không commit thông tin nhạy cảm — file `.env` đã có trong `.gitignore`.
+- **Main branch:** `main` — automatically deployed to Vercel on every push.
+- **Development branch:** `VuDev` — used for active development; merged into `main` upon completion.
+- Never commit the `.env` file — it is already listed in `.gitignore`.
+- All new features and bug fixes are automatically committed and pushed to GitHub upon completion.
