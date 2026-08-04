@@ -1,7 +1,7 @@
 import type { Product } from '@/types/product';
 
 const browserApiPrefix = '/backend-api';
-const serverApiPrefix = `${process.env.API_URL ?? 'http://localhost:8081'}/api`;
+const serverApiPrefix = `${process.env.API_URL ?? 'http://localhost:8080'}/api`;
 
 export interface ApiUser { id: string; name: string; email: string; }
 export interface RegisterResponse { email: string; message: string; }
