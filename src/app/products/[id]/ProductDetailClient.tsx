@@ -16,7 +16,8 @@ import {
   Check, 
   Award,
   Sparkles,
-  Heart
+  Heart,
+  ChevronLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -32,7 +33,17 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   // Safe defaults for arrays/objects that might be undefined in API response
   const colors = (product.colors && product.colors.length > 0) ? product.colors : [{ name: 'Mặc định', hex: '#000', image: product.image }];
   const storages = (product.storages && product.storages.length > 0) ? product.storages : [{ name: 'Mặc định', priceOffset: 0 }];
-  const images = (product.images && product.images.length > 0) ? product.images : (product.image ? [product.image] : []);
+  
+  let allImages = (product.images && product.images.length > 0) ? [...product.images] : (product.image ? [product.image] : []);
+  if (product.colors) {
+    product.colors.forEach(c => {
+      if (c.image && !allImages.includes(c.image)) {
+        allImages.push(c.image);
+      }
+    });
+  }
+  const images = allImages;
+  
   const reviews = product.reviews || [];
   const specs = product.specs || {};
 
@@ -208,7 +219,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeImageIndex}
-                  src={product.images[activeImageIndex] || product.image}
+                  src={images[activeImageIndex] || product.image}
                   alt={product.name}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -217,6 +228,24 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   className="object-contain h-full w-full max-w-[90%]"
                 />
               </AnimatePresence>
+              
+              {/* Prev / Next Buttons */}
+              {images.length > 1 && (
+                <>
+                  <button 
+                    onClick={() => setActiveImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                    className="absolute left-4 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md flex items-center justify-center backdrop-blur-sm transition-all z-10"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button 
+                    onClick={() => setActiveImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                    className="absolute right-4 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md flex items-center justify-center backdrop-blur-sm transition-all z-10"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
             </div>
 
             {/* Thumbnail selector */}
@@ -226,8 +255,8 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
-                    className={`relative w-20 h-20 rounded-2xl bg-white border overflow-hidden flex items-center justify-center p-1.5 shrink-0 transition ${
-                      activeImageIndex === idx ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200 hover:border-gray-400'
+                    className={`relative w-20 h-20 rounded-2xl bg-white overflow-hidden flex items-center justify-center p-1.5 shrink-0 transition ${
+                      activeImageIndex === idx ? 'opacity-100 shadow-sm' : 'opacity-50 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt={`thumbnail-${idx}`} className="object-contain w-full h-full" />

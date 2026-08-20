@@ -40,14 +40,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to detail page when clicking button
-    
-    if (product.stock === 0) return;
-
     // Add default color and storage
-    const defaultColor = product.colors?.[0]?.name || 'Mặc định';
-    const defaultStorage = product.storages?.[0]?.name || 'Mặc định';
+    const defaultColor = product.colors[0]?.name || 'Mặc định';
+    const defaultStorage = product.storages[0]?.name || 'Mặc định';
     addToCart(product, defaultColor, defaultStorage, 1);
-    
+
     // Quick notification / visual cue
     setIsAdded(true);
     setTimeout(() => {
@@ -64,7 +61,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       transition={{ duration: 0.3 }}
       className="relative flex flex-col justify-between overflow-hidden bg-white border border-gray-100 rounded-3xl p-4 transition-all duration-300 group select-none cursor-pointer h-full"
     >
-      <button 
+      <button
         onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
         className={`absolute top-4 right-4 z-20 transition-colors ${isWished ? 'text-[#ff3b60]' : 'text-gray-300 hover:text-primary'}`}
       >
@@ -91,15 +88,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img
             src={product.image}
             alt={product.name}
-            className={`object-contain w-full h-full mix-blend-multiply transition-transform duration-500 ease-out ${product.stock > 0 ? 'group-hover:scale-105' : 'grayscale opacity-50'}`}
+            className="object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ease-out"
           />
-          {product.stock === 0 && (
-            <div className="absolute inset-0 bg-white/40 flex items-center justify-center z-10 backdrop-blur-[1px]">
-              <span className="bg-red-500 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border border-white/20 uppercase tracking-wider">
-                Đã Hết Hàng
-              </span>
-            </div>
-          )}
         </div>
 
         {/* Product Name */}
@@ -137,11 +127,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex items-center gap-1 mb-4 text-[11px] text-gray-500 font-semibold">
           <div className="flex text-yellow-400">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star 
-                key={i} 
-                className={`h-3.5 w-3.5 fill-current ${
-                  i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-200'
-                }`} 
+              <Star
+                key={i}
+                className={`h-3.5 w-3.5 fill-current ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-200'
+                  }`}
               />
             ))}
           </div>
@@ -160,20 +149,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </span>
             )}
           </div>
-          
+
           {/* Quick Add Button */}
           <button
             onClick={handleQuickAdd}
-            disabled={isAdded || product.stock === 0}
+            disabled={isAdded}
             className={cn(
-              "transition-all duration-300 shrink-0 flex items-center justify-center overflow-hidden rounded-full h-8",
-              isAdded 
-                ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20" 
-                : product.stock === 0
-                ? "bg-gray-100 text-gray-400 w-8 cursor-not-allowed"
-                : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8 active:scale-95 group-hover/btn:shadow-sm"
+              "transition-all duration-300 shrink-0 group/btn active:scale-95 flex items-center justify-center overflow-hidden rounded-full h-8",
+              isAdded
+                ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20"
+                : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8"
             )}
-            title={product.stock === 0 ? "Sản phẩm đã hết hàng" : "Thêm nhanh vào giỏ hàng"}
+            title="Thêm nhanh vào giỏ hàng"
           >
             {isAdded ? (
               <motion.div
@@ -185,7 +172,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <span className="text-sm font-bold whitespace-nowrap">Đã thêm</span>
               </motion.div>
             ) : (
-              <ShoppingCart className={`h-4 w-4 transition-transform ${product.stock > 0 ? 'group-hover/btn:scale-110' : ''}`} />
+              <ShoppingCart className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
             )}
           </button>
         </div>
