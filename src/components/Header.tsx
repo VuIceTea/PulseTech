@@ -54,7 +54,6 @@ export const Header = () => {
             <a href="tel:18002097" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><Phone className="h-4 w-4" /><span>1800.2097</span></a>
             <Link href="/products" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><MapPin className="h-4 w-4" /><span>Cửa hàng</span></Link>
             <Link href={user ? "/orders" : "/order-tracking"} className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><FileText className="h-4 w-4" /><span>Đơn hàng</span></Link>
-            <a href="http://localhost:3001" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 rounded-xl bg-amber-400 text-brand-black px-2.5 py-1.5 font-bold hover:bg-amber-300 transition shadow-sm"><span>Quản trị (Admin)</span></a>
           </nav>
 
           <div className="flex shrink-0 items-center gap-2 text-xs font-semibold sm:gap-3">
@@ -82,7 +81,6 @@ export const Header = () => {
             <div className="space-y-3 px-4 py-4">
               <form onSubmit={handleSearch} className="relative md:hidden"><input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Tìm sản phẩm..." className="w-full rounded-xl bg-white py-2.5 pl-10 pr-4 text-sm text-brand-black outline-none" /><Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /></form>
               <nav className="grid gap-1 rounded-2xl bg-white p-2 text-sm font-bold text-gray-600">
-                <a onClick={() => setMobileOpen(false)} href="http://localhost:3001" target="_blank" rel="noopener noreferrer" className="rounded-xl px-3 py-3 bg-amber-50 text-amber-800 font-extrabold hover:bg-amber-100">Quản trị (Admin Dashboard)</a>
                 {navigations.map(nav => (
                   <Link key={nav.id} onClick={() => setMobileOpen(false)} href={nav.href} className="rounded-xl px-3 py-3 hover:bg-gray-50">{nav.title}</Link>
                 ))}

@@ -44,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     const defaultColor = product.colors[0]?.name || 'Mặc định';
     const defaultStorage = product.storages[0]?.name || 'Mặc định';
     addToCart(product, defaultColor, defaultStorage, 1);
-    
+
     // Quick notification / visual cue
     setIsAdded(true);
     setTimeout(() => {
@@ -61,7 +61,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       transition={{ duration: 0.3 }}
       className="relative flex flex-col justify-between overflow-hidden bg-white border border-gray-100 rounded-3xl p-4 transition-all duration-300 group select-none cursor-pointer h-full"
     >
-      <button 
+      <button
         onClick={(e) => { e.preventDefault(); toggleWishlist(product); }}
         className={`absolute top-4 right-4 z-20 transition-colors ${isWished ? 'text-[#ff3b60]' : 'text-gray-300 hover:text-primary'}`}
       >
@@ -127,11 +127,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <div className="flex items-center gap-1 mb-4 text-[11px] text-gray-500 font-semibold">
           <div className="flex text-yellow-400">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star 
-                key={i} 
-                className={`h-3.5 w-3.5 fill-current ${
-                  i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-200'
-                }`} 
+              <Star
+                key={i}
+                className={`h-3.5 w-3.5 fill-current ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-200'
+                  }`}
               />
             ))}
           </div>
@@ -150,15 +149,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </span>
             )}
           </div>
-          
+
           {/* Quick Add Button */}
           <button
             onClick={handleQuickAdd}
             disabled={isAdded}
             className={cn(
               "transition-all duration-300 shrink-0 group/btn active:scale-95 flex items-center justify-center overflow-hidden rounded-full h-8",
-              isAdded 
-                ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20" 
+              isAdded
+                ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20"
                 : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8"
             )}
             title="Thêm nhanh vào giỏ hàng"
