@@ -40,9 +40,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating to detail page when clicking button
+    
+    if (product.stock === 0) return;
+
     // Add default color and storage
-    const defaultColor = product.colors[0]?.name || 'Mặc định';
-    const defaultStorage = product.storages[0]?.name || 'Mặc định';
+    const defaultColor = product.colors?.[0]?.name || 'Mặc định';
+    const defaultStorage = product.storages?.[0]?.name || 'Mặc định';
     addToCart(product, defaultColor, defaultStorage, 1);
     
     // Quick notification / visual cue
@@ -88,8 +91,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img
             src={product.image}
             alt={product.name}
-            className="object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500 ease-out"
+            className={`object-contain w-full h-full mix-blend-multiply transition-transform duration-500 ease-out ${product.stock > 0 ? 'group-hover:scale-105' : 'grayscale opacity-50'}`}
           />
+          {product.stock === 0 && (
+            <div className="absolute inset-0 bg-white/40 flex items-center justify-center z-10 backdrop-blur-[1px]">
+              <span className="bg-red-500 text-white font-bold text-xs px-3 py-1.5 rounded-full shadow-lg border border-white/20 uppercase tracking-wider">
+                Đã Hết Hàng
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Product Name */}
@@ -154,14 +164,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {/* Quick Add Button */}
           <button
             onClick={handleQuickAdd}
-            disabled={isAdded}
+            disabled={isAdded || product.stock === 0}
             className={cn(
-              "transition-all duration-300 shrink-0 group/btn active:scale-95 flex items-center justify-center overflow-hidden rounded-full h-8",
+              "transition-all duration-300 shrink-0 flex items-center justify-center overflow-hidden rounded-full h-8",
               isAdded 
                 ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20" 
-                : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8"
+                : product.stock === 0
+                ? "bg-gray-100 text-gray-400 w-8 cursor-not-allowed"
+                : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8 active:scale-95 group-hover/btn:shadow-sm"
             )}
-            title="Thêm nhanh vào giỏ hàng"
+            title={product.stock === 0 ? "Sản phẩm đã hết hàng" : "Thêm nhanh vào giỏ hàng"}
           >
             {isAdded ? (
               <motion.div
@@ -173,7 +185,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 <span className="text-sm font-bold whitespace-nowrap">Đã thêm</span>
               </motion.div>
             ) : (
-              <ShoppingCart className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
+              <ShoppingCart className={`h-4 w-4 transition-transform ${product.stock > 0 ? 'group-hover/btn:scale-110' : ''}`} />
             )}
           </button>
         </div>
