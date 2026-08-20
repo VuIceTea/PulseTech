@@ -51,6 +51,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const [selectedColor, setSelectedColor] = useState<ColorVariant>(colors[0]);
   const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(storages[0]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const liked = isInWishlist(product.id);
   const [showFullSpecs, setShowFullSpecs] = useState(false);
@@ -62,8 +63,26 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
     setSelectedColor(color);
     // Find index of color image in gallery if it exists
     const imgIndex = images.findIndex(img => img === color.image);
-    if (imgIndex !== -1) {
+    if (imgIndex !== -1 && imgIndex !== activeImageIndex) {
+      setDirection(imgIndex > activeImageIndex ? 1 : -1);
       setActiveImageIndex(imgIndex);
+    }
+  };
+
+  const handleNextImage = () => {
+    setDirection(1);
+    setActiveImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrevImage = () => {
+    setDirection(-1);
+    setActiveImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleSelectThumbnail = (idx: number) => {
+    if (idx !== activeImageIndex) {
+      setDirection(idx > activeImageIndex ? 1 : -1);
+      setActiveImageIndex(idx);
     }
   };
 
@@ -216,15 +235,16 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
           <div className="lg:col-span-5 flex flex-col gap-4">
             <div className="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-center relative h-[350px] md:h-[400px] lg:h-[480px] overflow-hidden group">
               {/* Product Main Image */}
-              <AnimatePresence mode="wait">
+              <AnimatePresence custom={direction} mode="wait">
                 <motion.img
                   key={activeImageIndex}
                   src={images[activeImageIndex] || product.image}
                   alt={product.name}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
+                  custom={direction}
+                  initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: direction < 0 ? 100 : -100 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                   className="object-contain h-full w-full max-w-[90%]"
                 />
               </AnimatePresence>
@@ -233,13 +253,13 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               {images.length > 1 && (
                 <>
                   <button 
-                    onClick={() => setActiveImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
+                    onClick={handlePrevImage}
                     className="absolute left-4 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md flex items-center justify-center backdrop-blur-sm transition-all z-10"
                   >
                     <ChevronLeft className="w-6 h-6" />
                   </button>
                   <button 
-                    onClick={() => setActiveImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
+                    onClick={handleNextImage}
                     className="absolute right-4 w-10 h-10 rounded-full bg-white/80 hover:bg-white text-gray-800 shadow-md flex items-center justify-center backdrop-blur-sm transition-all z-10"
                   >
                     <ChevronRight className="w-6 h-6" />
@@ -254,7 +274,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                 {images.map((img, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setActiveImageIndex(idx)}
+                    onClick={() => handleSelectThumbnail(idx)}
                     className={`relative w-20 h-20 rounded-2xl bg-white overflow-hidden flex items-center justify-center p-1.5 shrink-0 transition ${
                       activeImageIndex === idx ? 'opacity-100 shadow-sm' : 'opacity-50 hover:opacity-100'
                     }`}
