@@ -2,6 +2,7 @@ export interface ColorVariant {
   name: string;
   hex: string;
   image: string;
+  images?: string[];
 }
 
 export interface StorageVariant {
