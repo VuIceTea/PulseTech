@@ -7,15 +7,13 @@ import { MessageCircle, X, Send, User, Bot, Loader2 } from 'lucide-react';
 export function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [localInput, setLocalInput] = useState('');
-  const { messages, sendMessage, status, error } = useChat({
-    api: '/api/chat',
-  });
+  const { messages, sendMessage, status, error } = useChat();
   const isLoading = status === 'streaming' || status === 'submitted';
   
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!localInput.trim() || isLoading) return;
-    sendMessage({ role: 'user', content: localInput });
+    sendMessage({ role: 'user', parts: [{ type: 'text', text: localInput }] });
     setLocalInput('');
   };
   
@@ -84,7 +82,7 @@ export function ChatWidget() {
                       : 'bg-white text-gray-800 border border-gray-100 rounded-tl-sm'
                   }`}
                 >
-                  {m.content || (m.parts ? m.parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('') : '')}
+                  {m.parts ? m.parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('') : ''}
                 </div>
               </div>
             ))
