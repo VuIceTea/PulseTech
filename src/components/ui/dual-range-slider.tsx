@@ -25,19 +25,28 @@ export function DualRangeSlider({
   const [localValue, setLocalValue] = useState<[number, number]>(value);
 
   useEffect(() => {
-    setLocalValue(value);
+    // Only update local state if parent value changes externally and is not equal to local state
+    if (value[0] !== localValue[0] || value[1] !== localValue[1]) {
+      setLocalValue(value);
+    }
   }, [value]);
+
+  // Debounce the onChange callback to prevent lag during dragging
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      onChange(localValue);
+    }, 100);
+    return () => clearTimeout(handler);
+  }, [localValue, onChange]);
 
   const handleMinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = Math.min(Number(e.target.value), localValue[1] - step);
     setLocalValue([newVal, localValue[1]]);
-    onChange([newVal, localValue[1]]);
   };
 
   const handleMaxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVal = Math.max(Number(e.target.value), localValue[0] + step);
     setLocalValue([localValue[0], newVal]);
-    onChange([localValue[0], newVal]);
   };
 
   const minPercent = ((localValue[0] - min) / (max - min)) * 100;
