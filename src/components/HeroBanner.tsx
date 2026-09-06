@@ -216,6 +216,7 @@ export const HeroBanner: React.FC = () => {
               className={`absolute inset-0 bg-linear-to-r cursor-pointer ${slides.length > 0 && slides[current].bgColor ? slides[current].bgColor : 'from-zinc-900 to-zinc-800'} flex flex-col sm:flex-row justify-between p-6 sm:p-10 text-white h-full`}
             >
               {slides.length > 0 && (
+                <>
                   {/* Content left */}
                   <div className="flex flex-col justify-center space-y-2 sm:space-y-4 w-[65%] sm:max-w-md z-10 relative">
                     <span className="bg-primary/20 text-primary text-[10px] font-bold tracking-wider px-3 py-1 rounded-full w-fit uppercase flex items-center gap-1">
