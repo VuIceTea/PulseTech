@@ -351,7 +351,7 @@ export default function Home() {
               <div className="z-10 w-1/2 pr-2">
                 <span className="text-[9px] font-extrabold uppercase text-gray-500 tracking-wider">Đại Tiệc Sale</span>
                 <h3 className="font-display font-extrabold text-xl lg:text-3xl text-brand-black my-2 leading-tight">Siêu Sale Apple Black Friday</h3>
-                <Link href="/products" className="mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                <Link href="/products/iphone-15-pro-max" className="mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
                   Mua Ngay <ArrowRight className="w-3 h-3 text-primary" />
                 </Link>
               </div>
@@ -363,7 +363,7 @@ export default function Home() {
               <div className="z-10 w-1/2 pr-2">
                 <span className="text-[9px] font-extrabold uppercase text-gray-500 tracking-wider">Giảm Giá Sốc</span>
                 <h3 className="font-display font-extrabold text-xl lg:text-3xl text-brand-black my-2 leading-tight">Ốp Lưng Điện Thoại Siêu Rẻ</h3>
-                <Link href="/products" className="mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                <Link href="/products/op-lung-magsafe-iphone-15" className="mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
                   Mua Ngay <ArrowRight className="w-3 h-3 text-primary" />
                 </Link>
               </div>
@@ -395,7 +395,7 @@ export default function Home() {
                 <h3 className="font-display font-black text-[36px] xl:text-[36px] text-white leading-[1.1] tracking-tight mb-6 drop-shadow-md">
                   Giảm Ngay 30%<br />Tai Nghe Bluetooth
                 </h3>
-                <Link href="/products" className="inline-flex self-start items-center gap-2 bg-white text-brand-black text-sm font-bold px-5 py-2 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer hover:-translate-y-0.5">
+                <Link href="/products/tai-nghe-apple-airpods-pro-2" className="inline-flex self-start items-center gap-2 bg-white text-brand-black text-sm font-bold px-5 py-2 rounded-full shadow-sm hover:shadow-md transition-all cursor-pointer hover:-translate-y-0.5">
                   Mua Ngay <ArrowRight className="w-4 h-4 text-[#ff3b60]" />
                 </Link>
               </div>
@@ -458,7 +458,7 @@ export default function Home() {
                 <div className="z-10 relative">
                   <span className="text-[10px] font-extrabold uppercase text-gray-300 tracking-wider">Ưu Đãi Đặc Biệt</span>
                   <h3 className="font-display font-extrabold text-2xl text-white leading-snug mt-1 mb-4">AirPods Chống Ồn Tuyệt Đỉnh</h3>
-                  <Link href="/products" className="inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-5 py-2 rounded-full hover:bg-primary hover:text-white transition-colors shadow-sm cursor-pointer">
+                  <Link href="/products/tai-nghe-apple-airpods-pro-2" className="inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-5 py-2 rounded-full hover:bg-primary hover:text-white transition-colors shadow-sm cursor-pointer">
                     Mua Ngay <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -469,7 +469,7 @@ export default function Home() {
                 <div className="z-10 relative">
                   <span className="text-[10px] font-extrabold uppercase text-gray-300 tracking-wider">Chỉ Từ 490k</span>
                   <h3 className="font-display font-extrabold text-2xl text-white leading-snug mt-1 mb-4">Cáp Sạc Siêu Nhanh Bền Bỉ</h3>
-                  <Link href="/products" className="inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-5 py-2 rounded-full hover:bg-primary hover:text-white transition-colors shadow-sm cursor-pointer">
+                  <Link href="/products/cap-sac-apple-lightning" className="inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-5 py-2 rounded-full hover:bg-primary hover:text-white transition-colors shadow-sm cursor-pointer">
                     Mua Ngay <ArrowRight className="w-3 h-3" />
                   </Link>
                 </div>
@@ -498,7 +498,7 @@ export default function Home() {
                 <div className="z-10 w-3/5">
                   <span className="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider">Lên Tới Giảm 50%</span>
                   <h3 className="font-display font-extrabold text-xl md:text-2xl text-brand-black my-2 leading-snug">AirPods Chống Ồn Tuyệt Đỉnh</h3>
-                  <Link href="/products" className="mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                  <Link href="/products/tai-nghe-apple-airpods-pro-2" className="mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
                     Mua Ngay <ArrowRight className="w-2.5 h-2.5 text-primary" />
                   </Link>
                 </div>
@@ -510,7 +510,7 @@ export default function Home() {
                 <div className="z-10 w-3/5">
                   <span className="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider">Ưu Đãi Đến 40%</span>
                   <h3 className="font-display font-extrabold text-xl md:text-2xl text-brand-black my-2 leading-snug">Củ Sạc Siêu Nhanh 25W</h3>
-                  <Link href="/products" className="mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                  <Link href="/products/cu-sac-samsung-25w" className="mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
                     Mua Ngay <ArrowRight className="w-2.5 h-2.5 text-primary" />
                   </Link>
                 </div>
