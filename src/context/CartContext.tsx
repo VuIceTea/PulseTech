@@ -50,6 +50,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isAuthLoaded]);
 
   const addToCart = async (product: Product, color: string, storage: string, quantity = 1) => {
+    if (product.stock === 0) return;
+
     const storageObj = product.storages.find(s => s.name === storage);
     const storageOffset = storageObj ? storageObj.priceOffset : 0;
     const finalPrice = product.basePrice + storageOffset;

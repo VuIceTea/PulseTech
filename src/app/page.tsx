@@ -166,7 +166,11 @@ export default function Home() {
               <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Shuffle className="h-4 w-4" /></button>
               <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Eye className="h-4 w-4" /></button>
               <button className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 ${isWished ? 'bg-[#ff3b60] text-white border-[#ff3b60]' : 'bg-white text-gray-500 hover:bg-primary hover:text-white hover:border-primary'}`} onClick={handleWishlist}><Heart className="h-4 w-4 fill-current" /></button>
-              <button disabled={isAdded} className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer ${isAdded ? 'bg-green-500 text-white' : 'bg-white text-primary hover:bg-primary hover:text-white hover:border-primary hover:scale-110 active:scale-95'}`} onClick={handleAddToCart}>
+              <button 
+                disabled={isAdded || product.stock === 0} 
+                className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer ${isAdded ? 'bg-green-500 text-white' : product.stock === 0 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white text-primary hover:bg-primary hover:text-white hover:border-primary hover:scale-110 active:scale-95'}`} 
+                onClick={product.stock === 0 ? undefined : handleAddToCart}
+              >
                 {isAdded ? <Check className="h-4 w-4" /> : <ShoppingBag className="h-4 w-4" />}
               </button>
             </div>
@@ -192,21 +196,30 @@ export default function Home() {
                 </span>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                disabled={isAdded}
-                className={`text-[11px] font-bold border rounded-full py-1 px-3 transition-all cursor-pointer flex items-center gap-1.5 opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 duration-300 ${isAdded ? 'bg-green-500 text-white border-green-500 shadow-md shadow-green-500/20' : 'text-primary border-primary/30 hover:bg-primary hover:text-white'}`}
-              >
-                {isAdded ? (
-                  <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Đã thêm
-                  </motion.div>
-                ) : (
-                  <>
-                    <ShoppingBag className="w-3 h-3" /> Thêm
-                  </>
-                )}
-              </button>
+              {product.stock === 0 ? (
+                <button
+                  disabled
+                  className="text-[9px] font-bold border rounded-full py-1 px-3 transition-all cursor-not-allowed flex items-center gap-1.5 opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 duration-300 bg-gray-200 text-gray-500 border-gray-300"
+                >
+                  Hết hàng
+                </button>
+              ) : (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAdded}
+                  className={`text-[11px] font-bold border rounded-full py-1 px-3 transition-all cursor-pointer flex items-center gap-1.5 opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 duration-300 ${isAdded ? 'bg-green-500 text-white border-green-500 shadow-md shadow-green-500/20' : 'text-primary border-primary/30 hover:bg-primary hover:text-white'}`}
+                >
+                  {isAdded ? (
+                    <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Đã thêm
+                    </motion.div>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-3 h-3" /> Thêm
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </Link>

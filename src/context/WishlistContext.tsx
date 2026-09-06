@@ -14,6 +14,7 @@ export interface WishlistItem {
   originalPrice: number;
   discount: number;
   category: string;
+  stock: number;
 }
 
 interface WishlistContextType {
@@ -52,6 +53,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                   originalPrice: product.originalPrice,
                   discount: product.discount,
                   category: product.category,
+                  stock: product.stock,
                 });
               } catch (e) {
                 console.error('Failed to fetch wishlist product', pid, e);
@@ -108,6 +110,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         originalPrice: product.originalPrice,
         discount: product.discount,
         category: product.category,
+        stock: product.stock
       }];
     });
   };
