@@ -239,7 +239,7 @@ function ProductsListContent() {
                   <SlidersHorizontal className="h-4 w-4" />
                   Bộ lọc
                   {(() => {
-                    const activeCount = Object.entries(selectedCriteria).filter(([k, v]) => k !== 'accessory_type' && v !== '').length;
+                    const activeCount = Object.entries(selectedCriteria).filter(([k, v]) => k !== 'accessory_type' && v && v.length > 0).length;
                     return activeCount > 0 && <span className="bg-primary text-white text-[9px] rounded-full h-4 w-4 flex items-center justify-center">{activeCount}</span>;
                   })()}
                 </Button>
