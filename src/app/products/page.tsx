@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
+import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 import { cn } from '@/lib/utils';
 
 function ProductsListContent() {
@@ -46,7 +47,7 @@ function ProductsListContent() {
   // Quản lý state bộ lọc
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
   const [selectedBrand, setSelectedBrand] = useState<string>(urlBrand);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000000]);
   const [selectedCriteria, setSelectedCriteria] = useState<Record<string, string>>(
     urlAccessoryType ? { accessory_type: urlAccessoryType } : {}
   );
@@ -72,13 +73,6 @@ function ProductsListContent() {
     setIsPageLoading(false);
   }, [urlCategory, urlBrand, urlSearch, urlAccessoryType]);
 
-  const priceRanges = [
-    { id: 'under-5', name: 'Dưới 5 triệu', min: 0, max: 5000000 },
-    { id: '5-10', name: '5 - 10 triệu', min: 5000000, max: 10000000 },
-    { id: '10-20', name: '10 - 20 triệu', min: 10000000, max: 20000000 },
-    { id: 'over-20', name: 'Trên 20 triệu', min: 20000000, max: 999999999 }
-  ];
-
   const rams = ['6 GB', '8 GB', '12 GB', '16 GB'];
 
   // --- XỬ LÝ LỌC ---
@@ -98,14 +92,14 @@ function ProductsListContent() {
   const handleResetFilters = () => {
     setSelectedCategory('');
     setSelectedBrand('');
-    setSelectedPriceRange('');
+    setPriceRange([0, 50000000]);
     setSelectedCriteria({});
     setSearchQuery('');
     setSortBy('featured');
     router.push('/products');
   };
 
-  const hasActiveFilters = selectedCategory || selectedBrand || selectedPriceRange || Object.keys(selectedCriteria).length > 0 || searchQuery;
+  const hasActiveFilters = selectedCategory || selectedBrand || priceRange[0] > 0 || priceRange[1] < 50000000 || Object.keys(selectedCriteria).length > 0 || searchQuery;
 
   // --- DATA LỌC & SẮP XẾP ---
 
@@ -114,12 +108,7 @@ function ProductsListContent() {
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
     const discountedPrice = product.basePrice;
-    if (selectedPriceRange) {
-      const activeRange = priceRanges.find(r => r.id === selectedPriceRange);
-      if (activeRange) {
-        if (discountedPrice < activeRange.min || discountedPrice > activeRange.max) return false;
-      }
-    }
+    if (discountedPrice < priceRange[0] || discountedPrice > priceRange[1]) return false;
 
     if (Object.keys(selectedCriteria).length > 0) {
       for (const [key, value] of Object.entries(selectedCriteria)) {
@@ -162,9 +151,22 @@ function ProductsListContent() {
     <div className="w-[1100px] max-w-[95vw] bg-white rounded-2xl flex flex-col relative overflow-hidden">
       <div className="p-6 max-h-[70vh] overflow-y-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="space-y-3 md:col-span-2">
+            <h4 className="text-sm font-bold text-brand-black uppercase tracking-wider">KHOẢNG GIÁ</h4>
+            <div className="px-2 mt-4">
+              <DualRangeSlider
+                min={0}
+                max={50000000}
+                step={500000}
+                value={priceRange}
+                onChange={setPriceRange}
+                formatLabel={(val) => val.toLocaleString('vi-VN') + ' đ'}
+              />
+            </div>
+          </div>
           {activeFilterCriteria.map(criteria => (
             <div key={criteria.id} className={cn("space-y-3", criteria.options.length > 12 ? 'md:col-span-2' : '')}>
-              <h4 className="text-sm font-bold text-brand-black">{criteria.name}</h4>
+              <h4 className="text-sm font-bold text-brand-black uppercase tracking-wider">{criteria.name}</h4>
               <div className="flex flex-wrap gap-2">
                 {criteria.options.map(option => (
                   <button
@@ -176,10 +178,10 @@ function ProductsListContent() {
                       }));
                     }}
                     className={cn(
-                      "cursor-pointer text-xs px-3 py-1.5 rounded-full transition",
+                      "cursor-pointer text-xs px-4 py-2 border rounded-full transition-colors",
                       selectedCriteria[criteria.id] === option
-                        ? "bg-primary text-white font-bold shadow-sm"
-                        : "bg-white text-gray-600 shadow-sm hover:bg-gray-50"
+                        ? "bg-[#1A56DB] text-white font-bold border-[#1A56DB]"
+                        : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                     )}
                   >
                     {option}
