@@ -95,11 +95,11 @@ export const FlashSale: React.FC = () => {
                         {product.name}
                       </h3>
                       
-                      <div className="flex items-end gap-2 mb-2">
-                        <span className="font-extrabold text-[#d70018] text-lg">
+                      <div className="flex flex-col sm:flex-row sm:items-end gap-0.5 sm:gap-2 mb-2">
+                        <span className="font-extrabold text-[#d70018] text-[15px] sm:text-lg leading-none">
                           {salePrice.toLocaleString('vi-VN')}đ
                         </span>
-                        <span className="text-sm text-gray-400 line-through font-semibold mb-[1px]">
+                        <span className="text-[11px] sm:text-sm text-gray-400 line-through font-semibold leading-none sm:mb-[1px]">
                           {product.originalPrice.toLocaleString('vi-VN')}đ
                         </span>
                       </div>
