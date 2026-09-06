@@ -189,7 +189,7 @@ export default function CartPage() {
         {cart.length > 0 && (
           <button
             onClick={() => setIsClearConfirmOpen(true)}
-            className="text-red-500 hover:text-red-500 text-sm font-bold flex items-center gap-1.5 transition-colors active:scale-95"
+            className="text-red-500 hover:text-red-500 text-sm font-bold flex items-center gap-1.5 transition-colors active:scale-95 mt-1 sm:mt-1.5"
           >
             <Trash2 className="w-4 h-4" /> Xóa tất cả
           </button>
@@ -225,12 +225,12 @@ export default function CartPage() {
 
                 {/* Pricing & Adjusters */}
                 <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-4 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-100">
-                  <div className="text-right">
-                    <span className="text-primary font-display font-extrabold text-sm block">
+                  <div className="flex sm:flex-col items-center sm:items-end gap-2 sm:gap-0">
+                    <span className="text-primary font-display font-extrabold text-[15px] sm:text-sm block">
                       {formatPrice(item.price * item.quantity)}
                     </span>
                     {item.quantity > 1 && (
-                      <span className="text-gray-400 text-[10px] font-medium block">
+                      <span className="text-gray-400 text-[10px] font-medium block mt-0.5 sm:mt-0">
                         {formatPrice(item.price)} / sản phẩm
                       </span>
                     )}
@@ -272,7 +272,7 @@ export default function CartPage() {
 
             <Link
               href="/products"
-              className="text-xs text-gray-500 font-bold hover:text-primary flex items-center gap-1.5 self-start pt-2 transition group"
+              className="text-xs text-gray-500 font-bold hover:text-primary items-center gap-1.5 self-start pt-2 transition group hidden sm:flex"
             >
               <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" /> Tiếp tục mua sắm
             </Link>
@@ -299,7 +299,7 @@ export default function CartPage() {
                 <button
                   type="submit"
                   disabled={couponApplied || !couponCode}
-                  className="bg-brand-black hover:bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm disabled:opacity-50"
+                  className="bg-brand-black hover:bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm disabled:opacity-50 shrink-0 whitespace-nowrap"
                 >
                   Áp dụng
                 </button>

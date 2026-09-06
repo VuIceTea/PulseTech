@@ -363,7 +363,7 @@ export default function CheckoutPage() {
               <div className="mb-6">
                 <div className="flex gap-2">
                   <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="Nhập mã giảm giá" className="flex-1 border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-primary focus:border-primary" />
-                  <button type="button" onClick={handleApplyCoupon} className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700">Áp dụng</button>
+                  <button type="button" onClick={handleApplyCoupon} className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700 shrink-0 whitespace-nowrap">Áp dụng</button>
                 </div>
                 {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
                 {appliedCoupon && <p className="text-green-600 text-xs mt-1">Đã áp dụng mã {appliedCoupon.code}</p>}
