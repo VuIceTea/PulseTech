@@ -206,11 +206,16 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
         {/* Product Meta Header */}
         <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="font-display font-extrabold text-xl sm:text-3xl text-brand-black tracking-tight flex items-center gap-3">
+            <h1 className="font-display font-extrabold text-xl sm:text-3xl text-brand-black tracking-tight flex items-center flex-wrap gap-3">
               {product.name}
               {product.isFeatured && (
                 <span className="bg-primary/10 text-primary border border-primary/20 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider h-fit">
                   Nổi bật
+                </span>
+              )}
+              {product.stock === 0 && (
+                <span className="bg-red-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider h-fit">
+                  Đã hết hàng
                 </span>
               )}
             </h1>
@@ -409,22 +414,26 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
 
               {/* Quantity Select */}
               <div className="mb-6 pt-2 border-t border-gray-50 flex items-center justify-between gap-4">
-                <span className="text-xs font-bold text-gray-500">SỐ LƯỢNG MUA</span>
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold text-gray-500">SỐ LƯỢNG MUA</span>
+                  <span className="text-[10px] text-gray-400 font-medium">Hiện đang còn {product.stock} sản phẩm</span>
+                </div>
                 <div className="flex items-center rounded-2xl overflow-hidden shadow-sm bg-gray-50">
                   <button
+                    disabled={product.stock === 0}
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition"
+                    className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     -
                   </button>
                   <input
                     type="number"
-                    min={1}
+                    min={product.stock === 0 ? 0 : 1}
                     max={product.stock}
-                    value={quantity}
+                    disabled={product.stock === 0}
+                    value={product.stock === 0 ? 0 : quantity}
                     onChange={(event) => {
                       const value = event.target.valueAsNumber;
-
                       if (!Number.isNaN(value)) {
                         setQuantity(
                           Math.min(product.stock, Math.max(1, Math.trunc(value)))
@@ -432,14 +441,15 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                       }
                     }}
                     className="w-14 bg-white px-2 py-2 text-center text-xs font-bold
-             text-brand-black border-0 outline-none
+             text-brand-black border-0 outline-none disabled:opacity-50 disabled:bg-gray-100
              [appearance:textfield]
              [&::-webkit-inner-spin-button]:appearance-none
              [&::-webkit-outer-spin-button]:appearance-none"
                   />
                   <button
+                    disabled={product.stock === 0}
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                    className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition"
+                    className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     +
                   </button>
@@ -447,21 +457,33 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               </div>
 
               {/* CTA Buy Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <button
-                  onClick={() => handleAddToCart(true)}
-                  className="px-6 min-w-[240px] bg-primary hover:bg-primary-hover text-white py-3 rounded-2xl font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex flex-col items-center justify-center"
-                >
-                  <span className="text-sm">Mua Ngay</span>
-                  <span className="text-[9px] font-normal normal-case opacity-90">(Giao tận nơi hoặc nhận tại cửa hàng)</span>
-                </button>
-                <button
-                  onClick={() => handleAddToCart(false)}
-                  className="px-6 bg-brand-black hover:bg-gray-800 text-white py-3 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart className="h-4.5 w-4.5" /> Thêm Vào Giỏ
-                </button>
-              </div>
+              {product.stock === 0 ? (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    disabled
+                    className="px-6 bg-gray-200 text-gray-500 py-3 rounded-2xl font-bold uppercase tracking-wider shadow-sm flex flex-col items-center justify-center cursor-not-allowed w-full min-h-[64px]"
+                  >
+                    <span className="text-sm">Đã Hết Hàng</span>
+                    <span className="text-[9px] font-normal normal-case opacity-90">(Vui lòng quay lại sau)</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => handleAddToCart(true)}
+                    className="px-6 min-w-[240px] bg-primary hover:bg-primary-hover text-white py-3 rounded-2xl font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex flex-col items-center justify-center"
+                  >
+                    <span className="text-sm">Mua Ngay</span>
+                    <span className="text-[9px] font-normal normal-case opacity-90">(Giao tận nơi hoặc nhận tại cửa hàng)</span>
+                  </button>
+                  <button
+                    onClick={() => handleAddToCart(false)}
+                    className="px-6 bg-brand-black hover:bg-gray-800 text-white py-3 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex items-center justify-center gap-2"
+                  >
+                    <ShoppingCart className="h-4.5 w-4.5" /> Thêm Vào Giỏ
+                  </button>
+                </div>
+              )}
 
             </div>
 
