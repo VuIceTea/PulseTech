@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
+import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 import { cn } from '@/lib/utils';
 
 function ProductsListContent() {
@@ -47,8 +48,9 @@ function ProductsListContent() {
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
   const [selectedBrand, setSelectedBrand] = useState<string>(urlBrand);
   const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
-  const [selectedCriteria, setSelectedCriteria] = useState<Record<string, string>>(
-    urlAccessoryType ? { accessory_type: urlAccessoryType } : {}
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000000]);
+  const [selectedCriteria, setSelectedCriteria] = useState<Record<string, string[]>>(
+    urlAccessoryType ? { accessory_type: [urlAccessoryType] } : {}
   );
   const [sortBy, setSortBy] = useState<string>('featured');
   const [searchQuery, setSearchQuery] = useState<string>(urlSearch);
@@ -66,18 +68,11 @@ function ProductsListContent() {
     setSelectedBrand(urlBrand);
     setSearchQuery(urlSearch);
     if (urlAccessoryType) {
-      setSelectedCriteria(prev => ({ ...prev, accessory_type: urlAccessoryType }));
+      setSelectedCriteria(prev => ({ ...prev, accessory_type: [urlAccessoryType] }));
     }
 
     setIsPageLoading(false);
   }, [urlCategory, urlBrand, urlSearch, urlAccessoryType]);
-
-  const priceRanges = [
-    { id: 'under-5', name: 'Dưới 5 triệu', min: 0, max: 5000000 },
-    { id: '5-10', name: '5 - 10 triệu', min: 5000000, max: 10000000 },
-    { id: '10-20', name: '10 - 20 triệu', min: 10000000, max: 20000000 },
-    { id: 'over-20', name: 'Trên 20 triệu', min: 20000000, max: 999999999 }
-  ];
 
   const rams = ['6 GB', '8 GB', '12 GB', '16 GB'];
 
@@ -85,11 +80,18 @@ function ProductsListContent() {
 
   const handleCriterionSelect = (filterId: string, option: string) => {
     setSelectedCriteria(prev => {
+      const current = prev[filterId] || [];
+      const isSelected = current.includes(option);
+      
+      const updated = isSelected
+        ? current.filter(item => item !== option)
+        : [...current, option];
+        
       const newCriteria = { ...prev };
-      if (newCriteria[filterId] === option) {
+      if (updated.length === 0) {
         delete newCriteria[filterId];
       } else {
-        newCriteria[filterId] = option;
+        newCriteria[filterId] = updated;
       }
       return newCriteria;
     });
@@ -98,14 +100,14 @@ function ProductsListContent() {
   const handleResetFilters = () => {
     setSelectedCategory('');
     setSelectedBrand('');
-    setSelectedPriceRange('');
+    setPriceRange([0, 50000000]);
     setSelectedCriteria({});
     setSearchQuery('');
     setSortBy('featured');
     router.push('/products');
   };
 
-  const hasActiveFilters = selectedCategory || selectedBrand || selectedPriceRange || Object.keys(selectedCriteria).length > 0 || searchQuery;
+  const hasActiveFilters = selectedCategory || selectedBrand || priceRange[0] > 0 || priceRange[1] < 50000000 || Object.keys(selectedCriteria).length > 0 || searchQuery;
 
   // --- DATA LỌC & SẮP XẾP ---
 
@@ -114,18 +116,16 @@ function ProductsListContent() {
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
     const discountedPrice = product.basePrice;
-    if (selectedPriceRange) {
-      const activeRange = priceRanges.find(r => r.id === selectedPriceRange);
-      if (activeRange) {
-        if (discountedPrice < activeRange.min || discountedPrice > activeRange.max) return false;
-      }
-    }
+    if (discountedPrice < priceRange[0] || discountedPrice > priceRange[1]) return false;
 
     if (Object.keys(selectedCriteria).length > 0) {
-      for (const [key, value] of Object.entries(selectedCriteria)) {
-        if (!value) continue;
+      for (const [key, values] of Object.entries(selectedCriteria)) {
+        if (!values || values.length === 0) continue;
         const specsString = JSON.stringify(product.specs).toLowerCase();
-        if (!specsString.includes(value.toLowerCase())) {
+        
+        // Product matches if it has AT LEAST ONE of the selected values for this criteria
+        const hasMatch = values.some(val => specsString.includes(val.toLowerCase()));
+        if (!hasMatch) {
           return false;
         }
       }
@@ -162,24 +162,32 @@ function ProductsListContent() {
     <div className="w-[1100px] max-w-[95vw] bg-white rounded-2xl flex flex-col relative overflow-hidden">
       <div className="p-6 max-h-[70vh] overflow-y-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="space-y-3 md:col-span-2">
+            <h4 className="text-sm font-bold text-brand-black uppercase tracking-wider">KHOẢNG GIÁ</h4>
+            <div className="px-2 mt-4">
+              <DualRangeSlider
+                min={0}
+                max={50000000}
+                step={10000}
+                value={priceRange}
+                onChange={setPriceRange}
+                formatLabel={(val) => val.toLocaleString('vi-VN') + ' đ'}
+              />
+            </div>
+          </div>
           {activeFilterCriteria.map(criteria => (
             <div key={criteria.id} className={cn("space-y-3", criteria.options.length > 12 ? 'md:col-span-2' : '')}>
-              <h4 className="text-sm font-bold text-brand-black">{criteria.name}</h4>
+              <h4 className="text-sm font-bold text-brand-black uppercase tracking-wider">{criteria.name}</h4>
               <div className="flex flex-wrap gap-2">
                 {criteria.options.map(option => (
                   <button
                     key={option}
-                    onClick={() => {
-                      setSelectedCriteria(prev => ({
-                        ...prev,
-                        [criteria.id]: prev[criteria.id] === option ? '' : option
-                      }));
-                    }}
+                    onClick={() => handleCriterionSelect(criteria.id, option)}
                     className={cn(
-                      "cursor-pointer text-xs px-3 py-1.5 rounded-full transition",
-                      selectedCriteria[criteria.id] === option
-                        ? "bg-primary text-white font-bold shadow-sm"
-                        : "bg-white text-gray-600 shadow-sm hover:bg-gray-50"
+                      "cursor-pointer text-xs px-4 py-2 border rounded-full transition-colors",
+                      (selectedCriteria[criteria.id] || []).includes(option)
+                        ? "bg-[#1A56DB] text-white font-bold border-[#1A56DB]"
+                        : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                     )}
                   >
                     {option}
@@ -242,7 +250,9 @@ function ProductsListContent() {
             </Popover>
 
             {activeFilterCriteria.map((filter) => {
-              const hasSelection = !!selectedCriteria[filter.filterId];
+              const hasSelection = (selectedCriteria[filter.filterId] || []).length > 0;
+              const selectionText = hasSelection ? ((selectedCriteria[filter.filterId] || []).length > 1 ? `${(selectedCriteria[filter.filterId] || []).length} lựa chọn` : (selectedCriteria[filter.filterId] || [])[0]) : '';
+              
               return (
                 <Popover key={filter.filterId}>
                   <PopoverTrigger asChild>
@@ -255,12 +265,12 @@ function ProductsListContent() {
                     >
                       {hasSelection ? (
                         <span className="flex items-center gap-1.5">
-                          {filter.name}: {selectedCriteria[filter.filterId]}
+                          {filter.name}: {selectionText}
                           <X
                             className="h-3.5 w-3.5 hover:text-red-500 hover:scale-110 transition-transform cursor-pointer ml-0.5"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCriterionSelect(filter.filterId, selectedCriteria[filter.filterId]);
+                              setSelectedCriteria(prev => { const next = {...prev}; delete next[filter.filterId]; return next; });
                             }}
                           />
                         </span>
@@ -279,7 +289,7 @@ function ProductsListContent() {
                         {hasSelection && (
                           <span
                             className="text-[10px] text-primary cursor-pointer hover:underline font-semibold"
-                            onClick={() => handleCriterionSelect(filter.filterId, selectedCriteria[filter.filterId])}
+                            onClick={() => setSelectedCriteria(prev => { const next = {...prev}; delete next[filter.filterId]; return next; })}
                           >
                             Bỏ chọn
                           </span>
@@ -292,7 +302,7 @@ function ProductsListContent() {
                             className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
                           >
                             <Checkbox
-                              checked={selectedCriteria[filter.filterId] === option}
+                              checked={(selectedCriteria[filter.filterId] || []).includes(option)}
                               onCheckedChange={() => handleCriterionSelect(filter.filterId, option)}
                               className="h-4 w-4 rounded-[4px] border-gray-300 text-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />

@@ -151,30 +151,40 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           {/* Quick Add Button */}
-          <button
-            onClick={handleQuickAdd}
-            disabled={isAdded}
-            className={cn(
-              "transition-all duration-300 shrink-0 group/btn active:scale-95 flex items-center justify-center overflow-hidden rounded-full h-8",
-              isAdded
-                ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20"
-                : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8"
-            )}
-            title="Thêm nhanh vào giỏ hàng"
-          >
-            {isAdded ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-1.5"
-              >
-                <Check className="h-4 w-4" />
-                <span className="text-sm font-bold whitespace-nowrap">Đã thêm</span>
-              </motion.div>
-            ) : (
-              <ShoppingCart className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
-            )}
-          </button>
+          {product.stock === 0 ? (
+            <button
+              disabled
+              className="transition-all duration-300 shrink-0 flex items-center justify-center overflow-hidden rounded-full h-8 bg-gray-200 text-gray-500 px-3 cursor-not-allowed"
+              title="Sản phẩm đã hết hàng"
+            >
+              <span className="text-[11px] font-bold whitespace-nowrap">Hết hàng</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleQuickAdd}
+              disabled={isAdded}
+              className={cn(
+                "transition-all duration-300 shrink-0 group/btn active:scale-95 flex items-center justify-center overflow-hidden rounded-full h-8",
+                isAdded
+                  ? "bg-green-500 text-white px-3 shadow-md shadow-green-500/20"
+                  : "bg-primary/5 text-primary hover:bg-primary hover:text-white w-8"
+              )}
+              title="Thêm nhanh vào giỏ hàng"
+            >
+              {isAdded ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-1.5"
+                >
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-bold whitespace-nowrap">Đã thêm</span>
+                </motion.div>
+              ) : (
+                <ShoppingCart className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
+              )}
+            </button>
+          )}
         </div>
       </Link>
     </motion.div>
