@@ -216,22 +216,21 @@ export const HeroBanner: React.FC = () => {
               className={`absolute inset-0 bg-linear-to-r cursor-pointer ${slides.length > 0 && slides[current].bgColor ? slides[current].bgColor : 'from-zinc-900 to-zinc-800'} flex flex-col sm:flex-row justify-between p-6 sm:p-10 text-white h-full`}
             >
               {slides.length > 0 && (
-                <>
                   {/* Content left */}
-                  <div className="flex flex-col justify-center space-y-2 sm:space-y-4 max-w-[280px] sm:max-w-md z-10">
+                  <div className="flex flex-col justify-center space-y-2 sm:space-y-4 w-[65%] sm:max-w-md z-10 relative">
                     <span className="bg-primary/20 text-primary text-[10px] font-bold tracking-wider px-3 py-1 rounded-full w-fit uppercase flex items-center gap-1">
                       <img src="https://img.icons8.com/fluency/48/fire-element.png" alt="Hot Deal" className="h-4 w-4 object-contain" /> Hot Deal Tuần Này
                     </span>
-                    <h2 className="font-display font-extrabold text-xl sm:text-3xl leading-tight">
+                    <h2 className="font-display font-extrabold text-lg xs:text-xl sm:text-3xl leading-tight drop-shadow-md">
                       {slides[current].title}
                     </h2>
                     {slides[current].subtitle && (
-                      <p className="text-gray-300 text-[10px] sm:text-sm font-medium">
+                      <p className="text-gray-300 text-[10px] sm:text-sm font-medium drop-shadow-md line-clamp-2">
                         {slides[current].subtitle}
                       </p>
                     )}
                     {slides[current].promoText && (
-                      <div className="text-[10px] sm:text-xs text-yellow-400 font-semibold bg-white/5 px-3 py-2 rounded-xl w-fit">
+                      <div className="text-[9px] sm:text-xs text-yellow-400 font-semibold bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl w-fit backdrop-blur-sm">
                         {slides[current].promoText}
                       </div>
                     )}
@@ -240,19 +239,19 @@ export const HeroBanner: React.FC = () => {
                         e.stopPropagation();
                         router.push(slides[current].link);
                       }}
-                      className="bg-primary hover:bg-primary-hover text-white text-[10px] sm:text-xs font-bold px-5 py-2.5 rounded-2xl w-fit transition shadow-md"
+                      className="bg-primary hover:bg-primary-hover text-white text-[10px] sm:text-xs font-bold px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl w-fit transition shadow-md mt-1"
                     >
                       Mua Ngay
                     </button>
                   </div>
 
                   {/* Image right */}
-                  <div className="hidden sm:flex items-center justify-center relative w-1/2 h-full z-10">
+                  <div className="absolute right-[-20px] bottom-0 sm:relative sm:right-0 flex items-center justify-center w-1/2 h-[90%] sm:h-full z-0 sm:z-10 opacity-60 sm:opacity-100 pointer-events-none sm:pointer-events-auto">
                     {slides[current].imageUrl && (
                       <img
                         src={slides[current].imageUrl}
                         alt={slides[current].title}
-                        className="object-contain w-full h-[95%] drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                        className="object-contain w-full h-[95%] drop-shadow-2xl hover:scale-105 transition-transform duration-500 origin-bottom-right sm:origin-center"
                       />
                     )}
                   </div>

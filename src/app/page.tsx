@@ -151,7 +151,7 @@ export default function Home() {
           </button>
         </div>
         <Link href={`/products/${product.id}`} className="flex-1 flex flex-col cursor-pointer">
-          <div className="flex items-center justify-center relative mb-3 h-48">
+          <div className="flex items-center justify-center relative mb-3 h-36 sm:h-40 md:h-48">
             <img
               src={product.image}
               alt={product.name}
@@ -188,10 +188,10 @@ export default function Home() {
 
             <div className="flex items-end justify-between mb-1">
               <div className="flex flex-col">
-                <span className="font-extrabold text-base text-primary leading-tight">
+                <span className="font-extrabold text-[13px] sm:text-base text-primary leading-tight">
                   {salePrice.toLocaleString("vi-VN")}đ
                 </span>
-                <span className="text-gray-400 text-xs line-through font-semibold mb-[2px]">
+                <span className="text-gray-400 text-[10px] sm:text-xs line-through font-semibold mb-[2px]">
                   {product.originalPrice.toLocaleString('vi-VN')}đ
                 </span>
               </div>
@@ -313,7 +313,7 @@ export default function Home() {
                 className="group flex flex-col items-center gap-2 sm:gap-3 cursor-pointer w-full text-center"
               >
                 {/* Large round image container */}
-                <div className="w-20 h-20 sm:w-16 sm:h-16 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40 2xl:w-44 2xl:h-44 rounded-full flex items-center justify-center bg-gray-100 overflow-hidden shadow-sm group-hover:scale-105 transition-all duration-350 relative border border-gray-200/20">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 xl:w-40 xl:h-40 2xl:w-44 2xl:h-44 rounded-full flex items-center justify-center bg-gray-100 overflow-hidden shadow-sm group-hover:scale-105 transition-all duration-350 relative border border-gray-200/20">
                   <div className={`absolute inset-0 ${cat.bg} transition-opacity duration-300`} />
                   <img
                     src={cat.img}
@@ -347,28 +347,28 @@ export default function Home() {
       <ScrollReveal>
         <section className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#f2f8fc] rounded-2xl p-6 sm:p-8 flex items-center justify-between h-[220px] border border-[#e5f0f9] overflow-hidden group cursor-pointer">
-              <div className="z-10 w-1/2 pr-2">
+            <div className="bg-[#f2f8fc] rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-center justify-between h-auto sm:h-[220px] border border-[#e5f0f9] overflow-hidden group cursor-pointer gap-4 sm:gap-0">
+              <div className="z-10 w-full sm:w-1/2 pr-0 sm:pr-2 text-center sm:text-left pt-2 sm:pt-0">
                 <span className="text-[9px] font-extrabold uppercase text-gray-500 tracking-wider">Đại Tiệc Sale</span>
                 <h3 className="font-display font-extrabold text-xl lg:text-3xl text-brand-black my-2 leading-tight">Siêu Sale Apple Black Friday</h3>
-                <Link href="/products/iphone-15-pro-max" className="mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                <Link href="/products/iphone-15-pro-max" className="mt-2 sm:mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer mx-auto sm:mx-0">
                   Mua Ngay <ArrowRight className="w-3 h-3 text-primary" />
                 </Link>
               </div>
-              <div className="w-1/2 relative h-full flex items-center justify-center">
-                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=400&auto=format&fit=crop" className="w-[110%] object-cover rounded-xl group-hover:scale-105 transition-transform duration-500 drop-shadow-xl absolute right-0" alt="iPhone Black Friday" />
+              <div className="w-[80%] sm:w-1/2 relative h-40 sm:h-full flex items-center justify-center mt-2 sm:mt-0">
+                <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=400&auto=format&fit=crop" className="w-full sm:w-[110%] object-cover rounded-xl group-hover:scale-105 transition-transform duration-500 drop-shadow-xl sm:absolute sm:right-0 h-full sm:h-auto" alt="iPhone Black Friday" />
               </div>
             </div>
-            <div className="bg-[#fff6e6] rounded-2xl p-6 sm:p-8 flex items-center justify-between h-[220px] border border-[#ffecca] overflow-hidden group cursor-pointer">
-              <div className="z-10 w-1/2 pr-2">
+            <div className="bg-[#fff6e6] rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-center justify-between h-auto sm:h-[220px] border border-[#ffecca] overflow-hidden group cursor-pointer gap-4 sm:gap-0">
+              <div className="z-10 w-full sm:w-1/2 pr-0 sm:pr-2 text-center sm:text-left pt-2 sm:pt-0">
                 <span className="text-[9px] font-extrabold uppercase text-gray-500 tracking-wider">Giảm Giá Sốc</span>
                 <h3 className="font-display font-extrabold text-xl lg:text-3xl text-brand-black my-2 leading-tight">Ốp Lưng Điện Thoại Siêu Rẻ</h3>
-                <Link href="/products/op-lung-magsafe-iphone-15" className="mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                <Link href="/products/op-lung-magsafe-iphone-15" className="mt-2 sm:mt-3 inline-flex items-center gap-1.5 bg-white border border-gray-200 text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer mx-auto sm:mx-0">
                   Mua Ngay <ArrowRight className="w-3 h-3 text-primary" />
                 </Link>
               </div>
-              <div className="w-1/2 relative h-full flex items-center justify-center">
-                <img src="/accessories/op-lung-iphone-15-pro-trong-suot-magsafe.png" className="w-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-xl absolute right-0 mix-blend-multiply" alt="Phone Case Offer" />
+              <div className="w-[70%] sm:w-1/2 relative h-32 sm:h-full flex items-center justify-center mt-2 sm:mt-0">
+                <img src="/accessories/op-lung-iphone-15-pro-trong-suot-magsafe.png" className="w-full object-contain group-hover:scale-105 transition-transform duration-500 drop-shadow-xl sm:absolute sm:right-0 mix-blend-multiply h-full sm:h-auto" alt="Phone Case Offer" />
               </div>
             </div>
           </div>
@@ -388,7 +388,7 @@ export default function Home() {
             </div>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-auto lg:h-[350px]">
-            <div className="lg:col-span-1 bg-[#ffcc00] rounded-2xl p-8 lg:p-10 flex flex-col justify-center border border-[#e6b800] relative overflow-hidden group cursor-pointer min-h-[350px]">
+            <div className="lg:col-span-1 bg-[#ffcc00] rounded-2xl p-6 md:p-8 lg:p-10 flex flex-col justify-center border border-[#e6b800] relative overflow-hidden group cursor-pointer min-h-[200px] sm:min-h-[280px] lg:min-h-[350px]">
               <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover blur-[2px] group-hover:scale-105 transition-transform duration-700 z-0 opacity-90 mix-blend-multiply" alt="Headphones Banner" />
               <div className="absolute inset-0 bg-white/10 z-0" />
               <div className="z-10 relative flex flex-col justify-center w-full">
@@ -401,8 +401,8 @@ export default function Home() {
               </div>
             </div>
             {/* Right Products (2 Cards converted to Banners) */}
-            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6 h-full">
-              <div className="bg-white rounded-2xl p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[300px]">
+            <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 h-full">
+              <div className="bg-white rounded-2xl p-6 md:p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[200px] sm:min-h-[250px] lg:min-h-[300px]">
                 <img src="https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=600&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover blur-[2px] group-hover:scale-105 transition-transform duration-700 z-0" alt="AirPods Banner" />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-0" />
                 <div className="z-10 relative h-full flex flex-col justify-start">
@@ -414,7 +414,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[300px]">
+              <div className="bg-white rounded-2xl p-6 md:p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[200px] sm:min-h-[250px] lg:min-h-[300px]">
                 <img src="https://images.unsplash.com/photo-1583863788434-e58a36330cf0?q=80&w=600&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover blur-[2px] group-hover:scale-105 transition-transform duration-700 z-0 mix-blend-multiply" alt="Cáp Sạc Banner" />
                 <div className="absolute inset-0 bg-[#f8fafc]/50 z-0" />
                 <div className="z-10 relative h-full flex flex-col justify-start">
@@ -445,14 +445,14 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* 3x2 Grid of Products */}
-            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6">
               {recentlyAdded.map(product => (
                 <VerticalProductCard key={product.id} product={product} />
               ))}
             </div>
             {/* 2 Vertical Stacked Banners */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              <div className="rounded-2xl p-6 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[320px]">
+            <div className="lg:col-span-2 flex flex-col gap-4 sm:gap-6">
+              <div className="rounded-2xl p-5 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[200px] sm:min-h-[320px]">
                 <img src="/accessories/airpod-pro-gen2.png" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 z-0" alt="AirPods" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-0" />
                 <div className="z-10 relative">
@@ -463,7 +463,7 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="rounded-2xl p-6 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[320px]">
+              <div className="rounded-2xl p-5 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[200px] sm:min-h-[320px]">
                 <img src="/accessories/day-sac-nhanh-typec-to-lightning.webp" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 z-0" alt="Cáp Sạc" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-0" />
                 <div className="z-10 relative">
@@ -493,8 +493,8 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto">
             {/* 2 Stacked Horizontal Banners */}
-            <div className="flex flex-col gap-6">
-              <div className="bg-[#f0f4f8] rounded-2xl p-6 md:p-8 flex items-center flex-1 relative overflow-hidden group cursor-pointer min-h-[220px]">
+            <div className="flex flex-col gap-4 sm:gap-6">
+              <div className="bg-[#f0f4f8] rounded-2xl p-5 sm:p-6 md:p-8 flex items-center flex-1 relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[220px]">
                 <div className="z-10 w-3/5">
                   <span className="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider">Lên Tới Giảm 50%</span>
                   <h3 className="font-display font-extrabold text-xl md:text-2xl text-brand-black my-2 leading-snug">AirPods Chống Ồn Tuyệt Đỉnh</h3>
@@ -506,7 +506,7 @@ export default function Home() {
                   <img src="/accessories/airpod-pro-gen2.png" className="h-[120%] object-cover group-hover:scale-105 transition-transform duration-500 origin-bottom-right rounded-br-2xl mix-blend-multiply" alt="AirPods" />
                 </div>
               </div>
-              <div className="bg-[#e6f4ea] rounded-2xl p-6 md:p-8 flex items-center flex-1 relative overflow-hidden group cursor-pointer min-h-[220px]">
+              <div className="bg-[#e6f4ea] rounded-2xl p-5 sm:p-6 md:p-8 flex items-center flex-1 relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[220px]">
                 <div className="z-10 w-3/5">
                   <span className="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider">Ưu Đãi Đến 40%</span>
                   <h3 className="font-display font-extrabold text-xl md:text-2xl text-brand-black my-2 leading-snug">Củ Sạc Siêu Nhanh 25W</h3>
@@ -520,7 +520,7 @@ export default function Home() {
               </div>
             </div>
             {/* Grid of 4 Small Products -> Now VerticalProductCard */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {hotSummerProducts.map(product => (
                 <VerticalProductCard key={product.id} product={product} />
               ))}
