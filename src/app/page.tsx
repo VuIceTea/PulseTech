@@ -346,7 +346,7 @@ export default function Home() {
       {/* 4. Black Friday & Sale Banners - Mobile/Accessories Themed */}
       <ScrollReveal>
         <section className="mx-auto max-w-[1600px] px-0 sm:px-6 lg:px-8 overflow-hidden">
-          <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 gap-4 md:gap-6 pb-4 px-4 sm:px-0 scrollbar-hide">
+          <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-2 gap-4 md:gap-6 pb-4 px-4 sm:px-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="shrink-0 w-[85vw] sm:w-[45vw] md:w-auto snap-center bg-[#f2f8fc] rounded-2xl p-5 sm:p-8 flex flex-col sm:flex-row items-center justify-between h-auto sm:h-[220px] border border-[#e5f0f9] overflow-hidden group cursor-pointer gap-4 sm:gap-0">
               <div className="z-10 w-full sm:w-1/2 pr-0 sm:pr-2 text-center sm:text-left pt-2 sm:pt-0">
                 <span className="text-[9px] font-extrabold uppercase text-gray-500 tracking-wider">Đại Tiệc Sale</span>
@@ -387,8 +387,8 @@ export default function Home() {
               <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:border-primary hover:text-primary transition-colors cursor-pointer"><ChevronRight className="w-4 h-4" /></button>
             </div>
           </div>
-          <div className="flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-3 gap-4 lg:gap-6 h-auto lg:h-[350px] pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 scrollbar-hide">
-            <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto lg:col-span-1 bg-[#ffcc00] rounded-2xl p-6 md:p-8 lg:p-10 flex flex-col justify-center border border-[#e6b800] relative overflow-hidden group cursor-pointer min-h-[200px] sm:min-h-[280px] lg:min-h-[350px] snap-center">
+          <div className="flex overflow-x-auto snap-x snap-mandatory lg:grid lg:grid-cols-3 gap-4 lg:gap-6 h-auto lg:h-[350px] pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto lg:col-span-1 bg-[#ffcc00] rounded-2xl p-6 md:p-8 lg:p-10 flex flex-col justify-center border border-[#e6b800] relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[280px] lg:min-h-[350px] snap-center">
               <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover blur-[2px] group-hover:scale-105 transition-transform duration-700 z-0 opacity-90 mix-blend-multiply" alt="Headphones Banner" />
               <div className="absolute inset-0 bg-white/10 z-0" />
               <div className="z-10 relative flex flex-col justify-center w-full">
@@ -401,7 +401,7 @@ export default function Home() {
               </div>
             </div>
             {/* Right Products (2 Cards converted to Banners) */}
-            <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto lg:col-span-1 bg-white rounded-2xl p-6 md:p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[200px] sm:min-h-[250px] lg:min-h-[300px] snap-center">
+            <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto lg:col-span-1 bg-white rounded-2xl p-5 sm:p-6 md:p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[250px] lg:min-h-[300px] snap-center">
               <img src="https://images.unsplash.com/photo-1606220588913-b3aacb4d2f46?q=80&w=600&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover blur-[2px] group-hover:scale-105 transition-transform duration-700 z-0" alt="AirPods Banner" />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-0" />
                 <div className="z-10 relative h-full flex flex-col justify-start">
@@ -413,7 +413,7 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto lg:col-span-1 bg-white rounded-2xl p-6 md:p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[200px] sm:min-h-[250px] lg:min-h-[300px] snap-center">
+            <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto lg:col-span-1 bg-white rounded-2xl p-5 sm:p-6 md:p-8 flex flex-col justify-between border border-gray-100 relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[250px] lg:min-h-[300px] snap-center">
               <img src="https://images.unsplash.com/photo-1583863788434-e58a36330cf0?q=80&w=600&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover blur-[2px] group-hover:scale-105 transition-transform duration-700 z-0 mix-blend-multiply" alt="Cáp Sạc Banner" />
                 <div className="absolute inset-0 bg-[#f8fafc]/50 z-0" />
                 <div className="z-10 relative h-full flex flex-col justify-start">
@@ -443,14 +443,17 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* 3x2 Grid of Products */}
-            <div className="lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-6">
+            {/* Products Carousel on Mobile */}
+            <div className="lg:col-span-3 flex overflow-x-auto lg:grid lg:grid-cols-3 snap-x snap-mandatory gap-3 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {recentlyAdded.map(product => (
-                <VerticalProductCard key={product.id} product={product} />
+                <div key={product.id} className="shrink-0 w-[45vw] sm:w-[30vw] lg:w-auto snap-center">
+                  <VerticalProductCard product={product} />
+                </div>
               ))}
             </div>
             {/* 2 Vertical Stacked Banners */}
-            <div className="lg:col-span-2 flex overflow-x-auto lg:flex-col snap-x snap-mandatory gap-4 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 scrollbar-hide">
-              <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto snap-center rounded-2xl p-5 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[200px] sm:min-h-[320px]">
+            <div className="lg:col-span-2 flex overflow-x-auto lg:flex-col snap-x snap-mandatory gap-4 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto snap-center rounded-2xl p-5 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[160px] sm:min-h-[320px]">
                 <img src="/accessories/airpod-pro-gen2.png" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 z-0" alt="AirPods" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-0" />
                 <div className="z-10 relative">
@@ -461,7 +464,7 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto snap-center rounded-2xl p-5 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[200px] sm:min-h-[320px]">
+              <div className="shrink-0 w-[85vw] sm:w-[45vw] lg:w-auto snap-center rounded-2xl p-5 md:p-8 flex flex-col justify-end items-start flex-1 border border-gray-100 group overflow-hidden relative text-left cursor-pointer min-h-[160px] sm:min-h-[320px]">
                 <img src="/accessories/day-sac-nhanh-typec-to-lightning.webp" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 z-0" alt="Cáp Sạc" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-0" />
                 <div className="z-10 relative">
@@ -491,28 +494,28 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-auto">
             {/* 2 Stacked Horizontal Banners */}
-            <div className="flex overflow-x-auto lg:flex-col snap-x snap-mandatory gap-4 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 scrollbar-hide">
-              <div className="shrink-0 w-[85vw] sm:w-[60vw] lg:w-auto snap-center bg-[#f0f4f8] rounded-2xl p-5 sm:p-6 md:p-8 flex items-center flex-1 relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[220px]">
-                <div className="z-10 w-3/5">
+            <div className="flex overflow-x-auto lg:flex-col snap-x snap-mandatory gap-4 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <div className="shrink-0 w-[75vw] sm:w-[60vw] lg:w-auto snap-center bg-[#f0f4f8] rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row justify-between flex-1 relative overflow-hidden group cursor-pointer min-h-[180px] sm:min-h-[220px]">
+                <div className="z-10 w-2/3 sm:w-3/5 mt-0 sm:mt-0">
                   <span className="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider">Lên Tới Giảm 50%</span>
-                  <h3 className="font-display font-extrabold text-xl md:text-2xl text-brand-black my-2 leading-snug">AirPods Chống Ồn Tuyệt Đỉnh</h3>
-                  <Link href="/products/tai-nghe-apple-airpods-pro-2" className="mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                  <h3 className="font-display font-extrabold text-[16px] xs:text-xl md:text-2xl text-brand-black my-1 sm:my-2 leading-tight">AirPods Chống Ồn Tuyệt Đỉnh</h3>
+                  <Link href="/products/tai-nghe-apple-airpods-pro-2" className="mt-2 sm:mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
                     Mua Ngay <ArrowRight className="w-2.5 h-2.5 text-primary" />
                   </Link>
                 </div>
-                <div className="w-2/5 absolute right-0 bottom-0 h-full flex items-end justify-end">
+                <div className="absolute right-0 bottom-0 h-[85%] sm:h-full w-[45%] flex items-end justify-end z-0">
                   <img src="/accessories/airpod-pro-gen2.png" className="h-[120%] object-cover group-hover:scale-105 transition-transform duration-500 origin-bottom-right rounded-br-2xl mix-blend-multiply" alt="AirPods" />
                 </div>
               </div>
-              <div className="shrink-0 w-[85vw] sm:w-[60vw] lg:w-auto snap-center bg-[#e6f4ea] rounded-2xl p-5 sm:p-6 md:p-8 flex items-center flex-1 relative overflow-hidden group cursor-pointer min-h-[160px] sm:min-h-[220px]">
-                <div className="z-10 w-3/5">
+              <div className="shrink-0 w-[75vw] sm:w-[60vw] lg:w-auto snap-center bg-[#e6f4ea] rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col sm:flex-row justify-between flex-1 relative overflow-hidden group cursor-pointer min-h-[180px] sm:min-h-[220px]">
+                <div className="z-10 w-2/3 sm:w-3/5 mt-0 sm:mt-0">
                   <span className="text-[10px] font-extrabold uppercase text-gray-500 tracking-wider">Ưu Đãi Đến 40%</span>
-                  <h3 className="font-display font-extrabold text-xl md:text-2xl text-brand-black my-2 leading-snug">Củ Sạc Siêu Nhanh 25W</h3>
-                  <Link href="/products/cu-sac-samsung-25w" className="mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
+                  <h3 className="font-display font-extrabold text-[16px] xs:text-xl md:text-2xl text-brand-black my-1 sm:my-2 leading-tight">Củ Sạc Siêu Nhanh 25W</h3>
+                  <Link href="/products/cu-sac-samsung-25w" className="mt-2 sm:mt-3 inline-flex items-center gap-1.5 bg-white text-brand-black text-[10px] font-bold px-4 py-1.5 rounded-full border border-gray-200 hover:border-primary hover:text-primary transition-colors shadow-sm cursor-pointer">
                     Mua Ngay <ArrowRight className="w-2.5 h-2.5 text-primary" />
                   </Link>
                 </div>
-                <div className="w-2/5 absolute right-0 bottom-0 h-full flex items-end justify-end">
+                <div className="absolute right-0 bottom-0 h-[85%] sm:h-full w-[45%] flex items-end justify-end z-0">
                   <img src="/accessories/cu-sac-nhanh-samsung-typeC.webp" className="h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-bottom-right mix-blend-multiply" alt="Củ Sạc" />
                 </div>
               </div>
