@@ -32,7 +32,7 @@ export interface Article { id: string; title: string; slug: string; summary: str
 export interface Policy { id: string; title: string; icon: string; contentHtml: string; orderIndex: number; }
 export interface Wishlist { id: string; productIds: string[]; }
 export interface UserAddress { id?: string; userId: string; fullName: string; phone: string; addressLine: string; ward: string; district: string; city: string; isDefault: boolean; }
-export interface Coupon { id: string; code: string; description: string; discountPercent: number; discountAmount: number; minOrderValue: number; maxDiscountValue: number; }
+export interface Coupon { code: string; discountAmount: number; discountType: string; finalAmount: number; }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const prefix = typeof window === 'undefined' ? serverApiPrefix : browserApiPrefix;
@@ -92,5 +92,5 @@ export const userApi = {
 };
 
 export const orderApi = {
-  validateCoupon: (code: string) => request<Coupon>(`/orders/coupons/validate?code=${encodeURIComponent(code)}`)
+  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[] }) => request<{ success: boolean; data: Coupon }>('/coupons/validate', { method: 'POST', body: JSON.stringify(payload) })
 };

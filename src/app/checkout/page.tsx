@@ -84,11 +84,11 @@ export default function CheckoutPage() {
     setCouponError(null);
     if (!couponCode) return;
     try {
-      const coupon = await orderApi.validateCoupon(couponCode);
-      if (cartTotal < coupon.minOrderValue) {
-        setCouponError(`Đơn hàng tối thiểu ${formatPrice(coupon.minOrderValue)}`);
+      const res = await orderApi.validateCoupon({ code: couponCode, orderAmount: cartTotal, productIds: [] });
+      if (res && res.success) {
+        setAppliedCoupon(res.data);
       } else {
-        setAppliedCoupon(coupon);
+        setCouponError('Mã giảm giá không hợp lệ.');
       }
     } catch (e: any) {
       setCouponError(e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
@@ -97,14 +97,7 @@ export default function CheckoutPage() {
 
   let discountValue = 0;
   if (appliedCoupon) {
-    if (appliedCoupon.discountPercent > 0) {
-      discountValue = (cartTotal * appliedCoupon.discountPercent) / 100;
-      if (appliedCoupon.maxDiscountValue > 0 && discountValue > appliedCoupon.maxDiscountValue) {
-        discountValue = appliedCoupon.maxDiscountValue;
-      }
-    } else {
-      discountValue = appliedCoupon.discountAmount;
-    }
+    discountValue = appliedCoupon.discountAmount;
   }
 
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
@@ -146,6 +139,7 @@ export default function CheckoutPage() {
           storage: item.storage,
           quantity: item.quantity,
         })),
+        couponCode: appliedCoupon?.code,
       });
 
       localStorage.setItem('last_order_info', JSON.stringify({
