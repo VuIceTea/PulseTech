@@ -140,6 +140,7 @@ export default function CheckoutPage() {
         customerEmail: user?.email || '',
         address: shippingAddress,
         paymentMethod,
+        couponCode: appliedCoupon?.code,
         items: cart.map(item => ({
           productId: item.id,
           color: item.color,
@@ -150,8 +151,10 @@ export default function CheckoutPage() {
 
       localStorage.setItem('last_order_info', JSON.stringify({
         customerName: fullName,
-        totalPrice: cart.reduce((total, item) => total + item.price * item.quantity, 0),
-        paymentMethod: paymentMethod === 'cod' ? 'Giao tận nơi (COD)' : 'Thanh toán trực tuyến (VNPay)'
+        totalPrice: finalTotal,
+        paymentMethod: paymentMethod === 'cod' ? 'Giao tận nơi (COD)' : 'Thanh toán trực tuyến (VNPay)',
+        discountAmount: discountValue > 0 ? discountValue : undefined,
+        couponCode: appliedCoupon?.code,
       }));
 
       if (order.paymentUrl) {

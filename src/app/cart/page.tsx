@@ -16,7 +16,7 @@ import {
   Truck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api } from '@/lib/api';
+import { api, orderApi, Coupon } from '@/lib/api';
 import { toast } from 'sonner';
 
 export default function CartPage() {
@@ -27,7 +27,7 @@ export default function CartPage() {
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
-  const [discountPercent, setDiscountPercent] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState('');
 
@@ -84,23 +84,42 @@ export default function CartPage() {
   }, [clearCart]);
 
   // Apply Coupon logic
-  const handleApplyCoupon = (e: React.FormEvent) => {
+  const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     const code = couponCode.trim().toUpperCase();
-    if (code === 'PULSETECH' || code === 'CELLPHONES') {
-      setDiscountPercent(10); // 10% discount
-      setCouponApplied(true);
-      setCouponError('');
-    } else {
-      setCouponError('Mã giảm giá không hợp lệ. Thử: PULSETECH');
+    if (!code) return;
+    setCouponError('');
+    try {
+      const coupon = await orderApi.validateCoupon(code);
+      if (cartTotal < coupon.minOrderValue) {
+        setCouponError(`Đơn hàng tối thiểu ${coupon.minOrderValue.toLocaleString('vi-VN')}₫`);
+        setCouponApplied(false);
+        setAppliedCoupon(null);
+      } else {
+        setAppliedCoupon(coupon);
+        setCouponApplied(true);
+        setCouponError('');
+      }
+    } catch (e: any) {
+      setCouponError(e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
       setCouponApplied(false);
-      setDiscountPercent(0);
+      setAppliedCoupon(null);
     }
   };
 
   // Fees
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
-  const discountAmount = Math.round((cartTotal * discountPercent) / 100);
+  let discountAmount = 0;
+  if (appliedCoupon) {
+    if (appliedCoupon.discountPercent > 0) {
+      discountAmount = Math.round((cartTotal * appliedCoupon.discountPercent) / 100);
+      if (appliedCoupon.maxDiscountValue > 0 && discountAmount > appliedCoupon.maxDiscountValue) {
+        discountAmount = appliedCoupon.maxDiscountValue;
+      }
+    } else {
+      discountAmount = appliedCoupon.discountAmount;
+    }
+  }
   const finalTotal = cartTotal - discountAmount + shippingFee;
 
   // Handle Checkout submit
@@ -116,7 +135,7 @@ export default function CartPage() {
         customerPhone: phoneNumber,
         address: shippingAddress,
         paymentMethod,
-        couponCode: couponApplied ? couponCode.trim().toUpperCase() : undefined,
+        couponCode: couponApplied && appliedCoupon ? appliedCoupon.code : undefined,
         items: cart.map(item => ({
           productId: item.id,
           color: item.color,
@@ -288,7 +307,7 @@ export default function CartPage() {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Mã: PULSETECH"
+                    placeholder="Nhập mã giảm giá"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
                     disabled={couponApplied}
@@ -304,13 +323,13 @@ export default function CartPage() {
                   Áp dụng
                 </button>
               </form>
-              {couponApplied && (
+              {couponApplied && appliedCoupon && (
                 <div className="text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 mt-2 flex items-center justify-between">
-                  <span>Áp dụng thành công (Giảm 10% đơn hàng)</span>
+                  <span>Mã <strong>{appliedCoupon.code}</strong> áp dụng thành công 🎉</span>
                   <button
                     onClick={() => {
                       setCouponApplied(false);
-                      setDiscountPercent(0);
+                      setAppliedCoupon(null);
                       setCouponCode('');
                     }}
                     className="text-primary hover:underline ml-1"
@@ -335,9 +354,9 @@ export default function CartPage() {
                 <span className="text-brand-black">{formatPrice(cartTotal)}</span>
               </div>
 
-              {discountPercent > 0 && (
+              {discountAmount > 0 && appliedCoupon && (
                 <div className="flex justify-between text-xs text-green-600">
-                  <span>Chiết khấu ({discountPercent}%)</span>
+                  <span>Mã giảm giá ({appliedCoupon.code}){appliedCoupon.discountPercent > 0 ? ` -${appliedCoupon.discountPercent}%` : ''}</span>
                   <span>-{formatPrice(discountAmount)}</span>
                 </div>
               )}
