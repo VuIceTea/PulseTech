@@ -168,7 +168,7 @@ function ProductsListContent() {
               <DualRangeSlider
                 min={0}
                 max={50000000}
-                step={500000}
+                step={10000}
                 value={priceRange}
                 onChange={setPriceRange}
                 formatLabel={(val) => val.toLocaleString('vi-VN') + ' đ'}
