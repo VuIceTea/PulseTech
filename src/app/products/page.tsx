@@ -47,9 +47,10 @@ function ProductsListContent() {
   // Quản lý state bộ lọc
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
   const [selectedBrand, setSelectedBrand] = useState<string>(urlBrand);
+  const [selectedPriceRange, setSelectedPriceRange] = useState<string>('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50000000]);
-  const [selectedCriteria, setSelectedCriteria] = useState<Record<string, string>>(
-    urlAccessoryType ? { accessory_type: urlAccessoryType } : {}
+  const [selectedCriteria, setSelectedCriteria] = useState<Record<string, string[]>>(
+    urlAccessoryType ? { accessory_type: [urlAccessoryType] } : {}
   );
   const [sortBy, setSortBy] = useState<string>('featured');
   const [searchQuery, setSearchQuery] = useState<string>(urlSearch);
@@ -67,7 +68,7 @@ function ProductsListContent() {
     setSelectedBrand(urlBrand);
     setSearchQuery(urlSearch);
     if (urlAccessoryType) {
-      setSelectedCriteria(prev => ({ ...prev, accessory_type: urlAccessoryType }));
+      setSelectedCriteria(prev => ({ ...prev, accessory_type: [urlAccessoryType] }));
     }
 
     setIsPageLoading(false);
@@ -79,11 +80,18 @@ function ProductsListContent() {
 
   const handleCriterionSelect = (filterId: string, option: string) => {
     setSelectedCriteria(prev => {
+      const current = prev[filterId] || [];
+      const isSelected = current.includes(option);
+      
+      const updated = isSelected
+        ? current.filter(item => item !== option)
+        : [...current, option];
+        
       const newCriteria = { ...prev };
-      if (newCriteria[filterId] === option) {
+      if (updated.length === 0) {
         delete newCriteria[filterId];
       } else {
-        newCriteria[filterId] = option;
+        newCriteria[filterId] = updated;
       }
       return newCriteria;
     });
@@ -111,10 +119,13 @@ function ProductsListContent() {
     if (discountedPrice < priceRange[0] || discountedPrice > priceRange[1]) return false;
 
     if (Object.keys(selectedCriteria).length > 0) {
-      for (const [key, value] of Object.entries(selectedCriteria)) {
-        if (!value) continue;
+      for (const [key, values] of Object.entries(selectedCriteria)) {
+        if (!values || values.length === 0) continue;
         const specsString = JSON.stringify(product.specs).toLowerCase();
-        if (!specsString.includes(value.toLowerCase())) {
+        
+        // Product matches if it has AT LEAST ONE of the selected values for this criteria
+        const hasMatch = values.some(val => specsString.includes(val.toLowerCase()));
+        if (!hasMatch) {
           return false;
         }
       }
@@ -171,15 +182,10 @@ function ProductsListContent() {
                 {criteria.options.map(option => (
                   <button
                     key={option}
-                    onClick={() => {
-                      setSelectedCriteria(prev => ({
-                        ...prev,
-                        [criteria.id]: prev[criteria.id] === option ? '' : option
-                      }));
-                    }}
+                    onClick={() => handleCriterionSelect(criteria.id, option)}
                     className={cn(
                       "cursor-pointer text-xs px-4 py-2 border rounded-full transition-colors",
-                      selectedCriteria[criteria.id] === option
+                      (selectedCriteria[criteria.id] || []).includes(option)
                         ? "bg-[#1A56DB] text-white font-bold border-[#1A56DB]"
                         : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                     )}
@@ -244,7 +250,9 @@ function ProductsListContent() {
             </Popover>
 
             {activeFilterCriteria.map((filter) => {
-              const hasSelection = !!selectedCriteria[filter.filterId];
+              const hasSelection = (selectedCriteria[filter.filterId] || []).length > 0;
+              const selectionText = hasSelection ? ((selectedCriteria[filter.filterId] || []).length > 1 ? `${(selectedCriteria[filter.filterId] || []).length} lựa chọn` : (selectedCriteria[filter.filterId] || [])[0]) : '';
+              
               return (
                 <Popover key={filter.filterId}>
                   <PopoverTrigger asChild>
@@ -257,12 +265,12 @@ function ProductsListContent() {
                     >
                       {hasSelection ? (
                         <span className="flex items-center gap-1.5">
-                          {filter.name}: {selectedCriteria[filter.filterId]}
+                          {filter.name}: {selectionText}
                           <X
                             className="h-3.5 w-3.5 hover:text-red-500 hover:scale-110 transition-transform cursor-pointer ml-0.5"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleCriterionSelect(filter.filterId, selectedCriteria[filter.filterId]);
+                              setSelectedCriteria(prev => { const next = {...prev}; delete next[filter.filterId]; return next; });
                             }}
                           />
                         </span>
@@ -281,7 +289,7 @@ function ProductsListContent() {
                         {hasSelection && (
                           <span
                             className="text-[10px] text-primary cursor-pointer hover:underline font-semibold"
-                            onClick={() => handleCriterionSelect(filter.filterId, selectedCriteria[filter.filterId])}
+                            onClick={() => setSelectedCriteria(prev => { const next = {...prev}; delete next[filter.filterId]; return next; })}
                           >
                             Bỏ chọn
                           </span>
@@ -294,7 +302,7 @@ function ProductsListContent() {
                             className="flex items-center gap-3 py-2 px-2 hover:bg-gray-50 rounded-xl cursor-pointer transition-colors"
                           >
                             <Checkbox
-                              checked={selectedCriteria[filter.filterId] === option}
+                              checked={(selectedCriteria[filter.filterId] || []).includes(option)}
                               onCheckedChange={() => handleCriterionSelect(filter.filterId, option)}
                               className="h-4 w-4 rounded-[4px] border-gray-300 text-primary data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />

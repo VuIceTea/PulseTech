@@ -60,7 +60,7 @@ export function DualRangeSlider({
           step={step}
           value={localValue[0]}
           onChange={handleMinChange}
-          className="absolute w-full -top-1.5 h-1.5 appearance-none bg-transparent pointer-events-auto"
+          className="absolute w-full -top-[7px] h-5 appearance-none bg-transparent pointer-events-auto outline-none"
           style={{
             zIndex: localValue[0] > max - 100 ? 5 : 3
           }}
@@ -74,7 +74,7 @@ export function DualRangeSlider({
           step={step}
           value={localValue[1]}
           onChange={handleMaxChange}
-          className="absolute w-full -top-1.5 h-1.5 appearance-none bg-transparent pointer-events-auto"
+          className="absolute w-full -top-[7px] h-5 appearance-none bg-transparent pointer-events-auto outline-none"
           style={{ zIndex: 4 }}
         />
       </div>
