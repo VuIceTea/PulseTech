@@ -110,18 +110,27 @@ export default function WishlistPage() {
                   </div>
                 </Link>
 
-                <button 
-                  onClick={() => handleMoveToCart(item.id)}
-                  disabled={loadingProductId === item.id}
-                  className="mt-4 w-full bg-brand-black text-white font-bold py-2.5 rounded-xl hover:bg-primary transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50"
-                >
-                  {loadingProductId === item.id ? (
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  ) : (
-                    <ShoppingCart className="w-4 h-4" />
-                  )}
-                  Thêm vào giỏ hàng
-                </button>
+                {item.stock === 0 ? (
+                  <button
+                    disabled
+                    className="mt-4 w-full bg-gray-200 text-gray-500 py-2.5 rounded-xl text-sm font-bold shadow-sm transition cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    Đã Hết Hàng
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => handleMoveToCart(item.id)}
+                    disabled={loadingProductId === item.id}
+                    className="mt-4 w-full bg-brand-black text-white font-bold py-2.5 rounded-xl hover:bg-primary transition-colors flex items-center justify-center gap-2 text-sm disabled:opacity-50"
+                  >
+                    {loadingProductId === item.id ? (
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    ) : (
+                      <ShoppingCart className="w-4 h-4" />
+                    )}
+                    Thêm vào giỏ hàng
+                  </button>
+                )}
               </div>
             );
           })}
