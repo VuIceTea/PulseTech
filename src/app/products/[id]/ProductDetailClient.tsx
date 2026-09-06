@@ -468,19 +468,20 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-wrap gap-3">
+                <div className="flex gap-2 sm:gap-3 w-full">
                   <button
                     onClick={() => handleAddToCart(true)}
-                    className="px-6 min-w-[240px] bg-primary hover:bg-primary-hover text-white py-3 rounded-2xl font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex flex-col items-center justify-center"
+                    className="flex-[2] px-2 sm:px-6 bg-primary hover:bg-primary-hover text-white py-3 rounded-2xl font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex flex-col items-center justify-center text-center"
                   >
-                    <span className="text-sm">Mua Ngay</span>
-                    <span className="text-[9px] font-normal normal-case opacity-90">(Giao tận nơi hoặc nhận tại cửa hàng)</span>
+                    <span className="text-[12px] sm:text-sm">Mua Ngay</span>
+                    <span className="text-[8px] sm:text-[9px] font-normal normal-case opacity-90 leading-tight">(Giao tận nơi hoặc nhận tại cửa hàng)</span>
                   </button>
                   <button
                     onClick={() => handleAddToCart(false)}
-                    className="px-6 bg-brand-black hover:bg-gray-800 text-white py-3 rounded-2xl text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex items-center justify-center gap-2"
+                    className="flex-[1.2] px-2 sm:px-6 bg-brand-black hover:bg-gray-800 text-white py-3 rounded-2xl text-[11px] sm:text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-center"
                   >
-                    <ShoppingCart className="h-4.5 w-4.5" /> Thêm Vào Giỏ
+                    <ShoppingCart className="h-4 sm:h-4.5 w-4 sm:w-4.5 shrink-0" /> 
+                    <span>Thêm Vào Giỏ</span>
                   </button>
                 </div>
               )}
