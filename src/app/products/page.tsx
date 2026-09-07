@@ -43,6 +43,7 @@ function ProductsListContent() {
   const urlBrand = searchParams.get('brand') || '';
   const urlSearch = searchParams.get('search') || '';
   const urlAccessoryType = searchParams.get('accessory_type') || '';
+  const urlPrice = searchParams.get('price') || '';
 
   // Quản lý state bộ lọc
   const [selectedCategory, setSelectedCategory] = useState<string>(urlCategory);
@@ -70,9 +71,15 @@ function ProductsListContent() {
     if (urlAccessoryType) {
       setSelectedCriteria(prev => ({ ...prev, accessory_type: [urlAccessoryType] }));
     }
+    // Handle price range from URL
+    if (urlPrice === 'under5') setPriceRange([0, 5000000]);
+    else if (urlPrice === '5to10') setPriceRange([5000000, 10000000]);
+    else if (urlPrice === '10to20') setPriceRange([10000000, 20000000]);
+    else if (urlPrice === 'over20') setPriceRange([20000000, 50000000]);
+    else if (!urlPrice) setPriceRange([0, 50000000]);
 
     setIsPageLoading(false);
-  }, [urlCategory, urlBrand, urlSearch, urlAccessoryType]);
+  }, [urlCategory, urlBrand, urlSearch, urlAccessoryType, urlPrice]);
 
   const rams = ['6 GB', '8 GB', '12 GB', '16 GB'];
 
@@ -112,10 +119,16 @@ function ProductsListContent() {
   // --- DATA LỌC & SẮP XẾP ---
 
   const filteredProducts = products.filter((product) => {
-    if (selectedCategory && product.category !== selectedCategory) return false;
+    // Handle sub-categories from mega menu (e.g. accessory_charge, laptop_gaming)
+    if (selectedCategory) {
+      const [baseCategory] = selectedCategory.split('_');
+      if (product.category !== baseCategory && product.category !== selectedCategory) return false;
+    }
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
-    const discountedPrice = product.basePrice;
+    const discountedPrice = product.discount > 0
+      ? Math.round(product.basePrice * (1 - product.discount / 100))
+      : product.basePrice;
     if (discountedPrice < priceRange[0] || discountedPrice > priceRange[1]) return false;
 
     if (Object.keys(selectedCriteria).length > 0) {
@@ -140,8 +153,8 @@ function ProductsListContent() {
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = a.basePrice;
-    const priceB = b.basePrice;
+    const priceA = a.discount > 0 ? Math.round(a.basePrice * (1 - a.discount / 100)) : a.basePrice;
+    const priceB = b.discount > 0 ? Math.round(b.basePrice * (1 - b.discount / 100)) : b.basePrice;
 
     if (sortBy === 'price-asc') return priceA - priceB;
     if (sortBy === 'price-desc') return priceB - priceA;
