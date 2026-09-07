@@ -90,15 +90,19 @@ export default function CartPage() {
     if (!code) return;
     setCouponError('');
     try {
-      const coupon = await orderApi.validateCoupon(code);
-      if (cartTotal < coupon.minOrderValue) {
-        setCouponError(`Đơn hàng tối thiểu ${coupon.minOrderValue.toLocaleString('vi-VN')}₫`);
-        setCouponApplied(false);
-        setAppliedCoupon(null);
-      } else {
-        setAppliedCoupon(coupon);
+      const response = await orderApi.validateCoupon({
+        code,
+        orderAmount: cartTotal,
+        productIds: cart.map(item => item.id)
+      });
+      if (response.success && response.data) {
+        setAppliedCoupon(response.data);
         setCouponApplied(true);
         setCouponError('');
+      } else {
+        setCouponError('Mã giảm giá không hợp lệ hoặc không đủ điều kiện.');
+        setCouponApplied(false);
+        setAppliedCoupon(null);
       }
     } catch (e: any) {
       setCouponError(e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
@@ -111,14 +115,7 @@ export default function CartPage() {
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
   let discountAmount = 0;
   if (appliedCoupon) {
-    if (appliedCoupon.discountPercent > 0) {
-      discountAmount = Math.round((cartTotal * appliedCoupon.discountPercent) / 100);
-      if (appliedCoupon.maxDiscountValue > 0 && discountAmount > appliedCoupon.maxDiscountValue) {
-        discountAmount = appliedCoupon.maxDiscountValue;
-      }
-    } else {
-      discountAmount = appliedCoupon.discountAmount;
-    }
+    discountAmount = appliedCoupon.discountAmount;
   }
   const finalTotal = cartTotal - discountAmount + shippingFee;
 
@@ -356,7 +353,7 @@ export default function CartPage() {
 
               {discountAmount > 0 && appliedCoupon && (
                 <div className="flex justify-between text-xs text-green-600">
-                  <span>Mã giảm giá ({appliedCoupon.code}){appliedCoupon.discountPercent > 0 ? ` -${appliedCoupon.discountPercent}%` : ''}</span>
+                  <span>Mã giảm giá ({appliedCoupon.code}){appliedCoupon.discountType === 'PERCENTAGE' ? ' (Tỷ lệ)' : ''}</span>
                   <span>-{formatPrice(discountAmount)}</span>
                 </div>
               )}

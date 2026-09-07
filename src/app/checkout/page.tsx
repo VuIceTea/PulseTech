@@ -140,7 +140,6 @@ export default function CheckoutPage() {
           storage: item.storage,
           quantity: item.quantity,
         })),
-        couponCode: appliedCoupon?.code,
       });
 
       localStorage.setItem('last_order_info', JSON.stringify({
