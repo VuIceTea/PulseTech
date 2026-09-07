@@ -26,7 +26,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   // Calculate discounted price
-  const discountedPrice = product.basePrice;
+  const discountedPrice = product.discount > 0
+    ? Math.round(product.basePrice * (1 - product.discount / 100))
+    : product.basePrice;
 
   // Dynamic badge color
   const getBadgeColor = (badge: string) => {
