@@ -4,9 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { api, userApi, orderApi, UserAddress, Coupon } from '@/lib/api';
-import { ArrowLeft, CreditCard, Wallet, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin } from 'lucide-react';
+import { api, userApi, orderApi, UserAddress, Coupon, FullCoupon } from '@/lib/api';
+import { ArrowLeft, CreditCard, Wallet, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -28,6 +30,9 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
 
+  const [showVoucherModal, setShowVoucherModal] = useState(false);
+  const [availableVouchers, setAvailableVouchers] = useState<FullCoupon[]>([]);
+
   // Ensure client render
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -41,6 +46,10 @@ export default function CheckoutPage() {
           setFullName(defaultAddr.fullName);
           setPhoneNumber(defaultAddr.phone);
         }
+      }).catch(console.error);
+
+      orderApi.getCoupons(user.email).then(data => {
+        setAvailableVouchers(data.filter(c => c.isActive));
       }).catch(console.error);
     }
   }, [user]);
@@ -80,18 +89,20 @@ export default function CheckoutPage() {
     return price.toLocaleString('vi-VN') + '₫';
   };
 
-  const handleApplyCoupon = async () => {
+  const handleApplyCoupon = async (codeToApply: string = couponCode) => {
     setCouponError(null);
-    if (!couponCode) return;
+    if (!codeToApply) return;
     try {
-      const res = await orderApi.validateCoupon({ code: couponCode, orderAmount: cartTotal, productIds: [] });
+      const res = await orderApi.validateCoupon({ code: codeToApply, orderAmount: cartTotal, productIds: [], customerEmail: user?.email || '' });
       if (res && res.success) {
-        setAppliedCoupon(res.data);
+        setAppliedCoupon(res.data as Coupon);
+        setCouponCode(codeToApply);
+        setShowVoucherModal(false);
       } else {
-        setCouponError('Mã giảm giá không hợp lệ.');
+        setCouponError(typeof res.data === 'string' ? res.data : 'Mã giảm giá không hợp lệ.');
       }
     } catch (e: any) {
-      setCouponError(e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+      setCouponError('Mã giảm giá không tồn tại hoặc đã hết hạn.');
     }
   };
 
@@ -357,9 +368,16 @@ export default function CheckoutPage() {
 
               {/* Nhập mã giảm giá */}
               <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-sm font-semibold text-gray-700">Mã giảm giá</label>
+                  <button type="button" onClick={() => setShowVoucherModal(true)} className="text-primary text-sm font-bold flex items-center gap-1 hover:underline">
+                    <Ticket className="w-4 h-4" />
+                    Chọn mã giảm giá
+                  </button>
+                </div>
                 <div className="flex gap-2">
                   <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} placeholder="Nhập mã giảm giá" className="flex-1 border-gray-200 rounded-xl px-4 py-2 text-sm focus:ring-primary focus:border-primary" />
-                  <button type="button" onClick={handleApplyCoupon} className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700 shrink-0 whitespace-nowrap">Áp dụng</button>
+                  <button type="button" onClick={() => handleApplyCoupon()} className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700 shrink-0 whitespace-nowrap">Áp dụng</button>
                 </div>
                 {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
                 {appliedCoupon && <p className="text-green-600 text-xs mt-1">Đã áp dụng mã {appliedCoupon.code}</p>}
@@ -394,6 +412,54 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
+
+      {/* Voucher Modal */}
+      <AnimatePresence>
+        {showVoucherModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-2xl rounded-3xl bg-gray-50 shadow-2xl relative max-h-[80vh] flex flex-col"
+            >
+              <div className="p-4 border-b border-gray-200 bg-white rounded-t-3xl flex justify-between items-center">
+                <h3 className="font-bold text-lg text-brand-black">Chọn Mã Giảm Giá</h3>
+                <button onClick={() => setShowVoucherModal(false)} className="text-gray-400 hover:text-red-500 font-bold text-2xl leading-none">&times;</button>
+              </div>
+              
+              <div className="p-4 overflow-y-auto flex-1">
+                {availableVouchers.length === 0 ? (
+                  <div className="text-center py-10 text-gray-500">Không có mã giảm giá nào.</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {availableVouchers.map((v) => {
+                      const isEligible = cartTotal >= v.minOrderValue;
+                      return (
+                        <div key={v.id} className={`h-full ${isEligible ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}`} onClick={() => isEligible && handleApplyCoupon(v.code)}>
+                          <BackgroundGradient className={`p-4 flex flex-col justify-between relative overflow-hidden h-full shadow-sm ${isEligible ? 'text-white' : 'text-gray-200'}`}>
+                            <div className="absolute top-0 right-0 h-16 w-16 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
+                            <div className="relative z-10 flex flex-col h-full">
+                              <div>
+                                <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold shadow-sm">
+                                  {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${v.discountAmount / 1000}K`}
+                                </span>
+                                <h4 className="mt-2 font-bold text-lg">{v.code}</h4>
+                                <p className="mt-1 text-xs opacity-90 flex-1 line-clamp-2">{v.description}</p>
+                                <p className="mt-2 text-[10px] font-medium opacity-80">Đơn tối thiểu: {v.minOrderValue.toLocaleString()}đ</p>
+                              </div>
+                            </div>
+                          </BackgroundGradient>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

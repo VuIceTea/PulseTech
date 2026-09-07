@@ -132,7 +132,7 @@ function MemberCard({ user }: { user: any }) {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <p className="text-xs font-medium text-white/80 uppercase tracking-widest">Điểm tích lũy</p>
-              <p className="mt-1 text-xl font-bold text-yellow-300">1,250</p>
+              <p className="mt-1 text-xl font-bold text-yellow-300">{user.rewardPoints?.toLocaleString() || '0'}</p>
             </div>
             <div>
               <p className="text-xs font-medium text-white/80 uppercase tracking-widest">Chi tiêu năm nay</p>

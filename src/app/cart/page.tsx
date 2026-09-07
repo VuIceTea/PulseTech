@@ -16,7 +16,8 @@ import {
   Truck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api, orderApi, Coupon } from '@/lib/api';
+import { api, orderApi, Coupon, FullCoupon } from '@/lib/api';
+import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { toast } from 'sonner';
 
 export default function CartPage() {
@@ -30,6 +31,9 @@ export default function CartPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponError, setCouponError] = useState('');
+
+  const [showVoucherModal, setShowVoucherModal] = useState(false);
+  const [availableVouchers, setAvailableVouchers] = useState<FullCoupon[]>([]);
 
   // Checkout modal state
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -52,6 +56,14 @@ export default function CartPage() {
   };
 
   const hasCleared = React.useRef(false);
+
+  React.useEffect(() => {
+    if (user?.email) {
+      orderApi.getCoupons(user.email).then(data => {
+        setAvailableVouchers(data.filter(c => c.isActive));
+      }).catch(console.error);
+    }
+  }, [user]);
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -84,28 +96,31 @@ export default function CartPage() {
   }, [clearCart]);
 
   // Apply Coupon logic
-  const handleApplyCoupon = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const code = couponCode.trim().toUpperCase();
+  const handleApplyCoupon = async (e?: React.FormEvent, codeToApply?: string) => {
+    if (e) e.preventDefault();
+    const code = (codeToApply || couponCode).trim().toUpperCase();
     if (!code) return;
     setCouponError('');
     try {
       const response = await orderApi.validateCoupon({
         code,
         orderAmount: cartTotal,
-        productIds: cart.map(item => item.id)
+        productIds: cart.map(item => item.id),
+        customerEmail: user?.email || ''
       });
       if (response.success && response.data) {
-        setAppliedCoupon(response.data);
+        setAppliedCoupon(response.data as Coupon);
+        setCouponCode(code);
         setCouponApplied(true);
         setCouponError('');
+        setShowVoucherModal(false);
       } else {
-        setCouponError('Mã giảm giá không hợp lệ hoặc không đủ điều kiện.');
+        setCouponError(typeof response.data === 'string' ? response.data : 'Mã giảm giá không hợp lệ hoặc không đủ điều kiện.');
         setCouponApplied(false);
         setAppliedCoupon(null);
       }
     } catch (e: any) {
-      setCouponError(e.message || 'Mã giảm giá không hợp lệ hoặc đã hết hạn.');
+      setCouponError('Mã giảm giá không tồn tại hoặc đã hết hạn.');
       setCouponApplied(false);
       setAppliedCoupon(null);
     }
@@ -299,7 +314,13 @@ export default function CartPage() {
 
             {/* Promo Code Coupon Box */}
             <div className="bg-white border border-gray-100 rounded-3xl p-5 shadow-sm">
-              <span className="text-xs font-bold text-gray-500 block mb-3 uppercase tracking-wider">MÃ GIẢM GIÁ</span>
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">MÃ GIẢM GIÁ</span>
+                <button type="button" onClick={() => setShowVoucherModal(true)} className="text-primary text-xs font-bold flex items-center gap-1 hover:underline">
+                  <Ticket className="w-4 h-4" />
+                  Chọn mã giảm giá
+                </button>
+              </div>
               <form onSubmit={handleApplyCoupon} className="flex gap-2">
                 <div className="relative flex-1">
                   <input
@@ -417,6 +438,54 @@ export default function CartPage() {
           </Link>
         </motion.div>
       )}
+
+      {/* Voucher Modal */}
+      <AnimatePresence>
+        {showVoucherModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-2xl rounded-3xl bg-gray-50 shadow-2xl relative max-h-[80vh] flex flex-col"
+            >
+              <div className="p-4 border-b border-gray-200 bg-white rounded-t-3xl flex justify-between items-center">
+                <h3 className="font-bold text-lg text-brand-black">Chọn Mã Giảm Giá</h3>
+                <button onClick={() => setShowVoucherModal(false)} className="text-gray-400 hover:text-red-500 font-bold text-2xl leading-none">&times;</button>
+              </div>
+              
+              <div className="p-4 overflow-y-auto flex-1">
+                {availableVouchers.length === 0 ? (
+                  <div className="text-center py-10 text-gray-500">Không có mã giảm giá nào.</div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {availableVouchers.map((v) => {
+                      const isEligible = cartTotal >= v.minOrderValue;
+                      return (
+                        <div key={v.id} className={`h-full ${isEligible ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}`} onClick={() => isEligible && handleApplyCoupon(undefined, v.code)}>
+                          <BackgroundGradient className={`p-4 flex flex-col justify-between relative overflow-hidden h-full shadow-sm ${isEligible ? 'text-white' : 'text-gray-200'}`}>
+                            <div className="absolute top-0 right-0 h-16 w-16 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
+                            <div className="relative z-10 flex flex-col h-full">
+                              <div>
+                                <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold shadow-sm">
+                                  {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${v.discountAmount / 1000}K`}
+                                </span>
+                                <h4 className="mt-2 font-bold text-lg">{v.code}</h4>
+                                <p className="mt-1 text-xs opacity-90 flex-1 line-clamp-2">{v.description}</p>
+                                <p className="mt-2 text-[10px] font-medium opacity-80">Đơn tối thiểu: {v.minOrderValue.toLocaleString()}đ</p>
+                              </div>
+                            </div>
+                          </BackgroundGradient>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Checkout details Modal Overlay (Framer Motion) */}
       <AnimatePresence>

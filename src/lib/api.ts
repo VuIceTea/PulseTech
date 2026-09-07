@@ -3,7 +3,7 @@ import type { Product } from '@/types/product';
 const browserApiPrefix = '/backend-api';
 const serverApiPrefix = `${process.env.API_URL ?? 'http://localhost:8080'}/api`;
 
-export interface ApiUser { id: string; name: string; email: string; }
+export interface ApiUser { id: string; name: string; email: string; rewardPoints: number; }
 export interface RegisterResponse { email: string; message: string; }
 export interface VerifyResponse { message: string; }
 export interface OrderItemRequest { productId: string; color: string; storage: string; quantity: number; }
@@ -93,6 +93,6 @@ export const userApi = {
 };
 
 export const orderApi = {
-  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[] }) => request<{ success: boolean; data: Coupon }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) }),
-  getCoupons: () => request<FullCoupon[]>('/orders/coupons')
+  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[]; customerEmail: string }) => request<{ success: boolean; data: any }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) }),
+  getCoupons: (email?: string) => request<FullCoupon[]>(`/orders/coupons${email ? `?email=${encodeURIComponent(email)}` : ''}`)
 };
