@@ -54,7 +54,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const storageObj = product.storages.find(s => s.name === storage);
     const storageOffset = storageObj ? storageObj.priceOffset : 0;
-    const finalPrice = product.basePrice + storageOffset;
+    const discountedBase = Math.round(product.basePrice * (1 - (product.discount || 0) / 100));
+    const finalPrice = discountedBase + storageOffset;
 
     const colorObj = product.colors.find(c => c.name === color);
     const itemImage = colorObj ? colorObj.image : product.image;
