@@ -92,5 +92,5 @@ export const userApi = {
 };
 
 export const orderApi = {
-  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[] }) => request<{ success: boolean; data: Coupon }>('/coupons/validate', { method: 'POST', body: JSON.stringify(payload) })
+  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[] }) => request<{ success: boolean; data: Coupon }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) })
 };
