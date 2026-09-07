@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
-import { api, type Order } from '@/lib/api';
+import { api, orderApi, type Order, type FullCoupon } from '@/lib/api';
 import { Package, Truck, CheckCircle2, ClipboardList, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -446,32 +446,56 @@ function TabHistory({ user }: { user: any }) {
 
 function TabOffers() {
   const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
+  const [vouchers, setVouchers] = useState<FullCoupon[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const vouchers = [
-    { code: 'PULSEWELCOME', discount: 'Giảm 50K', desc: 'Cho đơn hàng đầu tiên từ 500K', details: 'Áp dụng cho tất cả sản phẩm. Hạn sử dụng: 30/12/2026. Mỗi tài khoản chỉ được sử dụng 1 lần.' },
-    { code: 'FREESHIP100', discount: 'Freeship', desc: 'Miễn phí vận chuyển toàn quốc', details: 'Áp dụng cho đơn hàng từ 1.000.000đ trở lên. Không áp dụng cùng ưu đãi nội bộ.' },
-    { code: 'SMEMBERVIP', discount: 'Giảm 5%', desc: 'Đặc quyền cho khách hàng P-MEMBER', details: 'Giảm 5% tối đa 500K cho khách hàng hạng P-MEMBER. Áp dụng cho các dòng điện thoại, laptop.' },
-  ];
+  useEffect(() => {
+    const fetchCoupons = async () => {
+      try {
+        const data = await orderApi.getCoupons();
+        setVouchers(data.filter(c => c.isActive));
+      } catch (error) {
+        toast.error('Không thể tải danh sách ưu đãi');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCoupons();
+  }, []);
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold text-brand-black uppercase tracking-wide">Ưu đãi của bạn</h2>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {vouchers.map((v, i) => (
-          <div key={i} className="h-full cursor-pointer" onClick={() => setSelectedVoucher(v)}>
-            <BackgroundGradient className="p-5 flex flex-col justify-between relative overflow-hidden h-full text-white shadow-md">
-              <div className="absolute top-0 right-0 h-24 w-24 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
-              <div className="relative z-10 flex flex-col h-full">
-                <div>
-                  <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold text-white shadow-sm">{v.discount}</span>
-                  <h3 className="mt-3 font-bold text-white text-lg">{v.code}</h3>
-                  <p className="mt-2 text-xs text-white/90 flex-1">{v.desc}</p>
+      
+      {isLoading ? (
+        <div className="flex justify-center py-10">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-primary" />
+        </div>
+      ) : vouchers.length === 0 ? (
+        <div className="text-center py-10 text-gray-500 font-medium">Hiện tại chưa có ưu đãi nào dành cho bạn.</div>
+      ) : (
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {vouchers.map((v) => (
+            <div key={v.id} className="h-full cursor-pointer" onClick={() => setSelectedVoucher(v)}>
+              <BackgroundGradient className="p-5 flex flex-col justify-between relative overflow-hidden h-full text-white shadow-md">
+                <div className="absolute top-0 right-0 h-24 w-24 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
+                <div className="relative z-10 flex flex-col h-full">
+                  <div>
+                    <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold text-white shadow-sm">
+                      {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${v.discountAmount / 1000}K`}
+                    </span>
+                    <h3 className="mt-3 font-bold text-white text-lg">{v.code}</h3>
+                    <p className="mt-2 text-xs text-white/90 flex-1">{v.description}</p>
+                  </div>
+                  <button className="mt-5 w-full rounded-xl border border-white/40 bg-white/10 backdrop-blur-md py-2.5 text-xs font-bold text-white transition-colors hover:bg-white hover:text-primary">
+                    Xem chi tiết
+                  </button>
                 </div>
-                <button className="mt-5 w-full rounded-xl border border-white/40 bg-white/10 backdrop-blur-md py-2.5 text-xs font-bold text-white transition-colors hover:bg-white hover:text-primary">Xem chi tiết</button>
-              </div>
-            </BackgroundGradient>
-          </div>
-        ))}
-      </div>
+              </BackgroundGradient>
+            </div>
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {selectedVoucher && (
@@ -484,13 +508,20 @@ function TabOffers() {
             >
               <button onClick={() => setSelectedVoucher(null)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
               <div className="text-center">
-                <span className="inline-block rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-primary mb-3">{selectedVoucher.discount}</span>
+                <span className="inline-block rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-primary mb-3">
+                  {selectedVoucher.discountPercent > 0 ? `Giảm ${selectedVoucher.discountPercent}%` : `Giảm ${(selectedVoucher.discountAmount || 0).toLocaleString()}đ`}
+                </span>
                 <h3 className="text-2xl font-extrabold text-brand-black">{selectedVoucher.code}</h3>
-                <p className="mt-2 text-sm font-medium text-gray-600">{selectedVoucher.desc}</p>
+                <p className="mt-2 text-sm font-medium text-gray-600">{selectedVoucher.description}</p>
               </div>
               <div className="mt-6 rounded-2xl bg-gray-50 p-4 border border-gray-100">
                 <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Điều kiện áp dụng</h4>
-                <p className="text-sm text-brand-black leading-relaxed">{selectedVoucher.details}</p>
+                <div className="text-sm text-brand-black leading-relaxed space-y-2">
+                  <p>• Đơn tối thiểu: <strong>{(selectedVoucher.minOrderValue || 0).toLocaleString()}đ</strong></p>
+                  {selectedVoucher.maxDiscountValue > 0 && <p>• Giảm tối đa: <strong>{selectedVoucher.maxDiscountValue.toLocaleString()}đ</strong></p>}
+                  <p>• Hạn sử dụng: <strong>{new Date(selectedVoucher.validUntil).toLocaleDateString('vi-VN')}</strong></p>
+                  <p>• Số lượng còn lại: <strong>{Math.max(0, selectedVoucher.maxUsage - selectedVoucher.currentUsage)} lượt</strong></p>
+                </div>
               </div>
               <button onClick={() => setSelectedVoucher(null)} className="mt-6 w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Đóng</button>
             </motion.div>

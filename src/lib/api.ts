@@ -33,6 +33,7 @@ export interface Policy { id: string; title: string; icon: string; contentHtml: 
 export interface Wishlist { id: string; productIds: string[]; }
 export interface UserAddress { id?: string; userId: string; fullName: string; phone: string; addressLine: string; ward: string; district: string; city: string; isDefault: boolean; }
 export interface Coupon { code: string; discountAmount: number; discountType: string; finalAmount: number; }
+export interface FullCoupon { id: string; code: string; description: string; discountPercent: number; discountAmount: number; minOrderValue: number; maxDiscountValue: number; validFrom: string; validUntil: string; currentUsage: number; maxUsage: number; isActive: boolean; }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const prefix = typeof window === 'undefined' ? serverApiPrefix : browserApiPrefix;
@@ -92,5 +93,6 @@ export const userApi = {
 };
 
 export const orderApi = {
-  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[] }) => request<{ success: boolean; data: Coupon }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) })
+  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[] }) => request<{ success: boolean; data: Coupon }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) }),
+  getCoupons: () => request<FullCoupon[]>('/orders/coupons')
 };
