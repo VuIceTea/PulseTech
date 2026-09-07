@@ -25,10 +25,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return price.toLocaleString('vi-VN') + '₫';
   };
 
-  // Calculate discounted price
-  const discountedPrice = product.discount > 0
-    ? Math.round(product.basePrice * (1 - product.discount / 100))
-    : product.basePrice;
+  const discountedPrice = product.basePrice;
 
   // Dynamic badge color
   const getBadgeColor = (badge: string) => {

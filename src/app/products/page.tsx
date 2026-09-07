@@ -144,9 +144,7 @@ function ProductsListContent() {
     }
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
-    const discountedPrice = product.discount > 0
-      ? Math.round(product.basePrice * (1 - product.discount / 100))
-      : product.basePrice;
+    const discountedPrice = product.basePrice;
     if (discountedPrice < priceRange[0] || discountedPrice > priceRange[1]) return false;
 
     if (Object.keys(selectedCriteria).length > 0) {
@@ -171,8 +169,8 @@ function ProductsListContent() {
   });
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = a.discount > 0 ? Math.round(a.basePrice * (1 - a.discount / 100)) : a.basePrice;
-    const priceB = b.discount > 0 ? Math.round(b.basePrice * (1 - b.discount / 100)) : b.basePrice;
+    const priceA = a.basePrice;
+    const priceB = b.basePrice;
 
     if (sortBy === 'price-asc') return priceA - priceB;
     if (sortBy === 'price-desc') return priceB - priceA;
