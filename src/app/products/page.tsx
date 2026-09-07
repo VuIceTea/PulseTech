@@ -121,8 +121,26 @@ function ProductsListContent() {
   const filteredProducts = products.filter((product) => {
     // Handle sub-categories from mega menu (e.g. accessory_charge, laptop_gaming)
     if (selectedCategory) {
-      const [baseCategory] = selectedCategory.split('_');
-      if (product.category !== baseCategory && product.category !== selectedCategory) return false;
+      if (selectedCategory.includes('_')) {
+        const [baseCategory, subCategory] = selectedCategory.split('_');
+        if (product.category !== baseCategory) return false;
+        
+        const specsStr = JSON.stringify(product.specs).toLowerCase();
+        if (baseCategory === 'accessory') {
+           if (subCategory === 'charge' && !specsStr.includes('sạc')) return false;
+           if (subCategory === 'battery' && !specsStr.includes('dự phòng') && !specsStr.includes('pin')) return false;
+           if (subCategory === 'case' && !specsStr.includes('ốp lưng') && !specsStr.includes('bao da')) return false;
+        } else if (baseCategory === 'laptop') {
+           if (subCategory === 'gaming' && !specsStr.includes('gaming')) return false;
+           if (subCategory === 'office' && !specsStr.includes('văn phòng') && !specsStr.includes('macbook')) return false;
+        } else if (baseCategory === 'audio') {
+           if (subCategory === 'tws' && !specsStr.includes('true wireless') && !specsStr.includes('tws')) return false;
+           if (subCategory === 'headphone' && !specsStr.includes('chụp tai') && !specsStr.includes('over-ear') && !specsStr.includes('headphone')) return false;
+           if (subCategory === 'speaker' && !specsStr.includes('loa')) return false;
+        }
+      } else {
+        if (product.category !== selectedCategory) return false;
+      }
     }
     if (selectedBrand && product.brand !== selectedBrand) return false;
 
