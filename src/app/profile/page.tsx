@@ -7,11 +7,11 @@ import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
-import { api, orderApi, userApi, type Order, type FullCoupon } from '@/lib/api';
-import { Package, Truck, CheckCircle2, ClipboardList, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
+import { getMonth, getYear } from 'date-fns';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { HiChevronRight } from 'react-icons/hi2';
@@ -256,24 +256,38 @@ function TabAccount({ user }: { user: any }) {
   const customSelectStyles = {
     control: (base: any, state: any) => ({
       ...base,
-      border: state.isFocused ? '1px solid #e11d48' : '1px solid #e5e7eb',
-      boxShadow: state.isFocused ? '0 0 0 1px #e11d48' : 'none',
+      border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #e5e7eb',
+      boxShadow: state.isFocused ? '0 0 0 2px rgba(215, 0, 24, 0.15)' : 'none',
       borderRadius: '0.75rem',
-      padding: '0.2rem 0.5rem',
+      padding: '0.25rem 0.5rem',
       fontSize: '0.875rem',
+      cursor: 'pointer',
+      transition: 'all 0.2s',
       '&:hover': {
-        border: state.isFocused ? '1px solid #e11d48' : '1px solid #d1d5db',
+        border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #d1d5db',
       }
     }),
     option: (base: any, state: any) => ({
       ...base,
-      backgroundColor: state.isSelected ? '#e11d48' : state.isFocused ? '#ffe4e6' : 'white',
-      color: state.isSelected ? 'white' : '#1f2937',
+      backgroundColor: state.isSelected ? '#d70018' : state.isFocused ? '#ffebed' : 'white',
+      color: state.isSelected ? 'white' : state.isFocused ? '#b80014' : '#1f2937',
       fontSize: '0.875rem',
       cursor: 'pointer',
+      transition: 'all 0.15s',
+      borderRadius: '0.5rem',
+      margin: '0.2rem 0.4rem',
+      width: 'auto',
       '&:active': {
         backgroundColor: '#fda4af'
       }
+    }),
+    menu: (base: any) => ({
+      ...base,
+      borderRadius: '0.75rem',
+      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #f3f4f6',
+      overflow: 'hidden',
+      padding: '0.25rem 0',
     })
   };
 
@@ -281,6 +295,12 @@ function TabAccount({ user }: { user: any }) {
     { value: 'male', label: 'Nam' },
     { value: 'female', label: 'Nữ' },
     { value: 'other', label: 'Khác' }
+  ];
+
+  const years = Array.from({ length: 100 }, (_, i) => getYear(new Date()) - i);
+  const months = [
+    "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+    "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"
   ];
 
   return (
@@ -293,15 +313,15 @@ function TabAccount({ user }: { user: any }) {
           <div className="space-y-4 flex-1 flex flex-col">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
+              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
+              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Email</label>
-              <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
+              <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -312,13 +332,26 @@ function TabAccount({ user }: { user: any }) {
                     onChange={(date: Date | null) => setFormData({...formData, dob: date ? date.toISOString().split('T')[0] : ''})} 
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Chọn ngày sinh"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors cursor-pointer shadow-sm"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer shadow-sm hover:border-gray-300"
                     wrapperClassName="w-full"
-                    showMonthDropdown
-                    showYearDropdown
-                    dropdownMode="select"
-                    yearDropdownItemNumber={100}
-                    scrollableYearDropdown
+                    renderCustomHeader={({ date, changeYear, changeMonth, decreaseMonth, increaseMonth, prevMonthButtonDisabled, nextMonthButtonDisabled }) => (
+                      <div className="flex items-center justify-between px-2 py-1">
+                        <button type="button" onClick={decreaseMonth} disabled={prevMonthButtonDisabled} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors disabled:opacity-50">
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <div className="flex gap-2">
+                          <select value={months[getMonth(date)]} onChange={({ target: { value } }) => changeMonth(months.indexOf(value))} className="text-sm font-bold text-brand-black bg-transparent outline-none cursor-pointer hover:text-primary transition-colors">
+                            {months.map((option) => (<option key={option} value={option}>{option}</option>))}
+                          </select>
+                          <select value={getYear(date)} onChange={({ target: { value } }) => changeYear(Number(value))} className="text-sm font-bold text-brand-black bg-transparent outline-none cursor-pointer hover:text-primary transition-colors">
+                            {years.map((option) => (<option key={option} value={option}>{option}</option>))}
+                          </select>
+                        </div>
+                        <button type="button" onClick={increaseMonth} disabled={nextMonthButtonDisabled} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors disabled:opacity-50">
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   />
                 </div>
               </div>
@@ -703,25 +736,39 @@ function TabAddress({ user }: { user: any }) {
   const addressSelectStyles = {
     control: (base: any, state: any) => ({
       ...base,
-      border: state.isFocused ? '1px solid #e11d48' : '1px solid #e5e7eb',
-      boxShadow: state.isFocused ? '0 0 0 1px #e11d48' : 'none',
+      border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #e5e7eb',
+      boxShadow: state.isFocused ? '0 0 0 2px rgba(215, 0, 24, 0.15)' : 'none',
       borderRadius: '0.75rem',
-      padding: '0.2rem',
+      padding: '0.25rem 0.5rem',
       fontSize: '0.875rem',
+      cursor: 'pointer',
       backgroundColor: state.isDisabled ? '#f3f4f6' : '#f9fafb',
+      transition: 'all 0.2s',
       '&:hover': {
-        border: state.isDisabled ? '1px solid #e5e7eb' : state.isFocused ? '1px solid #e11d48' : '1px solid #d1d5db',
+        border: state.isDisabled ? '1px solid #e5e7eb' : state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #d1d5db',
       }
     }),
     option: (base: any, state: any) => ({
       ...base,
-      backgroundColor: state.isSelected ? '#e11d48' : state.isFocused ? '#ffe4e6' : 'white',
-      color: state.isSelected ? 'white' : '#1f2937',
+      backgroundColor: state.isSelected ? '#d70018' : state.isFocused ? '#ffebed' : 'white',
+      color: state.isSelected ? 'white' : state.isFocused ? '#b80014' : '#1f2937',
       fontSize: '0.875rem',
       cursor: 'pointer',
+      transition: 'all 0.15s',
+      borderRadius: '0.5rem',
+      margin: '0.2rem 0.4rem',
+      width: 'auto',
       '&:active': {
         backgroundColor: '#fda4af'
       }
+    }),
+    menu: (base: any) => ({
+      ...base,
+      borderRadius: '0.75rem',
+      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+      border: '1px solid #f3f4f6',
+      overflow: 'hidden',
+      padding: '0.25rem 0',
     })
   };
 
@@ -743,11 +790,11 @@ function TabAddress({ user }: { user: any }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" defaultValue={user.name} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+              <input type="text" defaultValue={user.name} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text focus:bg-white hover:border-gray-300" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+              <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text focus:bg-white hover:border-gray-300" />
             </div>
           </div>
           
@@ -781,7 +828,7 @@ function TabAddress({ user }: { user: any }) {
 
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-gray-500">Địa chỉ cụ thể</label>
-            <input type="text" defaultValue={""} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+            <input type="text" defaultValue={""} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text focus:bg-white hover:border-gray-300" />
           </div>
           <div className="pt-4 flex gap-3">
             <button type="button" onClick={() => setModalType(null)} className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200">Hủy bỏ</button>
