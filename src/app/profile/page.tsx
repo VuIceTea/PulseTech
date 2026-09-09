@@ -616,7 +616,16 @@ function TabOffers() {
     const fetchCoupons = async () => {
       try {
         const data = await orderApi.getCoupons();
-        setVouchers(data.filter(c => c.isActive));
+        const activeCoupons = data.filter(c => c.isActive);
+        
+        // Group by code to show xN if user has multiple of the same voucher
+        const grouped = activeCoupons.reduce((acc: any, v) => {
+          if (!acc[v.code]) acc[v.code] = { ...v, count: 1 };
+          else acc[v.code].count += 1;
+          return acc;
+        }, {});
+        
+        setVouchers(Object.values(grouped));
       } catch (error) {
         toast.error('Không thể tải danh sách ưu đãi');
       } finally {
@@ -644,9 +653,16 @@ function TabOffers() {
                 <div className="absolute top-0 right-0 h-24 w-24 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
                 <div className="relative z-10 flex flex-col h-full">
                   <div>
-                    <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold text-white shadow-sm">
-                      {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${v.discountAmount / 1000}K`}
-                    </span>
+                    <div className="flex justify-between items-start">
+                      <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold text-white shadow-sm">
+                        {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${(v.discountAmount || 0) / 1000}K`}
+                      </span>
+                      {v.count > 1 && (
+                        <span className="inline-flex items-center justify-center bg-red-500/90 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-md ring-2 ring-white/20 z-20">
+                          x{v.count}
+                        </span>
+                      )}
+                    </div>
                     <h3 className="mt-3 font-bold text-white text-lg">{v.code}</h3>
                     <p className="mt-2 text-xs text-white/90 flex-1">{v.description}</p>
                   </div>
@@ -671,9 +687,16 @@ function TabOffers() {
             >
               <button onClick={() => setSelectedVoucher(null)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
               <div className="text-center">
-                <span className="inline-block rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-primary mb-3">
-                  {selectedVoucher.discountPercent > 0 ? `Giảm ${selectedVoucher.discountPercent}%` : `Giảm ${(selectedVoucher.discountAmount || 0).toLocaleString()}đ`}
-                </span>
+                <div className="flex justify-center items-center gap-2 mb-3">
+                  <span className="inline-block rounded-full bg-red-100 px-4 py-2 text-sm font-bold text-primary">
+                    {selectedVoucher.discountPercent > 0 ? `Giảm ${selectedVoucher.discountPercent}%` : `Giảm ${(selectedVoucher.discountAmount || 0).toLocaleString()}đ`}
+                  </span>
+                  {selectedVoucher.count > 1 && (
+                    <span className="inline-flex items-center justify-center bg-primary text-white rounded-full px-3 py-2 text-sm font-bold shadow-md">
+                      x{selectedVoucher.count}
+                    </span>
+                  )}
+                </div>
                 <h3 className="text-2xl font-extrabold text-brand-black">{selectedVoucher.code}</h3>
                 <p className="mt-2 text-sm font-medium text-gray-600">{selectedVoucher.description}</p>
               </div>
@@ -683,7 +706,7 @@ function TabOffers() {
                   <p>• Đơn tối thiểu: <strong>{(selectedVoucher.minOrderValue || 0).toLocaleString()}đ</strong></p>
                   {selectedVoucher.maxDiscountValue > 0 && <p>• Giảm tối đa: <strong>{selectedVoucher.maxDiscountValue.toLocaleString()}đ</strong></p>}
                   <p>• Hạn sử dụng: <strong>{new Date(selectedVoucher.validUntil).toLocaleDateString('vi-VN')}</strong></p>
-                  <p>• Số lượng còn lại: <strong>{Math.max(0, selectedVoucher.maxUsage - selectedVoucher.currentUsage)} lượt</strong></p>
+                  <p>• Giới hạn: <strong>1 lần / mỗi khách hàng</strong></p>
                 </div>
               </div>
               <button onClick={() => setSelectedVoucher(null)} className="mt-6 w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Đóng</button>
