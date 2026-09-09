@@ -10,6 +10,9 @@ import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { api, orderApi, userApi, type Order, type FullCoupon } from '@/lib/api';
 import { Package, Truck, CheckCircle2, ClipboardList, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import Select from 'react-select';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 import { HiChevronRight } from 'react-icons/hi2';
 
@@ -239,9 +242,46 @@ function TabAccount({ user }: { user: any }) {
     }).catch(console.error);
   }, [user]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (formData.email !== user.email) {
+      // Simulate API email check
+      if (formData.email === 'admin@gmail.com' || formData.email.includes('exist')) {
+        toast.error('Email này đã được sử dụng bởi tài khoản khác!');
+        return;
+      }
+    }
     toast.success('Cập nhật thông tin thành công!');
   };
+
+  const customSelectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      border: state.isFocused ? '1px solid #e11d48' : '1px solid #e5e7eb',
+      boxShadow: state.isFocused ? '0 0 0 1px #e11d48' : 'none',
+      borderRadius: '0.75rem',
+      padding: '0.2rem 0.5rem',
+      fontSize: '0.875rem',
+      '&:hover': {
+        border: state.isFocused ? '1px solid #e11d48' : '1px solid #d1d5db',
+      }
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected ? '#e11d48' : state.isFocused ? '#ffe4e6' : 'white',
+      color: state.isSelected ? 'white' : '#1f2937',
+      fontSize: '0.875rem',
+      cursor: 'pointer',
+      '&:active': {
+        backgroundColor: '#fda4af'
+      }
+    })
+  };
+
+  const genderOptions = [
+    { value: 'male', label: 'Nam' },
+    { value: 'female', label: 'Nữ' },
+    { value: 'other', label: 'Khác' }
+  ];
 
   return (
     <div className="space-y-6">
@@ -261,21 +301,32 @@ function TabAccount({ user }: { user: any }) {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Email</label>
-              <input type="text" readOnly value={formData.email} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-500 outline-none cursor-not-allowed" />
+              <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-gray-500">Ngày sinh</label>
-                <input type="date" value={formData.dob} onChange={e => setFormData({...formData, dob: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
+                <div className="custom-datepicker-wrapper">
+                  <DatePicker 
+                    selected={formData.dob ? new Date(formData.dob) : null} 
+                    onChange={(date: Date | null) => setFormData({...formData, dob: date ? date.toISOString().split('T')[0] : ''})} 
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Chọn ngày sinh"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors cursor-pointer"
+                    wrapperClassName="w-full"
+                  />
+                </div>
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-gray-500">Giới tính</label>
-                <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors appearance-none">
-                  <option value="">Chọn giới tính</option>
-                  <option value="male">Nam</option>
-                  <option value="female">Nữ</option>
-                  <option value="other">Khác</option>
-                </select>
+                <Select 
+                  options={genderOptions}
+                  value={genderOptions.find(o => o.value === formData.gender) || null}
+                  onChange={(option: any) => setFormData({...formData, gender: option ? option.value : ''})}
+                  placeholder="Chọn giới tính"
+                  styles={customSelectStyles}
+                  isSearchable={false}
+                />
               </div>
             </div>
             <div className="pt-4 mt-auto">
@@ -629,8 +680,8 @@ function TabAddress({ user }: { user: any }) {
     }
   }, [modalType]);
 
-  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const val = e.target.value;
+  const handleProvinceChange = (option: any) => {
+    const val = option ? option.value : "";
     setSelectedProvince(val);
     setSelectedWard("");
     setWards([]);
@@ -644,16 +695,44 @@ function TabAddress({ user }: { user: any }) {
     }
   };
 
+  const addressSelectStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      border: state.isFocused ? '1px solid #e11d48' : '1px solid #e5e7eb',
+      boxShadow: state.isFocused ? '0 0 0 1px #e11d48' : 'none',
+      borderRadius: '0.75rem',
+      padding: '0.2rem',
+      fontSize: '0.875rem',
+      backgroundColor: state.isDisabled ? '#f3f4f6' : '#f9fafb',
+      '&:hover': {
+        border: state.isDisabled ? '1px solid #e5e7eb' : state.isFocused ? '1px solid #e11d48' : '1px solid #d1d5db',
+      }
+    }),
+    option: (base: any, state: any) => ({
+      ...base,
+      backgroundColor: state.isSelected ? '#e11d48' : state.isFocused ? '#ffe4e6' : 'white',
+      color: state.isSelected ? 'white' : '#1f2937',
+      fontSize: '0.875rem',
+      cursor: 'pointer',
+      '&:active': {
+        backgroundColor: '#fda4af'
+      }
+    })
+  };
+
+  const provinceOptions = provinces.map(p => ({ value: p.code, label: p.name }));
+  const wardOptions = wards.map(w => ({ value: w.code, label: w.name }));
+
   const AddressModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-2xl relative my-auto"
+        className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-2xl relative my-auto overflow-visible"
       >
         <button onClick={() => setModalType(null)} className="absolute top-5 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl">&times;</button>
-        <h3 className="text-xl font-bold text-brand-black mb-6">{modalType === 'add' ? 'Thêm địa chỉ mới (Chuẩn 2026 - 34 Tỉnh/Thành)' : 'Sửa địa chỉ'}</h3>
+        <h3 className="text-xl font-bold text-brand-black mb-6">{modalType === 'add' ? 'Thêm địa chỉ mới' : 'Sửa địa chỉ'}</h3>
 
         <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setModalType(null); toast.info('Chưa hỗ trợ lưu địa chỉ'); }}>
           <div className="grid grid-cols-2 gap-4">
@@ -670,17 +749,28 @@ function TabAddress({ user }: { user: any }) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Tỉnh/Thành phố</label>
-              <select value={selectedProvince} onChange={handleProvinceChange} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors appearance-none">
-                <option value="">Chọn Tỉnh/Thành</option>
-                {provinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
-              </select>
+              <Select
+                options={provinceOptions}
+                value={provinceOptions.find(o => o.value == selectedProvince) || null}
+                onChange={handleProvinceChange}
+                placeholder="Chọn Tỉnh/Thành"
+                styles={addressSelectStyles}
+                isSearchable={true}
+                noOptionsMessage={() => "Không tìm thấy"}
+              />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Phường/Xã</label>
-              <select value={selectedWard} onChange={(e) => setSelectedWard(e.target.value)} required disabled={!selectedProvince} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors appearance-none disabled:opacity-50">
-                <option value="">Chọn Phường/Xã</option>
-                {wards.map(w => <option key={w.code} value={w.code}>{w.name}</option>)}
-              </select>
+              <Select
+                options={wardOptions}
+                value={wardOptions.find(o => o.value == selectedWard) || null}
+                onChange={(option: any) => setSelectedWard(option ? option.value : "")}
+                placeholder="Chọn Phường/Xã"
+                styles={addressSelectStyles}
+                isDisabled={!selectedProvince}
+                isSearchable={true}
+                noOptionsMessage={() => "Không tìm thấy"}
+              />
             </div>
           </div>
 
