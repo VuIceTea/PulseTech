@@ -257,15 +257,15 @@ function TabAccount({ user }: { user: any }) {
   const customSelectStyles = {
     control: (base: any, state: any) => ({
       ...base,
-      border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #e5e7eb',
-      boxShadow: state.isFocused ? '0 0 0 2px rgba(215, 0, 24, 0.15)' : 'none',
+      border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.5)' : '1px solid #e5e7eb',
+      boxShadow: 'none',
       borderRadius: '0.75rem',
       padding: '0.25rem 0.5rem',
       fontSize: '0.875rem',
       cursor: 'pointer',
       transition: 'all 0.2s',
       '&:hover': {
-        border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #d1d5db',
+        border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.5)' : '1px solid #d1d5db',
       }
     }),
     option: (base: any, state: any) => ({
@@ -314,15 +314,15 @@ function TabAccount({ user }: { user: any }) {
           <div className="space-y-4 flex-1 flex flex-col">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text" />
+              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/50 transition-all cursor-text" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text" />
+              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/50 transition-all cursor-text" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Email</label>
-              <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text" />
+              <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary/50 transition-all cursor-text" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -333,22 +333,32 @@ function TabAccount({ user }: { user: any }) {
                     onChange={(date: Date | null) => setFormData({...formData, dob: date ? date.toISOString().split('T')[0] : ''})} 
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Chọn ngày sinh"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-pointer shadow-sm hover:border-gray-300"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary/50 transition-all cursor-pointer shadow-sm hover:border-gray-300"
                     wrapperClassName="w-full"
                     renderCustomHeader={({ date, changeYear, changeMonth, decreaseMonth, increaseMonth, prevMonthButtonDisabled, nextMonthButtonDisabled }) => (
-                      <div className="flex items-center justify-between px-2 py-1">
-                        <button type="button" onClick={decreaseMonth} disabled={prevMonthButtonDisabled} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors disabled:opacity-50">
+                      <div className="flex items-center justify-between px-3 py-2 bg-white">
+                        <button type="button" onClick={decreaseMonth} disabled={prevMonthButtonDisabled} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors disabled:opacity-50">
                           <ChevronLeft className="w-5 h-5" />
                         </button>
-                        <div className="flex gap-2">
-                          <select value={months[getMonth(date)]} onChange={({ target: { value } }) => changeMonth(months.indexOf(value))} className="text-sm font-bold text-brand-black bg-transparent outline-none cursor-pointer hover:text-primary transition-colors">
-                            {months.map((option) => (<option key={option} value={option}>{option}</option>))}
-                          </select>
-                          <select value={getYear(date)} onChange={({ target: { value } }) => changeYear(Number(value))} className="text-sm font-bold text-brand-black bg-transparent outline-none cursor-pointer hover:text-primary transition-colors">
-                            {years.map((option) => (<option key={option} value={option}>{option}</option>))}
-                          </select>
+                        <div className="flex gap-3">
+                          <div className="relative">
+                            <select value={months[getMonth(date)]} onChange={({ target: { value } }) => changeMonth(months.indexOf(value))} className="appearance-none text-base font-bold text-brand-black bg-transparent outline-none cursor-pointer hover:text-primary transition-colors pr-4 py-1">
+                              {months.map((option) => (<option key={option} value={option}>{option}</option>))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center text-gray-400">
+                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                          </div>
+                          <div className="relative">
+                            <select value={getYear(date)} onChange={({ target: { value } }) => changeYear(Number(value))} className="appearance-none text-base font-bold text-brand-black bg-transparent outline-none cursor-pointer hover:text-primary transition-colors pr-4 py-1">
+                              {years.map((option) => (<option key={option} value={option}>{option}</option>))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center text-gray-400">
+                              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                          </div>
                         </div>
-                        <button type="button" onClick={increaseMonth} disabled={nextMonthButtonDisabled} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors disabled:opacity-50">
+                        <button type="button" onClick={increaseMonth} disabled={nextMonthButtonDisabled} className="p-2 rounded-full hover:bg-gray-100 text-gray-500 hover:text-primary transition-colors disabled:opacity-50">
                           <ChevronRight className="w-5 h-5" />
                         </button>
                       </div>
@@ -737,8 +747,8 @@ function TabAddress({ user }: { user: any }) {
   const addressSelectStyles = {
     control: (base: any, state: any) => ({
       ...base,
-      border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #e5e7eb',
-      boxShadow: state.isFocused ? '0 0 0 2px rgba(215, 0, 24, 0.15)' : 'none',
+      border: state.isFocused ? '1px solid rgba(215, 0, 24, 0.5)' : '1px solid #e5e7eb',
+      boxShadow: 'none',
       borderRadius: '0.75rem',
       padding: '0.25rem 0.5rem',
       fontSize: '0.875rem',
@@ -746,7 +756,7 @@ function TabAddress({ user }: { user: any }) {
       backgroundColor: state.isDisabled ? '#f3f4f6' : '#f9fafb',
       transition: 'all 0.2s',
       '&:hover': {
-        border: state.isDisabled ? '1px solid #e5e7eb' : state.isFocused ? '1px solid rgba(215, 0, 24, 0.4)' : '1px solid #d1d5db',
+        border: state.isDisabled ? '1px solid #e5e7eb' : state.isFocused ? '1px solid rgba(215, 0, 24, 0.5)' : '1px solid #d1d5db',
       }
     }),
     option: (base: any, state: any) => ({
@@ -791,11 +801,11 @@ function TabAddress({ user }: { user: any }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" defaultValue={user.name} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text focus:bg-white hover:border-gray-300" />
+              <input type="text" defaultValue={user.name} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text focus:bg-white hover:border-gray-300" />
+              <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
             </div>
           </div>
           
@@ -829,7 +839,7 @@ function TabAddress({ user }: { user: any }) {
 
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-gray-500">Địa chỉ cụ thể</label>
-            <input type="text" defaultValue={""} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-all cursor-text focus:bg-white hover:border-gray-300" />
+            <input type="text" defaultValue={""} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
           </div>
           <div className="pt-4 flex gap-3">
             <button type="button" onClick={() => setModalType(null)} className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200">Hủy bỏ</button>
