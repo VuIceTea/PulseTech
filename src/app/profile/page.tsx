@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
-import { api, orderApi, type Order, type FullCoupon } from '@/lib/api';
+import { api, orderApi, userApi, type Order, type FullCoupon } from '@/lib/api';
 import { Package, Truck, CheckCircle2, ClipboardList, RefreshCw, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -112,7 +112,7 @@ export default function ProfilePage() {
   );
 }
 
-function MemberCard({ user }: { user: any }) {
+function MemberCard({ user, totalSpent = 0 }: { user: any, totalSpent?: number }) {
   return (
     <BackgroundGradient className="p-6 sm:p-8 text-white shadow-xl">
       {/* Background Pattern */}
@@ -136,7 +136,7 @@ function MemberCard({ user }: { user: any }) {
             </div>
             <div>
               <p className="text-xs font-medium text-white/80 uppercase tracking-widest">Chi tiêu năm nay</p>
-              <p className="mt-1 text-xl font-bold">12.500.000đ</p>
+              <p className="mt-1 text-xl font-bold">{totalSpent.toLocaleString('vi-VN')}đ</p>
             </div>
           </div>
         </div>
@@ -154,10 +154,34 @@ function MemberCard({ user }: { user: any }) {
 }
 
 function TabHome({ user }: { user: any }) {
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [vouchersCount, setVouchersCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    api.getOrderHistory(user.email).then((data) => {
+      // Current active orders: status 0 (Pending), 1 (Confirmed), 2 (Shipping)
+      const currentOrders = data.filter(o => o.status < 3);
+      setOrdersCount(currentOrders.length);
+      
+      // Total spent: Only count successful orders (status 3)
+      const successfulOrders = data.filter(o => o.status === 3);
+      const spent = successfulOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+      setTotalSpent(spent);
+    }).catch(console.error);
+
+    orderApi.getCoupons(user.email).then((data) => {
+      setVouchersCount(data.filter(c => c.isActive).length);
+    }).catch(console.error);
+  }, [user]);
+
+  const nextTier = totalSpent < 50000000 ? 'P-VIP' : 'P-DIAMOND';
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold text-brand-black uppercase tracking-wide">Trang chủ Pulse Member</h2>
-      <MemberCard user={user} />
+      <MemberCard user={user} totalSpent={totalSpent} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 flex items-center gap-4">
@@ -165,21 +189,21 @@ function TabHome({ user }: { user: any }) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://img.icons8.com/fluency/48/order-history.png" alt="Order" className="h-full w-full object-contain" />
           </div>
-          <div><p className="text-xs font-semibold text-gray-500">Đơn hàng hiện tại</p><p className="text-lg font-bold text-brand-black">0 đơn</p></div>
+          <div><p className="text-xs font-semibold text-gray-500">Đơn hàng hiện tại</p><p className="text-lg font-bold text-brand-black">{ordersCount} đơn</p></div>
         </div>
         <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://img.icons8.com/fluency/48/gift.png" alt="Offers" className="h-full w-full object-contain" />
           </div>
-          <div><p className="text-xs font-semibold text-gray-500">Ưu đãi của bạn</p><p className="text-lg font-bold text-brand-black">3 voucher</p></div>
+          <div><p className="text-xs font-semibold text-gray-500">Ưu đãi của bạn</p><p className="text-lg font-bold text-brand-black">{vouchersCount} voucher</p></div>
         </div>
         <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-100 flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://img.icons8.com/fluency/48/warranty-card.png" alt="Card" className="h-full w-full object-contain" />
           </div>
-          <div><p className="text-xs font-semibold text-gray-500">Hạng thẻ tiếp theo</p><p className="text-lg font-bold text-brand-black">P-VIP</p></div>
+          <div><p className="text-xs font-semibold text-gray-500">Hạng thẻ tiếp theo</p><p className="text-lg font-bold text-brand-black">{nextTier}</p></div>
         </div>
       </div>
     </div>
@@ -187,6 +211,26 @@ function TabHome({ user }: { user: any }) {
 }
 
 function TabAccount({ user }: { user: any }) {
+  const [phone, setPhone] = useState('Chưa cập nhật');
+  const [totalSpent, setTotalSpent] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    userApi.getAddresses(user.email).then((data) => {
+      const defaultAddr = data.find(a => a.isDefault);
+      if (defaultAddr && defaultAddr.phone) {
+        setPhone(defaultAddr.phone);
+      } else if (data.length > 0 && data[0].phone) {
+        setPhone(data[0].phone);
+      }
+    }).catch(console.error);
+
+    api.getOrderHistory(user.email).then((data) => {
+      const successfulOrders = data.filter(o => o.status === 3);
+      setTotalSpent(successfulOrders.reduce((sum, order) => sum + order.totalPrice, 0));
+    }).catch(console.error);
+  }, [user]);
+
   return (
     <div className="space-y-6">
       <h2 className="text-xl font-bold text-brand-black uppercase tracking-wide">Thông tin tài khoản</h2>
@@ -201,7 +245,7 @@ function TabAccount({ user }: { user: any }) {
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" readOnly value="0987654321" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+              <input type="text" readOnly value={phone} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Email</label>
@@ -210,20 +254,20 @@ function TabAccount({ user }: { user: any }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-gray-500">Ngày sinh</label>
-                <input type="text" readOnly value="01/01/2000" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+                <input type="text" readOnly value="Chưa cập nhật" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-gray-500">Giới tính</label>
-                <input type="text" readOnly value="Nam" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+                <input type="text" readOnly value="Chưa cập nhật" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
               </div>
             </div>
             <div className="pt-4 mt-auto">
-              <button className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Lưu thay đổi</button>
+              <button disabled className="w-full opacity-50 cursor-not-allowed rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors">Lưu thay đổi (Chưa hỗ trợ)</button>
             </div>
           </div>
         </div>
         <div className="xl:col-span-6 self-center">
-          <MemberCard user={user} />
+          <MemberCard user={user} totalSpent={totalSpent} />
         </div>
       </div>
     </div>
