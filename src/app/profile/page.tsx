@@ -700,9 +700,9 @@ function TabOffers() {
                       <h3 className="font-extrabold text-brand-black text-lg tracking-wide line-clamp-1">{v.code}</h3>
                       <p className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">{v.description}</p>
                     </div>
-                    {v.count > 1 && !isExpired && (
+                    {(v.count ?? 1) > 1 && !isExpired && (
                       <span className="shrink-0 bg-red-100 text-primary rounded-full px-2 py-0.5 text-[11px] font-bold">
-                        x{v.count}
+                        x{v.count ?? 1}
                       </span>
                     )}
                   </div>
