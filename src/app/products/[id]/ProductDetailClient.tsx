@@ -369,7 +369,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                       key={color.name}
                       onClick={() => handleColorSelect(color)}
                       className={`relative flex items-center gap-2 py-1.5 px-3 rounded-xl transition border bg-white ${selectedColor.name === color.name
-                        ? 'border-primary ring-1 ring-primary'
+                        ? 'border-primary ring-primary'
                         : 'border-gray-200 hover:border-gray-300'
                         }`}
                     >
@@ -480,7 +480,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                     onClick={() => handleAddToCart(false)}
                     className="flex-1 px-1 sm:px-6 bg-brand-black hover:bg-gray-800 text-white rounded-xl sm:rounded-2xl text-[11px] sm:text-sm font-bold uppercase tracking-wider shadow-md hover:scale-[1.01] active:scale-95 transition flex flex-row items-center justify-center gap-1 sm:gap-2 text-center"
                   >
-                    <ShoppingCart className="h-4 sm:h-4.5 w-4 sm:w-4.5 shrink-0" /> 
+                    <ShoppingCart className="h-4 sm:h-4.5 w-4 sm:w-4.5 shrink-0" />
                     <span className="whitespace-nowrap">Thêm Vào Giỏ</span>
                   </button>
                 </div>
