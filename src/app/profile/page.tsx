@@ -578,6 +578,16 @@ function TabOffers() {
 
 function TabAddress({ user }: { user: any }) {
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    userApi.getAddresses(user.email)
+      .then(setAddresses)
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }, [user]);
 
   const AddressModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -594,20 +604,20 @@ function TabAddress({ user }: { user: any }) {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" defaultValue={modalType === 'edit' ? user.name : ''} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+              <input type="text" defaultValue={user.name} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" defaultValue={modalType === 'edit' ? '0987654321' : ''} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+              <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
             </div>
           </div>
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-gray-500">Địa chỉ cụ thể</label>
-            <input type="text" defaultValue={modalType === 'edit' ? '123 Đường Công Nghệ, Phường Phần Mềm, Quận Web, TP.HCM' : ''} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+            <input type="text" defaultValue={""} placeholder="Số nhà, đường, phường, quận, thành phố" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
           </div>
           <div className="pt-4 flex gap-3">
             <button type="button" onClick={() => setModalType(null)} className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200">Hủy bỏ</button>
-            <button type="submit" className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Lưu địa chỉ</button>
+            <button type="submit" disabled className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark opacity-50 cursor-not-allowed">Chưa hỗ trợ lưu</button>
           </div>
         </form>
       </motion.div>
@@ -620,20 +630,33 @@ function TabAddress({ user }: { user: any }) {
         <h2 className="text-xl font-bold text-brand-black uppercase tracking-wide">Sổ địa chỉ</h2>
         <button onClick={() => setModalType('add')} className="rounded-xl bg-gray-100 px-4 py-2.5 text-xs font-bold text-brand-black transition-colors hover:bg-gray-200">Thêm địa chỉ mới</button>
       </div>
-      <div className="rounded-2xl border border-primary bg-red-50/30 p-5 shadow-sm relative overflow-hidden">
-        <div className="absolute right-0 top-0 h-16 w-16 bg-red-100 rounded-bl-full z-0"></div>
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <h3 className="font-bold text-brand-black">{user.name}</h3>
-              <span className="rounded bg-primary px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">Mặc định</span>
-            </div>
-            <button onClick={() => setModalType('edit')} className="text-sm font-semibold text-primary hover:underline">Sửa</button>
-          </div>
-          <p className="mt-2 text-sm text-gray-600">0987654321</p>
-          <p className="mt-1 text-sm text-gray-600">123 Đường Công Nghệ, Phường Phần Mềm, Quận Web, TP.HCM</p>
+
+      {isLoading ? (
+        <div className="flex justify-center py-10">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-primary" />
         </div>
-      </div>
+      ) : addresses.length === 0 ? (
+        <div className="text-center py-10 text-gray-500 font-medium">Bạn chưa có địa chỉ nào.</div>
+      ) : (
+        <div className="space-y-4">
+          {addresses.map((addr) => (
+            <div key={addr.id} className={`rounded-2xl border ${addr.isDefault ? 'border-primary bg-red-50/30' : 'border-gray-200 bg-white'} p-5 shadow-sm relative overflow-hidden`}>
+              {addr.isDefault && <div className="absolute right-0 top-0 h-16 w-16 bg-red-100 rounded-bl-full z-0"></div>}
+              <div className="relative z-10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-brand-black">{user.name}</h3>
+                    {addr.isDefault && <span className="rounded bg-primary px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">Mặc định</span>}
+                  </div>
+                  <button onClick={() => setModalType('edit')} className="text-sm font-semibold text-primary hover:underline">Sửa</button>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">{addr.phone}</p>
+                <p className="mt-1 text-sm text-gray-600">{addr.address}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <AnimatePresence>
         {modalType && <AddressModal />}
