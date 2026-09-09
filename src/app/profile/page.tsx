@@ -312,8 +312,13 @@ function TabAccount({ user }: { user: any }) {
                     onChange={(date: Date | null) => setFormData({...formData, dob: date ? date.toISOString().split('T')[0] : ''})} 
                     dateFormat="dd/MM/yyyy"
                     placeholderText="Chọn ngày sinh"
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors cursor-pointer"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors cursor-pointer shadow-sm"
                     wrapperClassName="w-full"
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                    yearDropdownItemNumber={100}
+                    scrollableYearDropdown
                   />
                 </div>
               </div>
@@ -729,10 +734,10 @@ function TabAddress({ user }: { user: any }) {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-2xl relative my-auto overflow-visible"
+        className="w-full max-w-2xl rounded-3xl bg-white p-6 sm:p-8 shadow-2xl relative my-auto overflow-visible"
       >
-        <button onClick={() => setModalType(null)} className="absolute top-5 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl">&times;</button>
-        <h3 className="text-xl font-bold text-brand-black mb-6">{modalType === 'add' ? 'Thêm địa chỉ mới' : 'Sửa địa chỉ'}</h3>
+        <button onClick={() => setModalType(null)} className="absolute top-5 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl transition-colors">&times;</button>
+        <h3 className="text-xl font-bold text-brand-black mb-8">{modalType === 'add' ? 'Thêm địa chỉ mới' : 'Sửa địa chỉ'}</h3>
 
         <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setModalType(null); toast.info('Chưa hỗ trợ lưu địa chỉ'); }}>
           <div className="grid grid-cols-2 gap-4">
