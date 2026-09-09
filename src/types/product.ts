@@ -52,6 +52,7 @@ export interface Product {
   storages: StorageVariant[];
   specs: ProductSpec;
   description: string;
+  content?: string;
   rating: number;
   reviewsCount: number;
   reviews: Review[];
