@@ -625,7 +625,15 @@ function TabOffers() {
           return acc;
         }, {});
         
-        setVouchers(Object.values(grouped));
+        const sortedVouchers = Object.values(grouped).sort((a: any, b: any) => {
+          const aExpired = new Date(a.validUntil) < new Date();
+          const bExpired = new Date(b.validUntil) < new Date();
+          if (aExpired && !bExpired) return 1;
+          if (!aExpired && bExpired) return -1;
+          return 0;
+        });
+        
+        setVouchers(sortedVouchers as any);
       } catch (error) {
         toast.error('Không thể tải danh sách ưu đãi');
       } finally {
@@ -647,32 +655,41 @@ function TabOffers() {
         <div className="text-center py-10 text-gray-500 font-medium">Hiện tại chưa có ưu đãi nào dành cho bạn.</div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-          {vouchers.map((v) => (
-            <div key={v.id} className="h-full cursor-pointer" onClick={() => setSelectedVoucher(v)}>
-              <BackgroundGradient className="p-5 flex flex-col justify-between relative overflow-hidden h-full text-white shadow-md">
-                <div className="absolute top-0 right-0 h-24 w-24 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
-                <div className="relative z-10 flex flex-col h-full">
-                  <div>
-                    <div className="flex justify-between items-start">
-                      <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold text-white shadow-sm">
-                        {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${(v.discountAmount || 0) / 1000}K`}
-                      </span>
-                      {v.count > 1 && (
-                        <span className="inline-flex items-center justify-center bg-red-500/90 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-md ring-2 ring-white/20 z-20">
-                          x{v.count}
-                        </span>
-                      )}
+          {vouchers.map((v) => {
+            const isExpired = new Date(v.validUntil) < new Date();
+            
+            return (
+              <div key={v.id} className={`h-full ${isExpired ? 'cursor-not-allowed opacity-70 grayscale' : 'cursor-pointer'}`} onClick={() => !isExpired && setSelectedVoucher(v)}>
+                <BackgroundGradient className="p-5 flex flex-col justify-between relative overflow-hidden h-full text-white shadow-md">
+                  {isExpired && (
+                    <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/10 backdrop-blur-[1px] rounded-3xl">
+                      <div className="bg-gray-800/90 text-white font-extrabold text-lg px-6 py-2 rounded-xl border-2 border-gray-500 shadow-xl rotate-[-12deg] tracking-wider uppercase">Đã Hết Hạn</div>
                     </div>
-                    <h3 className="mt-3 font-bold text-white text-lg">{v.code}</h3>
-                    <p className="mt-2 text-xs text-white/90 flex-1">{v.description}</p>
+                  )}
+                  <div className="absolute top-0 right-0 h-24 w-24 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div>
+                      <div className="flex justify-between items-start">
+                        <span className="inline-block rounded bg-white/20 backdrop-blur-md px-2 py-1 text-xs font-bold text-white shadow-sm">
+                          {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${(v.discountAmount || 0) / 1000}K`}
+                        </span>
+                        {v.count > 1 && !isExpired && (
+                          <span className="inline-flex items-center justify-center bg-red-500/90 text-white rounded-full px-2 py-0.5 text-xs font-bold shadow-md ring-2 ring-white/20 z-20">
+                            x{v.count}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="mt-3 font-bold text-white text-lg">{v.code}</h3>
+                      <p className="mt-2 text-xs text-white/90 flex-1">{v.description}</p>
+                    </div>
+                    <button disabled={isExpired} className={`mt-5 w-full rounded-xl border border-white/40 bg-white/10 backdrop-blur-md py-2.5 text-xs font-bold text-white transition-colors ${isExpired ? 'opacity-50' : 'hover:bg-white hover:text-primary'}`}>
+                      {isExpired ? 'Không khả dụng' : 'Xem chi tiết'}
+                    </button>
                   </div>
-                  <button className="mt-5 w-full rounded-xl border border-white/40 bg-white/10 backdrop-blur-md py-2.5 text-xs font-bold text-white transition-colors hover:bg-white hover:text-primary">
-                    Xem chi tiết
-                  </button>
-                </div>
-              </BackgroundGradient>
-            </div>
-          ))}
+                </BackgroundGradient>
+              </div>
+            );
+          })}
         </div>
       )}
 
