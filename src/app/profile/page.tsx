@@ -659,11 +659,11 @@ function TabOffers() {
             const isExpired = new Date(v.validUntil) < new Date();
             
             return (
-              <div key={v.id} className={`h-full ${isExpired ? 'cursor-not-allowed opacity-70 grayscale' : 'cursor-pointer'}`} onClick={() => !isExpired && setSelectedVoucher(v)}>
+              <div key={v.id} className={`h-full ${isExpired ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'}`} onClick={() => !isExpired && setSelectedVoucher(v)}>
                 <BackgroundGradient className="p-5 flex flex-col justify-between relative overflow-hidden h-full text-white shadow-md">
                   {isExpired && (
-                    <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/10 backdrop-blur-[1px] rounded-3xl">
-                      <div className="bg-gray-800/90 text-white font-extrabold text-lg px-6 py-2 rounded-xl border-2 border-gray-500 shadow-xl rotate-[-12deg] tracking-wider uppercase">Đã Hết Hạn</div>
+                    <div className="absolute inset-0 z-30 flex items-center justify-center bg-white/50 backdrop-blur-[2px] rounded-3xl">
+                      <div className="bg-white/90 text-gray-600 font-extrabold text-lg px-6 py-2 rounded-xl border-2 border-gray-400 shadow-xl rotate-[-12deg] tracking-wider uppercase">Đã Hết Hạn</div>
                     </div>
                   )}
                   <div className="absolute top-0 right-0 h-24 w-24 bg-white/10 rounded-bl-full z-0 blur-xl"></div>
