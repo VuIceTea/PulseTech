@@ -671,19 +671,6 @@ function TabOffers() {
                     WebkitMaskPosition: 'top, bottom'
                   }}
                 >
-                  {/* Barcode lines */}
-                  <div className="flex h-[80%] gap-[2px] opacity-40 shrink-0 ml-1">
-                     <div className="w-[1px] bg-white h-full"></div>
-                     <div className="w-[3px] bg-white h-full"></div>
-                     <div className="w-[2px] bg-white h-full"></div>
-                     <div className="w-[1px] bg-white h-full"></div>
-                     <div className="w-[4px] bg-white h-full"></div>
-                     <div className="w-[1px] bg-white h-full"></div>
-                     <div className="w-[2px] bg-white h-full"></div>
-                     <div className="w-[3px] bg-white h-full"></div>
-                     <div className="w-[1px] bg-white h-full"></div>
-                  </div>
-                  
                   <div className="flex-1 flex flex-col items-center justify-center h-full">
                     <div className="text-2xl font-black drop-shadow-sm">{v.discountPercent > 0 ? `${v.discountPercent}%` : `${(v.discountAmount || 0)/1000}K`}</div>
                     <div className="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-90">Giảm</div>
@@ -691,7 +678,7 @@ function TabOffers() {
                 </div>
 
                 {/* Dashed Line Separator */}
-                <div className="absolute left-[35%] top-3 bottom-3 border-l-2 border-dashed border-gray-200 z-10 -ml-[1px]"></div>
+                <div className="absolute left-[35%] top-3 bottom-3 border-l-[2.5px] border-dashed border-gray-300/80 z-10 -ml-[1px]"></div>
 
                 {/* Right Section (White) */}
                 <div 
