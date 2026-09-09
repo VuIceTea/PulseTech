@@ -659,10 +659,18 @@ function TabOffers() {
             const isExpired = new Date(v.validUntil) < new Date();
             
             return (
-              <div key={v.id} className={`relative flex w-full h-[140px] rounded-2xl bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden ${isExpired ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'}`} onClick={() => !isExpired && setSelectedVoucher(v)}>
+              <div key={v.id} className={`relative flex w-full h-[140px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:drop-shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all ${isExpired ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'}`} onClick={() => !isExpired && setSelectedVoucher(v)}>
                 
                 {/* Left Section (Red) */}
-                <div className="relative w-[35%] bg-primary flex items-center p-3 text-white border-r-[2px] border-dashed border-white/60 shrink-0">
+                <div 
+                  className="w-[35%] bg-primary rounded-l-2xl flex items-center p-3 text-white shrink-0 relative"
+                  style={{
+                    WebkitMaskImage: 'radial-gradient(circle at 100% 0, transparent 12px, black 12.5px), radial-gradient(circle at 100% 100%, transparent 12px, black 12.5px)',
+                    WebkitMaskSize: '100% 51%',
+                    WebkitMaskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'top, bottom'
+                  }}
+                >
                   {/* Barcode lines */}
                   <div className="flex h-[80%] gap-[2px] opacity-40 shrink-0 ml-1">
                      <div className="w-[1px] bg-white h-full"></div>
@@ -680,15 +688,22 @@ function TabOffers() {
                     <div className="text-2xl font-black drop-shadow-sm">{v.discountPercent > 0 ? `${v.discountPercent}%` : `${(v.discountAmount || 0)/1000}K`}</div>
                     <div className="text-[10px] uppercase font-bold tracking-widest mt-1 opacity-90">Giảm</div>
                   </div>
-                  
-                  {/* Cutouts for dashed line */}
-                  <div className="absolute -top-3 -right-[13px] w-6 h-6 bg-[#f4f6f8] rounded-full z-10"></div>
-                  <div className="absolute -bottom-3 -right-[13px] w-6 h-6 bg-[#f4f6f8] rounded-full z-10"></div>
                 </div>
 
+                {/* Dashed Line Separator */}
+                <div className="absolute left-[35%] top-3 bottom-3 border-l-2 border-dashed border-gray-200 z-10 -ml-[1px]"></div>
+
                 {/* Right Section (White) */}
-                <div className="w-[65%] p-4 flex flex-col justify-between bg-white relative">
-                  <div className="flex justify-between items-start gap-2">
+                <div 
+                  className="w-[65%] bg-white rounded-r-2xl p-4 flex flex-col justify-between"
+                  style={{
+                    WebkitMaskImage: 'radial-gradient(circle at 0% 0, transparent 12px, black 12.5px), radial-gradient(circle at 0% 100%, transparent 12px, black 12.5px)',
+                    WebkitMaskSize: '100% 51%',
+                    WebkitMaskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'top, bottom'
+                  }}
+                >
+                  <div className="flex justify-between items-start gap-2 pl-3">
                     <div>
                       <h3 className="font-extrabold text-brand-black text-lg tracking-wide line-clamp-1">{v.code}</h3>
                       <p className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">{v.description}</p>
@@ -699,7 +714,7 @@ function TabOffers() {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-end justify-between mt-2">
+                  <div className="flex items-end justify-between mt-2 pl-3">
                      <span className="text-[10px] text-gray-400 font-medium">
                         HSD: {new Date(v.validUntil).toLocaleDateString('vi-VN')}
                      </span>
