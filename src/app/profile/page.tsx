@@ -7,11 +7,12 @@ import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import QRCode from 'react-qr-code';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
+import { api, orderApi, userApi, type Order, type FullCoupon } from '@/lib/api';
+import { Package, Truck, CheckCircle2, ClipboardList, RefreshCw, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
 import { getMonth, getYear } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { HiChevronRight } from 'react-icons/hi2';
