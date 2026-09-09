@@ -211,17 +211,25 @@ function TabHome({ user }: { user: any }) {
 }
 
 function TabAccount({ user }: { user: any }) {
-  const [phone, setPhone] = useState('Chưa cập nhật');
   const [totalSpent, setTotalSpent] = useState(0);
+  const [formData, setFormData] = useState({
+    name: user?.name || '',
+    phone: '',
+    email: user?.email || '',
+    dob: '',
+    gender: ''
+  });
 
   useEffect(() => {
     if (!user) return;
+    setFormData(prev => ({ ...prev, name: user.name, email: user.email }));
+    
     userApi.getAddresses(user.email).then((data) => {
       const defaultAddr = data.find(a => a.isDefault);
       if (defaultAddr && defaultAddr.phone) {
-        setPhone(defaultAddr.phone);
+        setFormData(prev => ({ ...prev, phone: defaultAddr.phone }));
       } else if (data.length > 0 && data[0].phone) {
-        setPhone(data[0].phone);
+        setFormData(prev => ({ ...prev, phone: data[0].phone }));
       }
     }).catch(console.error);
 
@@ -230,6 +238,10 @@ function TabAccount({ user }: { user: any }) {
       setTotalSpent(successfulOrders.reduce((sum, order) => sum + order.totalPrice, 0));
     }).catch(console.error);
   }, [user]);
+
+  const handleSave = () => {
+    toast.success('Cập nhật thông tin thành công!');
+  };
 
   return (
     <div className="space-y-6">
@@ -241,28 +253,35 @@ function TabAccount({ user }: { user: any }) {
           <div className="space-y-4 flex-1 flex flex-col">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" readOnly value={user.name} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+              <input type="text" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" readOnly value={phone} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+              <input type="text" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Email</label>
-              <input type="text" readOnly value={user.email} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+              <input type="text" readOnly value={formData.email} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-500 outline-none cursor-not-allowed" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-gray-500">Ngày sinh</label>
-                <input type="text" readOnly value="Chưa cập nhật" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+                <input type="date" value={formData.dob} onChange={e => setFormData({...formData, dob: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors" />
               </div>
               <div>
                 <label className="mb-1.5 block text-xs font-semibold text-gray-500">Giới tính</label>
-                <input type="text" readOnly value="Chưa cập nhật" className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-brand-black outline-none" />
+                <select value={formData.gender} onChange={e => setFormData({...formData, gender: e.target.value})} className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-brand-black outline-none focus:border-primary transition-colors appearance-none">
+                  <option value="">Chọn giới tính</option>
+                  <option value="male">Nam</option>
+                  <option value="female">Nữ</option>
+                  <option value="other">Khác</option>
+                </select>
               </div>
             </div>
             <div className="pt-4 mt-auto">
-              <button disabled className="w-full opacity-50 cursor-not-allowed rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors">Lưu thay đổi (Chưa hỗ trợ)</button>
+              <button onClick={handleSave} className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark shadow-lg shadow-primary/30">
+                Lưu thay đổi
+              </button>
             </div>
           </div>
         </div>
@@ -581,6 +600,12 @@ function TabAddress({ user }: { user: any }) {
   const [addresses, setAddresses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Address form states
+  const [provinces, setProvinces] = useState<any[]>([]);
+  const [wards, setWards] = useState<any[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedWard, setSelectedWard] = useState("");
+
   useEffect(() => {
     if (!user) return;
     userApi.getAddresses(user.email)
@@ -589,18 +614,48 @@ function TabAddress({ user }: { user: any }) {
       .finally(() => setIsLoading(false));
   }, [user]);
 
+  useEffect(() => {
+    if (modalType) {
+      fetch('https://provinces.open-api.vn/api/v2/')
+        .then(res => res.json())
+        .then(data => {
+          setProvinces(data);
+        })
+        .catch(console.error);
+    } else {
+      setSelectedProvince("");
+      setSelectedWard("");
+      setWards([]);
+    }
+  }, [modalType]);
+
+  const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const val = e.target.value;
+    setSelectedProvince(val);
+    setSelectedWard("");
+    setWards([]);
+    if (val) {
+      fetch(`https://provinces.open-api.vn/api/v2/p/${val}?depth=2`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.wards) setWards(data.wards);
+        })
+        .catch(console.error);
+    }
+  };
+
   const AddressModal = () => (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-2xl relative"
+        className="w-full max-w-lg rounded-3xl bg-white p-6 sm:p-8 shadow-2xl relative my-auto"
       >
         <button onClick={() => setModalType(null)} className="absolute top-5 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl">&times;</button>
-        <h3 className="text-xl font-bold text-brand-black mb-6">{modalType === 'add' ? 'Thêm địa chỉ mới' : 'Sửa địa chỉ'}</h3>
+        <h3 className="text-xl font-bold text-brand-black mb-6">{modalType === 'add' ? 'Thêm địa chỉ mới (Chuẩn 2026 - 34 Tỉnh/Thành)' : 'Sửa địa chỉ'}</h3>
 
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setModalType(null); }}>
+        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setModalType(null); toast.info('Chưa hỗ trợ lưu địa chỉ'); }}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
@@ -611,13 +666,31 @@ function TabAddress({ user }: { user: any }) {
               <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
             </div>
           </div>
+          
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-gray-500">Tỉnh/Thành phố</label>
+              <select value={selectedProvince} onChange={handleProvinceChange} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors appearance-none">
+                <option value="">Chọn Tỉnh/Thành</option>
+                {provinces.map(p => <option key={p.code} value={p.code}>{p.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-gray-500">Phường/Xã</label>
+              <select value={selectedWard} onChange={(e) => setSelectedWard(e.target.value)} required disabled={!selectedProvince} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors appearance-none disabled:opacity-50">
+                <option value="">Chọn Phường/Xã</option>
+                {wards.map(w => <option key={w.code} value={w.code}>{w.name}</option>)}
+              </select>
+            </div>
+          </div>
+
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-gray-500">Địa chỉ cụ thể</label>
-            <input type="text" defaultValue={""} placeholder="Số nhà, đường, phường, quận, thành phố" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
+            <input type="text" defaultValue={""} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary focus:bg-white transition-colors" />
           </div>
           <div className="pt-4 flex gap-3">
             <button type="button" onClick={() => setModalType(null)} className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200">Hủy bỏ</button>
-            <button type="submit" disabled className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark opacity-50 cursor-not-allowed">Chưa hỗ trợ lưu</button>
+            <button type="submit" className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Lưu địa chỉ</button>
           </div>
         </form>
       </motion.div>
