@@ -665,7 +665,11 @@ function TabOffers() {
                 <div 
                   className="w-[35%] bg-primary rounded-l-2xl flex items-center p-3 text-white shrink-0 relative"
                   style={{
-                    WebkitMaskImage: 'radial-gradient(circle at 100% 0, transparent 12px, black 12.5px), radial-gradient(circle at 100% 100%, transparent 12px, black 12.5px)',
+                    maskImage: 'radial-gradient(circle at 100% 0, transparent 12px, black 13px), radial-gradient(circle at 100% 100%, transparent 12px, black 13px)',
+                    maskSize: '100% 51%',
+                    maskRepeat: 'no-repeat',
+                    maskPosition: 'top, bottom',
+                    WebkitMaskImage: 'radial-gradient(circle at 100% 0, transparent 12px, black 13px), radial-gradient(circle at 100% 100%, transparent 12px, black 13px)',
                     WebkitMaskSize: '100% 51%',
                     WebkitMaskRepeat: 'no-repeat',
                     WebkitMaskPosition: 'top, bottom'
@@ -677,14 +681,15 @@ function TabOffers() {
                   </div>
                 </div>
 
-                {/* Dashed Line Separator */}
-                <div className="absolute left-[35%] top-3 bottom-3 border-l-[2.5px] border-dashed border-gray-300/80 z-10 -ml-[1px]"></div>
-
                 {/* Right Section (White) */}
                 <div 
-                  className="w-[65%] bg-white rounded-r-2xl p-4 flex flex-col justify-between"
+                  className="w-[65%] bg-white rounded-r-2xl p-4 flex flex-col justify-between border-l-2 border-dashed border-gray-300"
                   style={{
-                    WebkitMaskImage: 'radial-gradient(circle at 0% 0, transparent 12px, black 12.5px), radial-gradient(circle at 0% 100%, transparent 12px, black 12.5px)',
+                    maskImage: 'radial-gradient(circle at 0% 0, transparent 12px, black 13px), radial-gradient(circle at 0% 100%, transparent 12px, black 13px)',
+                    maskSize: '100% 51%',
+                    maskRepeat: 'no-repeat',
+                    maskPosition: 'top, bottom',
+                    WebkitMaskImage: 'radial-gradient(circle at 0% 0, transparent 12px, black 13px), radial-gradient(circle at 0% 100%, transparent 12px, black 13px)',
                     WebkitMaskSize: '100% 51%',
                     WebkitMaskRepeat: 'no-repeat',
                     WebkitMaskPosition: 'top, bottom'
