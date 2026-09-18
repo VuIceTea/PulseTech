@@ -86,7 +86,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const reviews = product.reviews || [];
   
   // Use variant stock and specs if available
-  const displayStock = selectedStorage.stock !== undefined ? selectedStorage.stock : product.stock;
+  const displayStock = selectedStorage.stock ?? product.stock;
   
   const specs: ProductSpec = { 
     ...(product.specs || {}), 
@@ -129,7 +129,9 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
 
   // Add handlers
   const handleAddToCart = (redirect = false) => {
-    addToCart(product, selectedColor.name, selectedStorage.name, quantity);
+    if (displayStock <= 0) return;
+    const validQuantity = Math.min(displayStock, Math.max(1, quantity));
+    addToCart(product, selectedColor.name, selectedStorage.name, validQuantity);
     if (redirect) {
       router.push('/checkout');
     }
@@ -426,6 +428,9 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                           }`}
                       >
                         <span>{storage.name}</span>
+                        {(storage.stock ?? product.stock) <= 0 && (
+                          <span className="text-[10px] font-semibold">Hết hàng</span>
+                        )}
                         <span className="text-[10px] font-medium opacity-90">
                           {formatPrice(discountedBasePrice + storage.priceOffset)}
                         </span>

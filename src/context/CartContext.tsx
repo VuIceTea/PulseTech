@@ -50,9 +50,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isAuthLoaded]);
 
   const addToCart = async (product: Product, color: string, storage: string, quantity = 1) => {
-    if (product.stock === 0) return;
-
     const storageObj = product.storages.find(s => s.name === storage);
+    const availableStock = storageObj?.stock ?? product.stock;
+    if (availableStock <= 0 || quantity <= 0) return;
     const storageOffset = storageObj ? storageObj.priceOffset : 0;
     const finalPrice = product.basePrice + storageOffset;
 
@@ -61,6 +61,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const existing = cart.find(item => item.id === product.id && item.color === color && item.storage === storage);
     const newQuantity = existing ? existing.quantity + quantity : quantity;
+    if (newQuantity > availableStock) return;
 
     const apiItem: ApiCartItem = {
       id: product.id,

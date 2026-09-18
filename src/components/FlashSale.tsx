@@ -19,7 +19,7 @@ export const FlashSale: React.FC = () => {
             variantStorage: storage.name,
             name: `${product.name} ${storage.name}`,
             basePrice: variantPrice,
-            stock: storage.stock !== undefined ? storage.stock : product.stock
+            stock: storage.stock ?? product.stock
           };
         });
       }
