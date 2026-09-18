@@ -86,7 +86,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const reviews = product.reviews || [];
   
   // Use variant stock and specs if available
-  const displayStock = selectedStorage.stock ?? product.stock;
+  const displayStock = selectedStorage.stock ?? 0;
   
   const specs: ProductSpec = { 
     ...(product.specs || {}), 
@@ -428,7 +428,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                           }`}
                       >
                         <span>{storage.name}</span>
-                        {(storage.stock ?? product.stock) <= 0 && (
+                        {(storage.stock ?? 0) <= 0 && (
                           <span className="text-[10px] font-semibold">Hết hàng</span>
                         )}
                         <span className="text-[10px] font-medium opacity-90">

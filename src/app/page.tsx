@@ -57,7 +57,7 @@ export default function Home() {
           name: `${product.name} ${storage.name}`,
           basePrice: variantPrice,
           originalPrice: originalPrice,
-          stock: storage.stock ?? product.stock,
+          stock: storage.stock ?? 0,
           specs: storage.specs && Object.keys(storage.specs).length > 0 ? storage.specs : product.specs
         };
       });
