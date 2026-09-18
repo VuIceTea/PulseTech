@@ -43,6 +43,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
     ? storages.find(s => s.name === storageQuery) || storages[0]
     : storages[0];
 
+  const [selectedColor, setSelectedColor] = useState<ColorVariant>(colors[0]);
   const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(initialStorage);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
