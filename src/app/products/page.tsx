@@ -179,6 +179,27 @@ function ProductsListContent() {
     return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
   });
 
+  const flattenedProducts = sortedProducts.flatMap((product) => {
+    if (product.storages && product.storages.length > 0) {
+      return product.storages.map(storage => {
+        const variantPrice = product.basePrice + storage.priceOffset;
+        const originalPrice = product.originalPrice ? product.originalPrice + storage.priceOffset : variantPrice;
+        return {
+          ...product,
+          id: `${product.id}-${storage.name.replace(/\s+/g, '-')}`,
+          parentProductId: product.id,
+          variantStorage: storage.name,
+          name: `${product.name} ${storage.name}`,
+          basePrice: variantPrice,
+          originalPrice: originalPrice,
+          stock: storage.stock !== undefined ? storage.stock : product.stock,
+          specs: storage.specs && Object.keys(storage.specs).length > 0 ? storage.specs : product.specs
+        };
+      });
+    }
+    return [product];
+  });
+
   const activeFilterCriteria = (selectedCategory 
     ? filterCriteria.filter(c => 
         c.categories.includes(selectedCategory) || 
@@ -430,10 +451,10 @@ function ProductsListContent() {
               </div>
             ))}
           </div>
-        ) : sortedProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-            {sortedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+        ) : flattenedProducts.length > 0 ? (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {flattenedProducts.map((product, idx) => (
+              <ProductCard key={product.uniqueKey || product.id || idx} product={product} />
             ))}
           </div>
         ) : (
