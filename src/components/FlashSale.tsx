@@ -7,7 +7,27 @@ import { useProducts } from '@/hooks/useProducts';
 
 export const FlashSale: React.FC = () => {
   const { products } = useProducts();
-  const dealProducts = products.filter(p => p.discount > 0).slice(0, 5);
+  const flattenedProducts = React.useMemo(() => {
+    return products.flatMap((product) => {
+      if (product.storages && product.storages.length > 0) {
+        return product.storages.map(storage => {
+          const variantPrice = product.basePrice + storage.priceOffset;
+          return {
+            ...product,
+            id: `${product.id}-${storage.name.replace(/\s+/g, '-')}`,
+            parentProductId: product.id,
+            variantStorage: storage.name,
+            name: `${product.name} ${storage.name}`,
+            basePrice: variantPrice,
+            stock: storage.stock !== undefined ? storage.stock : product.stock
+          };
+        });
+      }
+      return [product];
+    });
+  }, [products]);
+
+  const dealProducts = flattenedProducts.filter(p => p.discount > 0).slice(0, 5);
 
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 2, minutes: 11, seconds: 54 });
 
@@ -80,7 +100,7 @@ export const FlashSale: React.FC = () => {
                   </div>
 
                   {/* Image */}
-                  <Link href={`/products/${product.id}`} className="flex flex-col flex-1 h-full">
+                  <Link href={`/products/${product.parentProductId || product.id}${product.variantStorage ? `?storage=${encodeURIComponent(product.variantStorage)}` : ''}`} className="flex flex-col flex-1 h-full">
                     <div className="relative w-full aspect-square mt-6 mb-4 flex items-center justify-center p-2">
                       <img
                         src={product.image}

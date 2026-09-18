@@ -17,7 +17,8 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
-  const isWished = isInWishlist(product.id);
+  const actualId = product.parentProductId || product.id;
+  const isWished = isInWishlist(actualId);
   const [isAdded, setIsAdded] = React.useState(false);
 
   // Format price helper
@@ -41,7 +42,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     e.preventDefault(); // Prevent navigating to detail page when clicking button
     // Add default color and storage
     const defaultColor = product.colors[0]?.name || 'Mặc định';
-    const defaultStorage = product.storages[0]?.name || 'Mặc định';
+    const defaultStorage = product.variantStorage || product.storages[0]?.name || 'Mặc định';
     addToCart(product, defaultColor, defaultStorage, 1);
 
     // Quick notification / visual cue
@@ -67,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <Heart className="h-5 w-5 fill-current" />
       </button>
 
-      <Link href={`/products/${product.id}`} className="flex flex-col flex-1">
+      <Link href={`/products/${actualId}${product.variantStorage ? `?storage=${encodeURIComponent(product.variantStorage)}` : ''}`} className="flex flex-col flex-1">
         {/* Top Badges */}
         <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 items-start">
           {product.discount > 0 && (

@@ -44,6 +44,27 @@ export default function Home() {
     setIsPageLoading(false);
   }, []);
 
+  const flattenedProducts = products.flatMap((product) => {
+    if (product.storages && product.storages.length > 0) {
+      return product.storages.map(storage => {
+        const variantPrice = product.basePrice + storage.priceOffset;
+        const originalPrice = product.originalPrice ? product.originalPrice + storage.priceOffset : variantPrice;
+        return {
+          ...product,
+          id: `${product.id}-${storage.name.replace(/\s+/g, '-')}`,
+          parentProductId: product.id,
+          variantStorage: storage.name,
+          name: `${product.name} ${storage.name}`,
+          basePrice: variantPrice,
+          originalPrice: originalPrice,
+          stock: storage.stock !== undefined ? storage.stock : product.stock,
+          specs: storage.specs && Object.keys(storage.specs).length > 0 ? storage.specs : product.specs
+        };
+      });
+    }
+    return [product];
+  });
+
   if (isPageLoading || isProductsLoading) {
     return (
       <div className="flex-1 min-h-[65vh] flex flex-col items-center justify-center bg-[#f8f9fa] transition-opacity duration-300">
@@ -58,14 +79,14 @@ export default function Home() {
   }
 
   // Phụ kiện, thiết bị điện thoại
-  const newAccessories = products.filter(p => p.category === 'accessory').slice(0, 2);
+  const newAccessories = flattenedProducts.filter(p => p.category === 'accessory').slice(0, 2);
   const newAccessoryIds = new Set(newAccessories.map(p => p.id));
   
-  const recentlyAdded = products
+  const recentlyAdded = flattenedProducts
     .filter(p => (p.category === 'phone' || p.category === 'accessory') && !newAccessoryIds.has(p.id))
     .slice(0, 6);
     
-  const hotSummerProducts = products
+  const hotSummerProducts = flattenedProducts
     .filter(p => p.category === 'accessory' && !newAccessoryIds.has(p.id))
     .slice(0, 4);
 

@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Product, ColorVariant, StorageVariant } from '@/types/product';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Product, ColorVariant, StorageVariant, ProductSpec } from '@/types/product';
 import { useCart } from '@/context/CartContext';
 import { useWishlist } from '@/context/WishlistContext';
 import {
@@ -35,8 +35,15 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const storages = (product.storages && product.storages.length > 0) ? product.storages : [{ name: 'Mặc định', priceOffset: 0 }];
 
   // State managers
-  const [selectedColor, setSelectedColor] = useState<ColorVariant>(colors[0]);
-  const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(storages[0]);
+  const searchParams = useSearchParams();
+  
+  // Find storage from URL param if exists
+  const storageQuery = searchParams.get('storage');
+  const initialStorage = storageQuery 
+    ? storages.find(s => s.name === storageQuery) || storages[0]
+    : storages[0];
+
+  const [selectedStorage, setSelectedStorage] = useState<StorageVariant>(initialStorage);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -76,7 +83,14 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const images = displayImages;
 
   const reviews = product.reviews || [];
-  const specs = product.specs || {};
+  
+  // Use variant stock and specs if available
+  const displayStock = selectedStorage.stock !== undefined ? selectedStorage.stock : product.stock;
+  
+  const specs: ProductSpec = { 
+    ...(product.specs || {}), 
+    ...((selectedStorage.specs && Object.keys(selectedStorage.specs).length > 0) ? selectedStorage.specs : {})
+  };
 
   // Update selected color image sync
   const handleColorSelect = (color: ColorVariant) => {
@@ -213,7 +227,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   Nổi bật
                 </span>
               )}
-              {product.stock === 0 && (
+              {displayStock === 0 && (
                 <span className="bg-red-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider h-fit">
                   Đã hết hàng
                 </span>
@@ -324,15 +338,23 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   <p className="text-[10px] text-gray-500">Nếu có lỗi phần cứng nhà sản xuất.</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-red-50 text-primary rounded-xl">
-                  <Truck className="h-5 w-5" />
+              {displayStock === 0 ? (
+                <div className="flex gap-3">
+                  <button disabled className="flex-1 bg-gray-200 text-gray-500 font-bold py-4 rounded-2xl cursor-not-allowed shadow-sm">
+                    SẢN PHẨM TẠM HẾT HÀNG
+                  </button>
                 </div>
-                <div>
-                  <h4 className="font-bold text-brand-black">Giao hàng miễn phí</h4>
-                  <p className="text-[10px] text-gray-500">Thanh toán an toàn bảo mật, COD toàn quốc.</p>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-red-50 text-primary rounded-xl">
+                    <Truck className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-brand-black">Giao hàng miễn phí</h4>
+                    <p className="text-[10px] text-gray-500">Thanh toán an toàn bảo mật, COD toàn quốc.</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
@@ -416,11 +438,11 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               <div className="mb-6 pt-2 border-t border-gray-50 flex items-center justify-between gap-4">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold text-gray-500">SỐ LƯỢNG MUA</span>
-                  <span className="text-[10px] text-gray-400 font-medium">Hiện đang còn {product.stock} sản phẩm</span>
+                  <span className="text-[10px] text-gray-400 font-medium">Hiện đang còn {displayStock} sản phẩm</span>
                 </div>
                 <div className="flex items-center rounded-2xl overflow-hidden shadow-sm bg-gray-50">
                   <button
-                    disabled={product.stock === 0}
+                    disabled={displayStock === 0}
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -428,15 +450,15 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   </button>
                   <input
                     type="number"
-                    min={product.stock === 0 ? 0 : 1}
-                    max={product.stock}
-                    disabled={product.stock === 0}
-                    value={product.stock === 0 ? 0 : quantity}
+                    min={displayStock === 0 ? 0 : 1}
+                    max={displayStock}
+                    disabled={displayStock === 0}
+                    value={displayStock === 0 ? 0 : quantity}
                     onChange={(event) => {
                       const value = event.target.valueAsNumber;
                       if (!Number.isNaN(value)) {
                         setQuantity(
-                          Math.min(product.stock, Math.max(1, Math.trunc(value)))
+                          Math.min(displayStock, Math.max(1, Math.trunc(value)))
                         );
                       }
                     }}
@@ -447,8 +469,8 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
              [&::-webkit-outer-spin-button]:appearance-none"
                   />
                   <button
-                    disabled={product.stock === 0}
-                    onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                    disabled={displayStock === 0 || quantity >= displayStock}
+                    onClick={() => setQuantity(Math.min(displayStock, quantity + 1))}
                     className="px-3.5 py-2 font-bold text-sm text-gray-600 hover:bg-gray-100 transition disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     +
@@ -457,7 +479,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               </div>
 
               {/* CTA Buy Buttons */}
-              {product.stock === 0 ? (
+              {displayStock === 0 ? (
                 <div className="flex flex-wrap gap-3">
                   <button
                     disabled

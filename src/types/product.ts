@@ -8,6 +8,8 @@ export interface ColorVariant {
 export interface StorageVariant {
   name: string;
   priceOffset: number;
+  stock?: number;
+  specs?: ProductSpec;
 }
 
 export interface ProductSpec {
@@ -60,4 +62,6 @@ export interface Product {
   isFlashSale?: boolean;
   badge?: string;
   stock: number;
+  variantStorage?: string;
+  parentProductId?: string;
 }
