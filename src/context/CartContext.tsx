@@ -50,6 +50,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isAuthLoaded]);
 
   const addToCart = async (product: Product, color: string, storage: string, quantity = 1) => {
+    const productId = product.parentProductId || product.id;
     const storageObj = product.storages.find(s => s.name === storage);
     const availableStock = storageObj?.stock ?? 0;
     if (availableStock <= 0 || quantity <= 0) return;
@@ -59,12 +60,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const colorObj = product.colors.find(c => c.name === color);
     const itemImage = colorObj ? colorObj.image : product.image;
 
-    const existing = cart.find(item => item.id === product.id && item.color === color && item.storage === storage);
+    const existing = cart.find(item => item.id === productId && item.color === color && item.storage === storage);
     const newQuantity = existing ? existing.quantity + quantity : quantity;
     if (newQuantity > availableStock) return;
 
     const apiItem: ApiCartItem = {
-      id: product.id,
+      id: productId,
       name: product.name,
       price: finalPrice,
       image: itemImage,
@@ -76,10 +77,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Optimistic update
     setCart(prevCart => {
       if (existing) {
-        return prevCart.map(item => item.id === product.id && item.color === color && item.storage === storage 
+        return prevCart.map(item => item.id === productId && item.color === color && item.storage === storage
           ? { ...item, quantity: newQuantity } : item);
       }
-      return [...prevCart, { ...apiItem, id: product.id }];
+      return [...prevCart, apiItem];
     });
 
     try {

@@ -39,27 +39,33 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         try {
           const apiWishlist = await userApi.getWishlist(user.email);
           if (apiWishlist && apiWishlist.productIds && apiWishlist.productIds.length > 0) {
-            // Fetch product details for each id
-            const items: WishlistItem[] = [];
-            for (const pid of apiWishlist.productIds) {
-              try {
-                const product = await api.product(pid);
-                items.push({
-                  id: product.id,
-                  name: product.name,
-                  brand: product.brand,
-                  image: product.image,
-                  basePrice: product.basePrice,
-                  originalPrice: product.originalPrice,
-                  discount: product.discount,
-                  category: product.category,
-                  stock: product.stock,
-                });
-              } catch (e) {
-                console.error('Failed to fetch wishlist product', pid, e);
+            // A few older home-page cards saved a generated variant id such as
+            // "iphone-15-pro-max-512GB". Resolve those entries against the
+            // product catalogue so the wishlist always stores the real parent id.
+            const products = await api.products();
+            const items: WishlistItem[] = apiWishlist.productIds.flatMap(pid => {
+              const product = products.find(candidate =>
+                candidate.id === pid || candidate.storages?.some(storage =>
+                  pid === `${candidate.id}-${storage.name.replace(/\s+/g, '-')}`
+                )
+              );
+              if (!product) {
+                console.warn('Wishlist product no longer exists', pid);
+                return [];
               }
-            }
-            setWishlist(items);
+              return [{
+                id: product.id,
+                name: product.name,
+                brand: product.brand,
+                image: product.image,
+                basePrice: product.basePrice,
+                originalPrice: product.originalPrice,
+                discount: product.discount,
+                category: product.category,
+                stock: product.stock,
+              }];
+            });
+            setWishlist(items.filter((item, index) => items.findIndex(candidate => candidate.id === item.id) === index));
           } else {
             setWishlist([]); // Clear if empty on backend
           }
@@ -99,10 +105,11 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [wishlist, isLoaded, user]);
 
   const addToWishlist = (product: Product) => {
+    const productId = product.parentProductId || product.id;
     setWishlist(prev => {
-      if (prev.find(item => item.id === product.id)) return prev;
+      if (prev.find(item => item.id === productId)) return prev;
       return [...prev, {
-        id: product.id,
+        id: productId,
         name: product.name,
         brand: product.brand,
         image: product.image,
@@ -124,8 +131,9 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   const toggleWishlist = (product: Product) => {
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
+    const productId = product.parentProductId || product.id;
+    if (isInWishlist(productId)) {
+      removeFromWishlist(productId);
     } else {
       addToWishlist(product);
     }

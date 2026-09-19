@@ -139,7 +139,7 @@ export default function Home() {
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { addToCart } = useCart();
     
-    const isWished = isInWishlist(product.id);
+    const isWished = isInWishlist(actualProductId);
 
     const handleWishlist = (e: React.MouseEvent) => {
       e.preventDefault();
