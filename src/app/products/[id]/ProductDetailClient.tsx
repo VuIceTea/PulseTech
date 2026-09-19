@@ -84,14 +84,74 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
   const images = displayImages;
 
   const reviews = product.reviews || [];
-  
+
   // Use variant stock and specs if available
   const displayStock = selectedStorage.stock ?? 0;
-  
-  const specs: ProductSpec = { 
-    ...(product.specs || {}), 
+
+  const specs: ProductSpec = {
+    ...(product.specs || {}),
     ...((selectedStorage.specs && Object.keys(selectedStorage.specs).length > 0) ? selectedStorage.specs : {})
   };
+
+  const isMemoryProduct = ['phone', 'tablet', 'laptop'].includes(product.category);
+  const accessoryType = (specs.accessoryType || '').toLocaleLowerCase('vi-VN');
+  const isCase = accessoryType.includes('ốp') || accessoryType.includes('bao da');
+  const isCable = accessoryType.includes('cáp') || accessoryType.includes('dây');
+  const isCharger = accessoryType.includes('củ sạc') || accessoryType.includes('sạc dự phòng') || accessoryType.includes('pin dự phòng');
+  const isHeadphone = accessoryType.includes('tai nghe');
+  const isAudioProduct = product.category === 'audio' || isHeadphone || accessoryType.includes('loa');
+  const isUsefulSpec = (value?: string) => {
+    const normalizedValue = value?.trim().toLocaleLowerCase('vi-VN');
+    return Boolean(normalizedValue && !['không có', 'không hỗ trợ'].includes(normalizedValue));
+  };
+
+  const specificationRows: Array<{ name: string; value?: string }> = isMemoryProduct
+    ? [
+      { name: 'Màn hình', value: specs.screen },
+      { name: 'Hệ điều hành', value: specs.os },
+      { name: 'Camera sau', value: specs.camera },
+      { name: 'Camera trước', value: specs.frontCamera },
+      { name: 'Vi xử lý (CPU)', value: specs.cpu },
+      { name: 'Dung lượng RAM', value: specs.ram },
+      { name: 'Bộ nhớ trong', value: selectedStorage.name },
+      { name: 'Dung lượng Pin', value: specs.battery }
+    ].filter(spec => Boolean(spec.value?.trim()))
+    : (isAudioProduct
+      ? [
+        { name: 'Loại thiết bị', value: specs.accessoryType },
+        { name: 'Kiểu tai nghe', value: isHeadphone ? specs.headphoneType : undefined },
+        { name: 'Tính năng âm thanh', value: specs.audioFeature },
+        { name: 'Chuẩn kết nối', value: specs.connectionType },
+        { name: 'Thời lượng pin', value: specs.battery }
+      ]
+      : isCase
+        ? [
+          { name: 'Loại phụ kiện', value: specs.accessoryType },
+          { name: 'Chất liệu', value: specs.caseMaterial },
+          { name: 'Tính năng', value: specs.caseFeature }
+        ]
+        : isCable
+          ? [
+            { name: 'Loại phụ kiện', value: specs.accessoryType },
+            { name: 'Chuẩn kết nối', value: specs.connectionType },
+            { name: 'Chiều dài cáp', value: specs.cableLength || selectedStorage.name },
+            { name: 'Công suất hỗ trợ', value: specs.chargingPower }
+          ]
+          : isCharger
+            ? [
+              { name: 'Loại phụ kiện', value: specs.accessoryType },
+              { name: 'Chuẩn kết nối', value: specs.connectionType },
+              { name: 'Công suất sạc', value: specs.chargingPower },
+              { name: 'Số cổng sạc', value: specs.chargingPorts }
+            ]
+            : [
+              { name: 'Loại phụ kiện', value: specs.accessoryType },
+              { name: 'Chuẩn kết nối', value: specs.connectionType },
+              { name: 'Công suất sạc', value: specs.chargingPower },
+              { name: 'Chiều dài cáp', value: specs.cableLength },
+              { name: 'Chất liệu', value: specs.caseMaterial },
+              { name: 'Tính năng', value: specs.caseFeature }
+            ]).filter(spec => isUsefulSpec(spec.value));
 
   // Update selected color image sync
   const handleColorSelect = (color: ColorVariant) => {
@@ -411,7 +471,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               {/* Storage Variants Options */}
               {storages.length > 1 && (
                 <div className="mb-4 pt-2 border-t border-gray-50">
-                  <span className="text-xs font-bold text-gray-500 block mb-2">PHIÊN BẢN BỘ NHỚ</span>
+                  <span className="text-xs font-bold text-gray-500 block mb-2">{isMemoryProduct ? 'PHIÊN BẢN BỘ NHỚ' : 'PHIÊN BẢN'}</span>
                   <div className="flex flex-wrap gap-2">
                     {storages.map((storage) => (
                       <button
@@ -578,16 +638,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
               Thông số kỹ thuật chi tiết
             </h3>
             <div className="flex flex-col text-xs font-semibold">
-              {[
-                { name: 'Màn hình', value: specs.screen },
-                { name: 'Hệ điều hành', value: specs.os },
-                { name: 'Camera sau', value: specs.camera },
-                { name: 'Camera trước', value: specs.frontCamera },
-                { name: 'Vi xử lý (CPU)', value: specs.cpu },
-                { name: 'Dung lượng RAM', value: specs.ram },
-                { name: 'Bộ nhớ trong', value: selectedStorage.name },
-                { name: 'Dung lượng Pin', value: specs.battery }
-              ].map((spec, index) => (
+              {specificationRows.map((spec, index) => (
                 <div
                   key={spec.name}
                   className={`grid grid-cols-3 py-3 px-4 rounded-xl ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
@@ -600,14 +651,16 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
             </div>
 
             {/* Quick Specs modal toggle */}
-            <button
-              onClick={() => setShowFullSpecs(!showFullSpecs)}
-              className="mt-5 text-center text-primary text-xs font-bold hover:underline transition uppercase tracking-wide flex items-center justify-center gap-1 py-1"
-            >
-              {showFullSpecs ? 'Thu gọn thông số' : 'Xem cấu hình đầy đủ'}
-            </button>
+            {product.category === 'phone' && (
+              <button
+                onClick={() => setShowFullSpecs(!showFullSpecs)}
+                className="mt-5 text-center text-primary text-xs font-bold hover:underline transition uppercase tracking-wide flex items-center justify-center gap-1 py-1"
+              >
+                {showFullSpecs ? 'Thu gọn thông số' : 'Xem cấu hình đầy đủ'}
+              </button>
+            )}
 
-            {showFullSpecs && (
+            {product.category === 'phone' && showFullSpecs && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
