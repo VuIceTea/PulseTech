@@ -218,14 +218,7 @@ export default function Home() {
                 </span>
               </div>
 
-              {product.stock === 0 ? (
-                <button
-                  disabled
-                  className="text-[9px] font-bold border rounded-full py-1 px-3 transition-all cursor-not-allowed flex items-center gap-1.5 opacity-0 group-hover:opacity-100 -translate-y-2 group-hover:translate-y-0 duration-300 bg-gray-200 text-gray-500 border-gray-300"
-                >
-                  Hết hàng
-                </button>
-              ) : (
+              {product.stock > 0 && (
                 <button
                   onClick={handleAddToCart}
                   disabled={isAdded}
