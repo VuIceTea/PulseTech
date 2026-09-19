@@ -21,7 +21,7 @@ export default function CheckoutPage() {
   const [fullName, setFullName] = useState(user?.name || '');
   const [phoneNumber, setPhoneNumber] = useState((user as any)?.phone || '');
   const [shippingAddress, setShippingAddress] = useState((user as any)?.address || '');
-  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'VNPAY'>('COD');
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'VNPAY' | 'MOMO' | 'STRIPE'>('COD');
 
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
   const [couponCode, setCouponCode] = useState('');
@@ -319,6 +319,30 @@ export default function CheckoutPage() {
                     <div>
                       <p className="font-bold text-sm text-brand-black">VNPay</p>
                       <p className="text-xs text-gray-500">Quét mã qua ứng dụng ngân hàng hoặc ví VNPAY</p>
+                    </div>
+                  </div>
+                </label>
+
+                {/* MoMo */}
+                <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'MOMO' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}`}>
+                  <input type="radio" name="payment" value="MOMO" checked={paymentMethod === 'MOMO'} onChange={() => setPaymentMethod('MOMO')} className="text-primary focus:ring-primary" />
+                  <div className="ml-3 flex items-center gap-3">
+                    <img src="/icons/momo.png" alt="MoMo" className="h-15 w-auto object-contain rounded" />
+                    <div>
+                      <p className="font-bold text-sm text-brand-black">MoMo</p>
+                      <p className="text-xs text-gray-500">Thanh toán qua ví điện tử MoMo</p>
+                    </div>
+                  </div>
+                </label>
+
+                {/* Stripe */}
+                <label className={`flex items-center p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'STRIPE' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'}`}>
+                  <input type="radio" name="payment" value="STRIPE" checked={paymentMethod === 'STRIPE'} onChange={() => setPaymentMethod('STRIPE')} className="text-primary focus:ring-primary" />
+                  <div className="ml-3 flex items-center gap-3">
+                    <img src="/icons/stripe.svg" alt="Stripe" className="h-7 w-auto object-contain" />
+                    <div>
+                      <p className="font-bold text-sm text-brand-black">Stripe (Thẻ Quốc Tế)</p>
+                      <p className="text-xs text-gray-500">Thanh toán an toàn qua thẻ Visa, Mastercard, JCB</p>
                     </div>
                   </div>
                 </label>
