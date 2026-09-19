@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { HeroBanner } from "@/components/HeroBanner";
 import { FlashSale } from "@/components/FlashSale";
 import { useProducts } from "@/hooks/useProducts";
@@ -20,7 +21,6 @@ import {
   Star,
   Heart,
   Eye,
-  Shuffle,
   ShoppingBag,
   ArrowRight,
   Watch,
@@ -37,6 +37,7 @@ import {
 let hasInitialLoaded = false;
 
 export default function Home() {
+  const router = useRouter();
   const [isPageLoading, setIsPageLoading] = useState(!hasInitialLoaded);
   const { products, isLoading: isProductsLoading } = useProducts();
 
@@ -134,6 +135,7 @@ export default function Home() {
     const salePrice = product.basePrice;
     const actualProductId = product.parentProductId || product.id;
     const selectedStorage = product.variantStorage || product.storages?.[0]?.name || 'Mặc định';
+    const productHref = `/products/${actualProductId}${product.variantStorage ? `?storage=${encodeURIComponent(product.variantStorage)}` : ''}`;
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { addToCart } = useCart();
     
@@ -146,6 +148,12 @@ export default function Home() {
     };
 
     const [isAdded, setIsAdded] = React.useState(false);
+
+    const handleViewDetails = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      router.push(productHref);
+    };
 
     const handleAddToCart = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -172,7 +180,7 @@ export default function Home() {
             <Heart className="h-4 w-4 fill-current" />
           </button>
         </div>
-        <Link href={`/products/${actualProductId}${product.variantStorage ? `?storage=${encodeURIComponent(product.variantStorage)}` : ''}`} className="flex-1 flex flex-col cursor-pointer">
+        <Link href={productHref} className="flex-1 flex flex-col cursor-pointer">
           <div className="flex items-center justify-center relative mb-3 h-36 sm:h-40 md:h-48">
             <img
               src={product.image}
@@ -185,10 +193,12 @@ export default function Home() {
             />
             {/* Hover Actions */}
             <div className="absolute bottom-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2.5 items-center justify-center w-full pb-2">
-              <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Shuffle className="h-4 w-4" /></button>
-              <button className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}><Eye className="h-4 w-4" /></button>
-              <button className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 ${isWished ? 'bg-[#ff3b60] text-white border-[#ff3b60]' : 'bg-white text-gray-500 hover:bg-primary hover:text-white hover:border-primary'}`} onClick={handleWishlist}><Heart className="h-4 w-4 fill-current" /></button>
+              <button type="button" aria-label="Xem chi tiết sản phẩm" title="Xem chi tiết" className="w-10 h-10 rounded-full bg-white shadow-md border border-gray-100 text-gray-500 hover:bg-primary hover:text-white hover:border-primary transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95" onClick={handleViewDetails}><Eye className="h-4 w-4" /></button>
+              <button type="button" aria-label={isWished ? "Bỏ khỏi yêu thích" : "Thêm vào yêu thích"} title={isWished ? "Bỏ yêu thích" : "Yêu thích"} className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer hover:scale-110 active:scale-95 ${isWished ? 'bg-[#ff3b60] text-white border-[#ff3b60]' : 'bg-white text-gray-500 hover:bg-primary hover:text-white hover:border-primary'}`} onClick={handleWishlist}><Heart className="h-4 w-4 fill-current" /></button>
               <button 
+                type="button"
+                aria-label="Thêm sản phẩm vào giỏ hàng"
+                title="Thêm vào giỏ hàng"
                 disabled={isAdded || product.stock === 0} 
                 className={`w-10 h-10 rounded-full shadow-md border border-gray-100 transition-all flex items-center justify-center cursor-pointer ${isAdded ? 'bg-green-500 text-white' : product.stock === 0 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white text-primary hover:bg-primary hover:text-white hover:border-primary hover:scale-110 active:scale-95'}`} 
                 onClick={product.stock === 0 ? undefined : handleAddToCart}
