@@ -22,8 +22,16 @@ export async function POST(req: Request) {
           let line = `- ${p.name}: Giá cơ bản ${p.basePrice.toLocaleString('vi-VN')} VND`;
           if (p.originalPrice) line += ` (Giá gốc: ${p.originalPrice.toLocaleString('vi-VN')} VND)`;
           if (p.storages && p.storages.length > 0) {
-            const variants = p.storages.map((s: any) => `${s.name} (+${s.priceOffset.toLocaleString('vi-VN')} VND)`).join(', ');
-            line += ` | Các bản nâng cấp dung lượng: ${variants}`;
+            const variants = p.storages.map((s: any) => {
+              const stock = Number(s.stock ?? 0);
+              const priceOffset = Number(s.priceOffset ?? 0);
+              const availability = stock > 0 ? 'CÒN HÀNG' : 'HẾT HÀNG';
+              return `${s.name} (+${priceOffset.toLocaleString('vi-VN')} VND, tồn kho: ${stock}, ${availability})`;
+            }).join('; ');
+            line += ` | Tồn kho theo từng phiên bản: ${variants}`;
+          } else {
+            const stock = Number(p.stock ?? 0);
+            line += ` | Tồn kho: ${stock}, ${stock > 0 ? 'CÒN HÀNG' : 'HẾT HÀNG'}`;
           }
           return line;
         }).join('\n');
@@ -51,9 +59,12 @@ Vai trò của bạn:
 - Hỗ trợ khách hàng nhiệt tình, lịch sự, và chuyên nghiệp.
 - Tư vấn về các sản phẩm công nghệ (iPhone, Samsung, Xiaomi, v.v.).
 - Giải đáp thắc mắc về chính sách bảo hành, giao hàng, đổi trả.
+- Khi khách hỏi còn hàng hay không, BẮT BUỘC kiểm tra đúng tồn kho của phiên bản được hỏi trong mục "Tồn kho theo từng phiên bản". Tồn kho bằng 0 nghĩa là HẾT HÀNG.
+- Không được dùng tồn kho tổng của sản phẩm cha để kết luận cho một phiên bản cụ thể. Không được suy đoán còn hàng chỉ vì phiên bản đó có tên hoặc có giá trong danh sách.
+- Nếu khách không nói rõ phiên bản, hãy nêu trạng thái tồn kho của từng phiên bản hoặc hỏi lại khách muốn chọn phiên bản nào.
 
 Một số thông tin về PulseTech (Bạn HÃY sử dụng dữ liệu này để trả lời chính xác các câu hỏi về chính sách):${policyContext}
-Hãy trả lời ngắn gọn, súc tích và tập trung vào việc giúp khách hàng mua sắm tốt nhất. Tuyệt đối KHÔNG sử dụng ký tự Markdown như dấu sao (*) hoặc (**) để in đậm hay gạch đầu dòng, chỉ dùng văn bản thuần túy (plain text) và dấu gạch ngang (-) nếu cần liệt kê. Nếu khách hỏi giá, hãy dựa vào danh sách sản phẩm được cung cấp bên dưới để trả lời chính xác. Để tính giá cho một bản nâng cấp dung lượng, hãy lấy Giá cơ bản + mức giá nâng cấp tương ứng. Không bịa đặt sản phẩm hoàn toàn không có trong danh sách.${productContext}`;
+Hãy trả lời ngắn gọn, súc tích và tập trung vào việc giúp khách hàng mua sắm tốt nhất. Tuyệt đối KHÔNG sử dụng ký tự Markdown như dấu sao (*) hoặc (**) để in đậm hay gạch đầu dòng, chỉ dùng văn bản thuần túy (plain text) và dấu gạch ngang (-) nếu cần liệt kê. Nếu khách hỏi giá hoặc tồn kho, hãy dựa vào danh sách sản phẩm được cung cấp bên dưới để trả lời chính xác. Để tính giá cho một bản nâng cấp dung lượng, hãy lấy Giá cơ bản + mức giá nâng cấp tương ứng. Không bịa đặt sản phẩm hoàn toàn không có trong danh sách.${productContext}`;
 
     const result = await streamText({
       model: google('gemini-3.5-flash'),
