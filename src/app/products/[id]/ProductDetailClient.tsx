@@ -230,11 +230,6 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   Nổi bật
                 </span>
               )}
-              {displayStock === 0 && (
-                <span className="bg-red-500 text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider h-fit">
-                  Đã hết hàng
-                </span>
-              )}
             </h1>
             <div className="flex items-center gap-4 text-xs font-semibold text-gray-500 mt-2">
               <div className="flex items-center gap-1 text-yellow-400">
@@ -428,9 +423,6 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                           }`}
                       >
                         <span>{storage.name}</span>
-                        {(storage.stock ?? 0) <= 0 && (
-                          <span className="text-[10px] font-semibold">Hết hàng</span>
-                        )}
                         <span className="text-[10px] font-medium opacity-90">
                           {formatPrice(discountedBasePrice + storage.priceOffset)}
                         </span>
