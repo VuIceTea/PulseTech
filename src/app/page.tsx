@@ -132,6 +132,8 @@ export default function Home() {
   // Thẻ sản phẩm dọc tiêu chuẩn
   const VerticalProductCard = ({ product }: { product: any }) => {
     const salePrice = product.basePrice;
+    const actualProductId = product.parentProductId || product.id;
+    const selectedStorage = product.variantStorage || product.storages?.[0]?.name || 'Mặc định';
     const { isInWishlist, toggleWishlist } = useWishlist();
     const { addToCart } = useCart();
     
@@ -149,8 +151,7 @@ export default function Home() {
       e.preventDefault();
       e.stopPropagation();
       const defaultColor = product.colors?.[0]?.name || 'Mặc định';
-      const defaultStorage = product.storages?.[0]?.name || 'Mặc định';
-      addToCart(product, defaultColor, defaultStorage, 1);
+      addToCart(product, defaultColor, selectedStorage, 1);
       
       setIsAdded(true);
       setTimeout(() => setIsAdded(false), 2000);
@@ -171,7 +172,7 @@ export default function Home() {
             <Heart className="h-4 w-4 fill-current" />
           </button>
         </div>
-        <Link href={`/products/${product.id}`} className="flex-1 flex flex-col cursor-pointer">
+        <Link href={`/products/${actualProductId}${product.variantStorage ? `?storage=${encodeURIComponent(product.variantStorage)}` : ''}`} className="flex-1 flex flex-col cursor-pointer">
           <div className="flex items-center justify-center relative mb-3 h-36 sm:h-40 md:h-48">
             <img
               src={product.image}
