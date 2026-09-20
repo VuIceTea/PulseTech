@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, isLoaded: isAuthLoaded } = useAuth();
   const [isPageLoading, setIsPageLoading] = useState(false);
 
   // Coupon state
@@ -66,13 +66,15 @@ export default function CartPage() {
   }, [user]);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (!isAuthLoaded || typeof window === 'undefined') return;
+
+    const finalizePayment = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const paymentSuccess = urlParams.get('payment_success');
       if (paymentSuccess === 'true') {
         setIsOrderFinished(true);
         setIsCheckoutOpen(true);
-        setCreatedOrderId(urlParams.get('orderId') || 'VNPay');
+        setCreatedOrderId(urlParams.get('orderId') || 'Thanh toán trực tuyến');
 
         try {
           const storedInfo = localStorage.getItem('last_order_info');
@@ -85,15 +87,24 @@ export default function CartPage() {
 
         if (!hasCleared.current) {
           hasCleared.current = true;
-          setTimeout(() => clearCart(), 300);
+          const cleared = await clearCart();
+          if (!cleared) {
+            hasCleared.current = false;
+            toast.error('Đơn hàng đã thanh toán nhưng chưa thể đồng bộ giỏ hàng. Vui lòng tải lại trang.');
+            return;
+          }
         }
+        // Only remove the success marker after the backend cart is cleared.
+        // If the request is interrupted, F5 will retry instead of restoring old items.
         window.history.replaceState({}, '', '/cart');
       } else if (paymentSuccess === 'false') {
         toast.error('Thanh toán thất bại hoặc chữ ký không hợp lệ!');
         window.history.replaceState({}, '', '/cart');
       }
-    }
-  }, [clearCart]);
+    };
+
+    void finalizePayment();
+  }, [clearCart, isAuthLoaded]);
 
   // Apply Coupon logic
   const handleApplyCoupon = async (e?: React.FormEvent, codeToApply?: string) => {
