@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 export default function CartPage() {
   const router = useRouter();
   const { cart, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, isLoaded: isAuthLoaded } = useAuth();
   const [isPageLoading, setIsPageLoading] = useState(false);
 
   // Coupon state
@@ -66,13 +66,15 @@ export default function CartPage() {
   }, [user]);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (!isAuthLoaded || typeof window === 'undefined') return;
+
+    const finalizePayment = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const paymentSuccess = urlParams.get('payment_success');
       if (paymentSuccess === 'true') {
         setIsOrderFinished(true);
         setIsCheckoutOpen(true);
-        setCreatedOrderId(urlParams.get('orderId') || 'VNPay');
+        setCreatedOrderId(urlParams.get('orderId') || 'Thanh toán trực tuyến');
 
         try {
           const storedInfo = localStorage.getItem('last_order_info');
@@ -85,15 +87,24 @@ export default function CartPage() {
 
         if (!hasCleared.current) {
           hasCleared.current = true;
-          setTimeout(() => clearCart(), 300);
+          const cleared = await clearCart();
+          if (!cleared) {
+            hasCleared.current = false;
+            toast.error('Đơn hàng đã thanh toán nhưng chưa thể đồng bộ giỏ hàng. Vui lòng tải lại trang.');
+            return;
+          }
         }
+        // Only remove the success marker after the backend cart is cleared.
+        // If the request is interrupted, F5 will retry instead of restoring old items.
         window.history.replaceState({}, '', '/cart');
       } else if (paymentSuccess === 'false') {
         toast.error('Thanh toán thất bại hoặc chữ ký không hợp lệ!');
         window.history.replaceState({}, '', '/cart');
       }
-    }
-  }, [clearCart]);
+    };
+
+    void finalizePayment();
+  }, [clearCart, isAuthLoaded]);
 
   // Apply Coupon logic
   const handleApplyCoupon = async (e?: React.FormEvent, codeToApply?: string) => {
@@ -102,10 +113,19 @@ export default function CartPage() {
     if (!code) return;
     setCouponError('');
     try {
+      const products = await api.products();
+      const productIds = cart.map(item => {
+        const product = products.find(candidate =>
+          candidate.id === item.id || candidate.storages?.some(storage =>
+            item.id === `${candidate.id}-${storage.name.replace(/\s+/g, '-')}`
+          )
+        );
+        return product?.id || item.id;
+      });
       const response = await orderApi.validateCoupon({
         code,
         orderAmount: cartTotal,
-        productIds: cart.map(item => item.id),
+        productIds,
         customerEmail: user?.email || ''
       });
       if (response.success && response.data) {
@@ -119,8 +139,8 @@ export default function CartPage() {
         setCouponApplied(false);
         setAppliedCoupon(null);
       }
-    } catch (e: any) {
-      setCouponError('Mã giảm giá không tồn tại hoặc đã hết hạn.');
+    } catch (e) {
+      setCouponError(e instanceof Error ? e.message : 'Không thể kiểm tra mã giảm giá.');
       setCouponApplied(false);
       setAppliedCoupon(null);
     }
@@ -141,6 +161,23 @@ export default function CartPage() {
     setIsSubmittingOrder(true);
     setCheckoutError(null);
     try {
+      const products = await api.products();
+      const normalizedItems = cart.map(item => {
+        const product = products.find(candidate =>
+          candidate.id === item.id || candidate.storages?.some(storage =>
+            item.id === `${candidate.id}-${storage.name.replace(/\s+/g, '-')}`
+          )
+        );
+        if (!product) {
+          throw new Error(`Sản phẩm "${item.name}" không còn tồn tại. Vui lòng xóa khỏi giỏ hàng.`);
+        }
+        return {
+          productId: product.id,
+          color: item.color,
+          storage: item.storage,
+          quantity: item.quantity,
+        };
+      });
       const order = await api.createOrder({
         customerName: fullName,
         customerEmail: customerEmail || `${phoneNumber}@example.com`,
@@ -148,13 +185,17 @@ export default function CartPage() {
         address: shippingAddress,
         paymentMethod,
         couponCode: couponApplied && appliedCoupon ? appliedCoupon.code : undefined,
-        items: cart.map(item => ({
-          productId: item.id,
-          color: item.color,
-          storage: item.storage,
-          quantity: item.quantity,
-        })),
+        items: normalizedItems,
       });
+      if (!order?.id || !Array.isArray(order.items) || order.totalPrice < 0) {
+        throw new Error('Backend trả về thông tin đơn hàng không hợp lệ. Vui lòng thử lại.');
+      }
+      localStorage.setItem('last_order_info', JSON.stringify({
+        orderId: order.id,
+        customerName: order.customerName,
+        totalPrice: order.totalPrice,
+        paymentMethod: order.paymentMethod,
+      }));
       if (order.paymentUrl) {
         window.location.href = order.paymentUrl;
       } else {

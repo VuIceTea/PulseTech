@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Product } from '@/types/product';
 import { useAuth } from './AuthContext';
 import { api, CartItem as ApiCartItem } from '@/lib/api';
@@ -14,7 +14,7 @@ interface CartContextType {
   addToCart: (product: Product, color: string, storage: string, quantity?: number) => Promise<void>;
   removeFromCart: (id: string, color: string, storage: string) => Promise<void>;
   updateQuantity: (id: string, color: string, storage: string, quantity: number, productPrice: number, image: string, productName: string) => Promise<void>;
-  clearCart: () => Promise<void>;
+  clearCart: () => Promise<boolean>;
   cartCount: number;
   cartTotal: number;
 }
@@ -25,7 +25,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [cart, setCart] = useState<CartItem[]>([]);
   const { user, isLoaded: isAuthLoaded } = useAuth();
   
-  const getUserId = () => {
+  const getUserId = useCallback(() => {
     if (user?.email) return user.email;
     let guestId = localStorage.getItem('guest_id');
     if (!guestId) {
@@ -33,7 +33,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('guest_id', guestId);
     }
     return guestId;
-  };
+  }, [user?.email]);
 
   useEffect(() => {
     if (!isAuthLoaded) return;
@@ -50,20 +50,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isAuthLoaded]);
 
   const addToCart = async (product: Product, color: string, storage: string, quantity = 1) => {
-    if (product.stock === 0) return;
-
+    const productId = product.parentProductId || product.id;
     const storageObj = product.storages.find(s => s.name === storage);
+    const availableStock = storageObj?.stock ?? 0;
+    if (availableStock <= 0 || quantity <= 0) return;
     const storageOffset = storageObj ? storageObj.priceOffset : 0;
     const finalPrice = product.basePrice + storageOffset;
 
     const colorObj = product.colors.find(c => c.name === color);
     const itemImage = colorObj ? colorObj.image : product.image;
 
-    const existing = cart.find(item => item.id === product.id && item.color === color && item.storage === storage);
+    const existing = cart.find(item => item.id === productId && item.color === color && item.storage === storage);
     const newQuantity = existing ? existing.quantity + quantity : quantity;
+    if (newQuantity > availableStock) return;
 
     const apiItem: ApiCartItem = {
-      id: product.id,
+      id: productId,
       name: product.name,
       price: finalPrice,
       image: itemImage,
@@ -75,10 +77,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Optimistic update
     setCart(prevCart => {
       if (existing) {
-        return prevCart.map(item => item.id === product.id && item.color === color && item.storage === storage 
+        return prevCart.map(item => item.id === productId && item.color === color && item.storage === storage
           ? { ...item, quantity: newQuantity } : item);
       }
-      return [...prevCart, { ...apiItem, id: product.id }];
+      return [...prevCart, apiItem];
     });
 
     try {
@@ -116,17 +118,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const clearCart = async () => {
+  const clearCart = useCallback(async () => {
     setCart([]);
     try {
       await api.clearCart(getUserId());
       // Ensure it stays empty even if a parallel fetchCart just finished
       setTimeout(() => setCart([]), 100);
       setTimeout(() => setCart([]), 500);
+      return true;
     } catch (error) {
       console.error('Failed to clear cart', error);
+      return false;
     }
-  };
+  }, [getUserId]);
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
   const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);

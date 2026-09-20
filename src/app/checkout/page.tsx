@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { api, userApi, orderApi, UserAddress, Coupon, FullCoupon } from '@/lib/api';
-import { ArrowLeft, CreditCard, Wallet, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin, Ticket } from 'lucide-react';
+import { ArrowLeft, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
@@ -17,13 +17,11 @@ export default function CheckoutPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
-  const [orderId, setOrderId] = useState<string | null>(null);
-
   // Form states
   const [fullName, setFullName] = useState(user?.name || '');
   const [phoneNumber, setPhoneNumber] = useState((user as any)?.phone || '');
   const [shippingAddress, setShippingAddress] = useState((user as any)?.address || '');
-  const [paymentMethod, setPaymentMethod] = useState('COD'); // COD, VNPAY, MOMO, STRIPE
+  const [paymentMethod, setPaymentMethod] = useState<'COD' | 'VNPAY' | 'MOMO' | 'STRIPE'>('COD');
 
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
   const [couponCode, setCouponCode] = useState('');
@@ -56,10 +54,10 @@ export default function CheckoutPage() {
 
   // Redirect to cart if it's empty (e.g. after successful checkout or direct access)
   useEffect(() => {
-    if (mounted && isLoaded && cart.length === 0) {
+    if (mounted && isLoaded && cart.length === 0 && !isSubmitting) {
       router.replace('/cart');
     }
-  }, [mounted, isLoaded, cart.length, router]);
+  }, [mounted, isLoaded, cart.length, isSubmitting, router]);
 
   if (!mounted || !isLoaded || cart.length === 0) return null;
 
@@ -93,7 +91,16 @@ export default function CheckoutPage() {
     setCouponError(null);
     if (!codeToApply) return;
     try {
-      const res = await orderApi.validateCoupon({ code: codeToApply, orderAmount: cartTotal, productIds: [], customerEmail: user?.email || '' });
+      const products = await api.products();
+      const productIds = cart.map(item => {
+        const product = products.find(candidate =>
+          candidate.id === item.id || candidate.storages?.some(storage =>
+            item.id === `${candidate.id}-${storage.name.replace(/\s+/g, '-')}`
+          )
+        );
+        return product?.id || item.id;
+      });
+      const res = await orderApi.validateCoupon({ code: codeToApply.trim(), orderAmount: cartTotal, productIds, customerEmail: user?.email || '' });
       if (res && res.success) {
         setAppliedCoupon(res.data as Coupon);
         setCouponCode(codeToApply);
@@ -101,8 +108,8 @@ export default function CheckoutPage() {
       } else {
         setCouponError(typeof res.data === 'string' ? res.data : 'Mã giảm giá không hợp lệ.');
       }
-    } catch (e: any) {
-      setCouponError('Mã giảm giá không tồn tại hoặc đã hết hạn.');
+    } catch (e) {
+      setCouponError(e instanceof Error ? e.message : 'Không thể kiểm tra mã giảm giá.');
     }
   };
 
@@ -112,7 +119,7 @@ export default function CheckoutPage() {
   }
 
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
-  const finalTotal = cartTotal + shippingFee - discountValue;
+  const finalTotal = Math.max(0, cartTotal + shippingFee - discountValue);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +144,26 @@ export default function CheckoutPage() {
     setIsSubmitting(true);
 
     try {
-      // Dùng API frontend để tạo đơn hàng.
+      // Resolve legacy generated variant ids before sending the order. The
+      // backend accepts the parent product id plus color/storage selections.
+      const products = await api.products();
+      const normalizedItems = cart.map(item => {
+        const product = products.find(candidate =>
+          candidate.id === item.id || candidate.storages?.some(storage =>
+            item.id === `${candidate.id}-${storage.name.replace(/\s+/g, '-')}`
+          )
+        );
+        if (!product) {
+          throw new Error(`Sản phẩm "${item.name}" không còn tồn tại. Vui lòng xóa khỏi giỏ hàng.`);
+        }
+        return {
+          productId: product.id,
+          color: item.color,
+          storage: item.storage,
+          quantity: item.quantity,
+        };
+      });
+
       const order = await api.createOrder({
         customerName: fullName,
         customerPhone: phoneNumber,
@@ -145,18 +171,18 @@ export default function CheckoutPage() {
         address: shippingAddress,
         paymentMethod,
         couponCode: appliedCoupon?.code,
-        items: cart.map(item => ({
-          productId: item.id,
-          color: item.color,
-          storage: item.storage,
-          quantity: item.quantity,
-        })),
+        items: normalizedItems,
       });
+
+      if (!order?.id || !Array.isArray(order.items) || order.totalPrice < 0) {
+        throw new Error('Backend trả về thông tin đơn hàng không hợp lệ. Vui lòng thử lại.');
+      }
 
       localStorage.setItem('last_order_info', JSON.stringify({
         customerName: fullName,
-        totalPrice: finalTotal,
-        paymentMethod: paymentMethod === 'cod' ? 'Giao tận nơi (COD)' : 'Thanh toán trực tuyến (VNPay)',
+        orderId: order.id,
+        totalPrice: order.totalPrice,
+        paymentMethod: order.paymentMethod,
         discountAmount: discountValue > 0 ? discountValue : undefined,
         couponCode: appliedCoupon?.code,
       }));
@@ -166,7 +192,8 @@ export default function CheckoutPage() {
         return;
       }
 
-      router.push(`/cart?payment_success=true&orderId=${order.id}`);
+      await clearCart();
+      router.push(`/orders?created=${encodeURIComponent(order.id)}`);
 
     } catch (error) {
       setCheckoutError(error instanceof Error ? error.message : 'Không thể tạo đơn hàng');
@@ -319,6 +346,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </label>
+
               </div>
             </div>
           </div>

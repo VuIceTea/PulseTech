@@ -8,7 +8,7 @@ export interface ColorVariant {
 export interface StorageVariant {
   name: string;
   priceOffset: number;
-  stock?: number;
+  stock?: number | null;
   specs?: ProductSpec;
 }
 
@@ -41,6 +41,7 @@ export interface Review {
 }
 
 export interface Product {
+  uniqueKey?: string;
   id: string;
   name: string;
   brand: string;
