@@ -751,7 +751,7 @@ function TabOffers({ user }: { user: any }) {
                   <p>• Đơn tối thiểu: <strong>{(selectedVoucher.minOrderValue || 0).toLocaleString()}đ</strong></p>
                   {selectedVoucher.maxDiscountValue > 0 && <p>• Giảm tối đa: <strong>{selectedVoucher.maxDiscountValue.toLocaleString()}đ</strong></p>}
                   <p>• Hạn sử dụng: <strong>{new Date(selectedVoucher.validUntil).toLocaleDateString('vi-VN')}</strong></p>
-                  <p>• Giới hạn: <strong>1 lần / mỗi khách hàng</strong></p>
+                  <p>• Lượt còn lại: <strong>{selectedVoucher.count ?? 1} lần</strong></p>
                 </div>
               </div>
               <button onClick={() => setSelectedVoucher(null)} className="mt-6 w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Đóng</button>
