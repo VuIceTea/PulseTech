@@ -105,7 +105,7 @@ export default function ProfilePage() {
               {activeTab === 'home' && <TabHome user={user} />}
               {activeTab === 'history' && <TabHistory user={user} />}
               {activeTab === 'account' && <TabAccount user={user} />}
-              {activeTab === 'offers' && <TabOffers />}
+              {activeTab === 'offers' && <TabOffers user={user} />}
               {activeTab === 'address' && <TabAddress user={user} />}
             </motion.div>
           </AnimatePresence>
@@ -607,7 +607,7 @@ function TabHistory({ user }: { user: any }) {
   );
 }
 
-function TabOffers() {
+function TabOffers({ user }: { user: any }) {
   const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
   const [vouchers, setVouchers] = useState<FullCoupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -615,17 +615,10 @@ function TabOffers() {
   useEffect(() => {
     const fetchCoupons = async () => {
       try {
-        const data = await orderApi.getCoupons();
-        const activeCoupons = data.filter(c => c.isActive);
-        
-        // Group by code to show xN if user has multiple of the same voucher
-        const grouped = activeCoupons.reduce((acc: any, v) => {
-          if (!acc[v.code]) acc[v.code] = { ...v, count: 1 };
-          else acc[v.code].count += 1;
-          return acc;
-        }, {});
-        
-        const sortedVouchers = Object.values(grouped).sort((a: any, b: any) => {
+        const data = await orderApi.getCoupons(user.email);
+        const activeCoupons = data.filter(c => c.isActive && (c.count ?? 0) > 0);
+
+        const sortedVouchers = activeCoupons.sort((a: any, b: any) => {
           const aExpired = new Date(a.validUntil) < new Date();
           const bExpired = new Date(b.validUntil) < new Date();
           if (aExpired && !bExpired) return 1;
@@ -633,7 +626,7 @@ function TabOffers() {
           return 0;
         });
         
-        setVouchers(sortedVouchers as any);
+        setVouchers(sortedVouchers as FullCoupon[]);
       } catch (error) {
         toast.error('Không thể tải danh sách ưu đãi');
       } finally {
@@ -641,7 +634,7 @@ function TabOffers() {
       }
     };
     fetchCoupons();
-  }, []);
+  }, [user.email]);
 
   return (
     <div className="space-y-6">

@@ -535,6 +535,11 @@ export default function CartPage() {
                                   {v.discountPercent > 0 ? `Giảm ${v.discountPercent}%` : `Giảm ${v.discountAmount / 1000}K`}
                                 </span>
                                 <h4 className="mt-2 font-bold text-lg">{v.code}</h4>
+                                {(v.count ?? 0) > 1 && (
+                                  <span className="absolute right-3 top-3 rounded-full bg-white px-2 py-0.5 text-[11px] font-extrabold text-primary shadow-sm">
+                                    x{v.count}
+                                  </span>
+                                )}
                                 <p className="mt-1 text-xs opacity-90 flex-1 line-clamp-2">{v.description}</p>
                                 <p className="mt-2 text-[10px] font-medium opacity-80">Đơn tối thiểu: {v.minOrderValue.toLocaleString()}đ</p>
                               </div>
