@@ -23,7 +23,7 @@ import {
   couponKindLabel,
   getCouponKind,
   listAppliedCoupons,
-  saveCheckoutCoupons,
+  saveCheckoutCouponTransfer,
 } from '@/lib/checkoutCoupons';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { toast } from 'sonner';
@@ -142,7 +142,6 @@ export default function CartPage() {
         const replaced = Boolean(appliedCoupons[kind]);
         const nextCoupons = { ...appliedCoupons, [kind]: nextCoupon };
         setAppliedCoupons(nextCoupons);
-        saveCheckoutCoupons(nextCoupons);
         setCouponCode(code);
         setCouponError('');
         setShowVoucherModal(false);
@@ -400,7 +399,6 @@ export default function CartPage() {
                         const nextCoupons = { ...appliedCoupons };
                         delete nextCoupons[kind];
                         setAppliedCoupons(nextCoupons);
-                        saveCheckoutCoupons(nextCoupons);
                         if (couponCode.trim().toUpperCase() === coupon.code) setCouponCode('');
                       }}
                       className="text-primary hover:underline ml-1"
@@ -463,7 +461,11 @@ export default function CartPage() {
                   if (!user) {
                     toast.error('Vui lòng đăng nhập để tiến hành thanh toán');
                   } else {
-                    saveCheckoutCoupons(appliedCoupons);
+                    const cartKey = cart
+                      .map(item => `${item.id}:${item.color}:${item.storage}:${item.quantity}`)
+                      .sort()
+                      .join('|');
+                    saveCheckoutCouponTransfer(appliedCoupons, cartKey);
                     router.push('/checkout');
                   }
                 }}

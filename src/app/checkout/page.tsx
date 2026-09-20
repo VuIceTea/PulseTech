@@ -9,11 +9,10 @@ import {
   AppliedCoupons,
   CHECKOUT_COUPONS_STORAGE_KEY,
   calculateCheckoutTotals,
+  consumeCheckoutCouponTransfer,
   couponKindLabel,
   getCouponKind,
   listAppliedCoupons,
-  loadCheckoutCoupons,
-  saveCheckoutCoupons,
 } from '@/lib/checkoutCoupons';
 import { ArrowLeft, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
@@ -64,8 +63,12 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (!mounted) return;
-    setAppliedCoupons(loadCheckoutCoupons());
-  }, [mounted]);
+    const cartKey = cart
+      .map(item => `${item.id}:${item.color}:${item.storage}:${item.quantity}`)
+      .sort()
+      .join('|');
+    setAppliedCoupons(consumeCheckoutCouponTransfer(cartKey));
+  }, [mounted, cart]);
 
   // Redirect to cart if it's empty (e.g. after successful checkout or direct access)
   useEffect(() => {
@@ -121,7 +124,6 @@ export default function CheckoutPage() {
         const kind = getCouponKind(nextCoupon);
         const nextCoupons = { ...appliedCoupons, [kind]: nextCoupon };
         setAppliedCoupons(nextCoupons);
-        saveCheckoutCoupons(nextCoupons);
         setCouponCode(nextCoupon.code);
         setShowVoucherModal(false);
         setCouponError(null);
@@ -204,6 +206,7 @@ export default function CheckoutPage() {
       }));
 
       if (order.paymentUrl) {
+        sessionStorage.removeItem(CHECKOUT_COUPONS_STORAGE_KEY);
         window.location.href = order.paymentUrl;
         return;
       }
@@ -443,7 +446,6 @@ export default function CheckoutPage() {
                           const nextCoupons = { ...appliedCoupons };
                           delete nextCoupons[kind];
                           setAppliedCoupons(nextCoupons);
-                          saveCheckoutCoupons(nextCoupons);
                           if (couponCode.trim().toUpperCase() === coupon.code) setCouponCode('');
                         }}
                       >

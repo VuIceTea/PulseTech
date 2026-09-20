@@ -4,6 +4,7 @@ export type CouponKind = 'PRODUCT' | 'SHIPPING';
 export type AppliedCoupons = Partial<Record<CouponKind, Coupon>>;
 
 export const CHECKOUT_COUPONS_STORAGE_KEY = 'pulsetech_checkout_coupons';
+export const CHECKOUT_COUPONS_TRANSFER_KEY = 'pulsetech_checkout_coupon_transfer';
 
 export function getCouponKind(coupon: Pick<Coupon, 'code'> & Partial<Pick<Coupon, 'couponType'>>): CouponKind {
   if (coupon.couponType === 'SHIPPING' || coupon.couponType === 'PRODUCT') {
@@ -36,23 +37,29 @@ export function calculateCheckoutTotals(cartTotal: number, shippingFee: number, 
   };
 }
 
-export function saveCheckoutCoupons(coupons: AppliedCoupons) {
+export function saveCheckoutCouponTransfer(coupons: AppliedCoupons, cartKey: string) {
   if (typeof window === 'undefined') return;
   const values = listAppliedCoupons(coupons);
   if (values.length === 0) {
-    sessionStorage.removeItem(CHECKOUT_COUPONS_STORAGE_KEY);
+    sessionStorage.removeItem(CHECKOUT_COUPONS_TRANSFER_KEY);
     return;
   }
-  sessionStorage.setItem(CHECKOUT_COUPONS_STORAGE_KEY, JSON.stringify(values));
+  sessionStorage.setItem(CHECKOUT_COUPONS_TRANSFER_KEY, JSON.stringify({
+    cartKey,
+    coupons: values,
+  }));
 }
 
-export function loadCheckoutCoupons(): AppliedCoupons {
+export function consumeCheckoutCouponTransfer(cartKey: string): AppliedCoupons {
   if (typeof window === 'undefined') return {};
   try {
-    const raw = sessionStorage.getItem(CHECKOUT_COUPONS_STORAGE_KEY);
+    const raw = sessionStorage.getItem(CHECKOUT_COUPONS_TRANSFER_KEY);
+    sessionStorage.removeItem(CHECKOUT_COUPONS_TRANSFER_KEY);
+    sessionStorage.removeItem(CHECKOUT_COUPONS_STORAGE_KEY);
     if (!raw) return {};
-    const coupons = JSON.parse(raw) as Coupon[];
-    return coupons.reduce<AppliedCoupons>((acc, coupon) => {
+    const payload = JSON.parse(raw) as { cartKey?: string; coupons?: Coupon[] };
+    if (payload.cartKey !== cartKey || !Array.isArray(payload.coupons)) return {};
+    return payload.coupons.reduce<AppliedCoupons>((acc, coupon) => {
       acc[getCouponKind(coupon)] = coupon;
       return acc;
     }, {});
