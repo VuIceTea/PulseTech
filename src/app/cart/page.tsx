@@ -17,6 +17,14 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { api, orderApi, Coupon, FullCoupon } from '@/lib/api';
+import {
+  AppliedCoupons,
+  calculateCheckoutTotals,
+  couponKindLabel,
+  getCouponKind,
+  listAppliedCoupons,
+  saveCheckoutCoupons,
+} from '@/lib/checkoutCoupons';
 import { BackgroundGradient } from '@/components/ui/background-gradient';
 import { toast } from 'sonner';
 
@@ -28,8 +36,7 @@ export default function CartPage() {
 
   // Coupon state
   const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
-  const [couponApplied, setCouponApplied] = useState(false);
+  const [appliedCoupons, setAppliedCoupons] = useState<AppliedCoupons>({});
   const [couponError, setCouponError] = useState('');
 
   const [showVoucherModal, setShowVoucherModal] = useState(false);
@@ -125,34 +132,36 @@ export default function CartPage() {
       const response = await orderApi.validateCoupon({
         code,
         orderAmount: cartTotal,
+        shippingFee,
         productIds,
         customerEmail: user?.email || ''
       });
       if (response.success && response.data) {
-        setAppliedCoupon(response.data as Coupon);
+        const nextCoupon = response.data as Coupon;
+        const kind = getCouponKind(nextCoupon);
+        const replaced = Boolean(appliedCoupons[kind]);
+        const nextCoupons = { ...appliedCoupons, [kind]: nextCoupon };
+        setAppliedCoupons(nextCoupons);
+        saveCheckoutCoupons(nextCoupons);
         setCouponCode(code);
-        setCouponApplied(true);
         setCouponError('');
         setShowVoucherModal(false);
+        toast.success(replaced
+          ? `Đã thay thế mã giảm giá ${couponKindLabel(kind)} bằng ${nextCoupon.code}.`
+          : `Đã áp dụng mã giảm giá ${couponKindLabel(kind)} ${nextCoupon.code}.`
+        );
       } else {
         setCouponError(typeof response.data === 'string' ? response.data : 'Mã giảm giá không hợp lệ hoặc không đủ điều kiện.');
-        setCouponApplied(false);
-        setAppliedCoupon(null);
       }
     } catch (e) {
       setCouponError(e instanceof Error ? e.message : 'Không thể kiểm tra mã giảm giá.');
-      setCouponApplied(false);
-      setAppliedCoupon(null);
     }
   };
 
   // Fees
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
-  let discountAmount = 0;
-  if (appliedCoupon) {
-    discountAmount = appliedCoupon.discountAmount;
-  }
-  const finalTotal = cartTotal - discountAmount + shippingFee;
+  const { productDiscount, shippingDiscount, payableShippingFee, finalTotal } = calculateCheckoutTotals(cartTotal, shippingFee, appliedCoupons);
+  const appliedCouponList = listAppliedCoupons(appliedCoupons);
 
   // Handle Checkout submit
   const handleConfirmOrder = async (e: React.FormEvent) => {
@@ -184,7 +193,7 @@ export default function CartPage() {
         customerPhone: phoneNumber,
         address: shippingAddress,
         paymentMethod,
-        couponCode: couponApplied && appliedCoupon ? appliedCoupon.code : undefined,
+        couponCodes: appliedCouponList.map(coupon => coupon.code),
         items: normalizedItems,
       });
       if (!order?.id || !Array.isArray(order.items) || order.totalPrice < 0) {
@@ -369,34 +378,38 @@ export default function CartPage() {
                     placeholder="Nhập mã giảm giá"
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value)}
-                    disabled={couponApplied}
-                    className="w-full bg-gray-50 border border-gray-200 placeholder-gray-400 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-primary disabled:opacity-60"
+                    className="w-full bg-gray-50 border border-gray-200 placeholder-gray-400 rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-primary"
                   />
                   <Ticket className="absolute right-3 top-2.5 h-4.5 w-4.5 text-gray-300 pointer-events-none" />
                 </div>
                 <button
                   type="submit"
-                  disabled={couponApplied || !couponCode}
+                  disabled={!couponCode}
                   className="bg-brand-black hover:bg-primary text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm disabled:opacity-50 shrink-0 whitespace-nowrap"
                 >
                   Áp dụng
                 </button>
               </form>
-              {couponApplied && appliedCoupon && (
-                <div className="text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 mt-2 flex items-center justify-between">
-                  <span>Mã <strong>{appliedCoupon.code}</strong> áp dụng thành công 🎉</span>
-                  <button
-                    onClick={() => {
-                      setCouponApplied(false);
-                      setAppliedCoupon(null);
-                      setCouponCode('');
-                    }}
-                    className="text-primary hover:underline ml-1"
-                  >
-                    Gỡ bỏ
-                  </button>
-                </div>
-              )}
+              {appliedCouponList.map((coupon) => {
+                const kind = getCouponKind(coupon);
+                return (
+                  <div key={kind} className="text-[11px] font-bold text-green-600 bg-green-50 border border-green-100 rounded-lg px-3 py-1.5 mt-2 flex items-center justify-between">
+                    <span>Mã {couponKindLabel(kind)} <strong>{coupon.code}</strong> áp dụng thành công 🎉</span>
+                    <button
+                      onClick={() => {
+                        const nextCoupons = { ...appliedCoupons };
+                        delete nextCoupons[kind];
+                        setAppliedCoupons(nextCoupons);
+                        saveCheckoutCoupons(nextCoupons);
+                        if (couponCode.trim().toUpperCase() === coupon.code) setCouponCode('');
+                      }}
+                      className="text-primary hover:underline ml-1"
+                    >
+                      Gỡ bỏ
+                    </button>
+                  </div>
+                );
+              })}
               {couponError && (
                 <p className="text-[10px] font-bold text-red-600 mt-1">{couponError}</p>
               )}
@@ -413,21 +426,28 @@ export default function CartPage() {
                 <span className="text-brand-black">{formatPrice(cartTotal)}</span>
               </div>
 
-              {discountAmount > 0 && appliedCoupon && (
+              {productDiscount > 0 && appliedCoupons.PRODUCT && (
                 <div className="flex justify-between text-xs text-green-600">
-                  <span>Mã giảm giá ({appliedCoupon.code}){appliedCoupon.discountType === 'PERCENTAGE' ? ' (Tỷ lệ)' : ''}</span>
-                  <span>-{formatPrice(discountAmount)}</span>
+                  <span>Mã giảm giá sản phẩm ({appliedCoupons.PRODUCT.code}){appliedCoupons.PRODUCT.discountType === 'PERCENTAGE' ? ' (Tỷ lệ)' : ''}</span>
+                  <span>-{formatPrice(productDiscount)}</span>
                 </div>
               )}
 
               <div className="flex justify-between text-xs text-gray-500">
                 <span>Phí vận chuyển</span>
                 <span className="text-brand-black">
-                  {shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}
+                  {payableShippingFee === 0 ? 'Miễn phí' : formatPrice(payableShippingFee)}
                 </span>
               </div>
 
-              {shippingFee > 0 && (
+              {appliedCoupons.SHIPPING && (
+                <div className="flex justify-between text-xs text-green-600">
+                  <span>Mã vận chuyển ({appliedCoupons.SHIPPING.code})</span>
+                  <span>-{formatPrice(shippingDiscount)}</span>
+                </div>
+              )}
+
+              {shippingFee > 0 && payableShippingFee > 0 && (
                 <span className="text-[10px] text-gray-400 font-medium bg-gray-50 p-2 rounded-lg flex items-center gap-1">
                   <Truck className="h-3.5 w-3.5 shrink-0" /> Mua thêm {formatPrice(5000000 - cartTotal)} để được Miễn phí giao hàng.
                 </span>
@@ -443,6 +463,7 @@ export default function CartPage() {
                   if (!user) {
                     toast.error('Vui lòng đăng nhập để tiến hành thanh toán');
                   } else {
+                    saveCheckoutCoupons(appliedCoupons);
                     router.push('/checkout');
                   }
                 }}

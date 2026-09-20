@@ -5,6 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { api, userApi, orderApi, UserAddress, Coupon, FullCoupon } from '@/lib/api';
+import {
+  AppliedCoupons,
+  CHECKOUT_COUPONS_STORAGE_KEY,
+  calculateCheckoutTotals,
+  couponKindLabel,
+  getCouponKind,
+  listAppliedCoupons,
+  loadCheckoutCoupons,
+  saveCheckoutCoupons,
+} from '@/lib/checkoutCoupons';
 import { ArrowLeft, Banknote, ShieldCheck, CheckCircle, AlertCircle, Tag, MapPin, Ticket } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +35,7 @@ export default function CheckoutPage() {
 
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
   const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [appliedCoupons, setAppliedCoupons] = useState<AppliedCoupons>({});
   const [couponError, setCouponError] = useState<string | null>(null);
 
   const [showVoucherModal, setShowVoucherModal] = useState(false);
@@ -51,6 +61,11 @@ export default function CheckoutPage() {
       }).catch(console.error);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (!mounted) return;
+    setAppliedCoupons(loadCheckoutCoupons());
+  }, [mounted]);
 
   // Redirect to cart if it's empty (e.g. after successful checkout or direct access)
   useEffect(() => {
@@ -100,11 +115,16 @@ export default function CheckoutPage() {
         );
         return product?.id || item.id;
       });
-      const res = await orderApi.validateCoupon({ code: codeToApply.trim(), orderAmount: cartTotal, productIds, customerEmail: user?.email || '' });
+      const res = await orderApi.validateCoupon({ code: codeToApply.trim(), orderAmount: cartTotal, shippingFee, productIds, customerEmail: user?.email || '' });
       if (res && res.success) {
-        setAppliedCoupon(res.data as Coupon);
-        setCouponCode(codeToApply);
+        const nextCoupon = res.data as Coupon;
+        const kind = getCouponKind(nextCoupon);
+        const nextCoupons = { ...appliedCoupons, [kind]: nextCoupon };
+        setAppliedCoupons(nextCoupons);
+        saveCheckoutCoupons(nextCoupons);
+        setCouponCode(nextCoupon.code);
         setShowVoucherModal(false);
+        setCouponError(null);
       } else {
         setCouponError(typeof res.data === 'string' ? res.data : 'Mã giảm giá không hợp lệ.');
       }
@@ -113,13 +133,9 @@ export default function CheckoutPage() {
     }
   };
 
-  let discountValue = 0;
-  if (appliedCoupon) {
-    discountValue = appliedCoupon.discountAmount;
-  }
-
   const shippingFee = cartTotal > 5000000 ? 0 : 30000;
-  const finalTotal = Math.max(0, cartTotal + shippingFee - discountValue);
+  const { productDiscount, shippingDiscount, payableShippingFee, finalTotal, totalDiscount } = calculateCheckoutTotals(cartTotal, shippingFee, appliedCoupons);
+  const appliedCouponList = listAppliedCoupons(appliedCoupons);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,7 +186,7 @@ export default function CheckoutPage() {
         customerEmail: user?.email || '',
         address: shippingAddress,
         paymentMethod,
-        couponCode: appliedCoupon?.code,
+        couponCodes: appliedCouponList.map(coupon => coupon.code),
         items: normalizedItems,
       });
 
@@ -183,8 +199,8 @@ export default function CheckoutPage() {
         orderId: order.id,
         totalPrice: order.totalPrice,
         paymentMethod: order.paymentMethod,
-        discountAmount: discountValue > 0 ? discountValue : undefined,
-        couponCode: appliedCoupon?.code,
+        discountAmount: totalDiscount > 0 ? totalDiscount : undefined,
+        couponCodes: appliedCouponList.map(coupon => coupon.code),
       }));
 
       if (order.paymentUrl) {
@@ -193,6 +209,7 @@ export default function CheckoutPage() {
       }
 
       await clearCart();
+      sessionStorage.removeItem(CHECKOUT_COUPONS_STORAGE_KEY);
       router.push(`/orders?created=${encodeURIComponent(order.id)}`);
 
     } catch (error) {
@@ -384,12 +401,18 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-500 font-medium">Phí vận chuyển</span>
-                  <span className="font-bold text-brand-black">{shippingFee === 0 ? 'Miễn phí' : formatPrice(shippingFee)}</span>
+                  <span className="font-bold text-brand-black">{payableShippingFee === 0 ? 'Miễn phí' : formatPrice(payableShippingFee)}</span>
                 </div>
-                {appliedCoupon && (
+                {appliedCoupons.PRODUCT && productDiscount > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-primary font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Mã giảm giá ({appliedCoupon.code})</span>
-                    <span className="font-bold text-primary">-{formatPrice(discountValue)}</span>
+                    <span className="text-primary font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Mã sản phẩm ({appliedCoupons.PRODUCT.code})</span>
+                    <span className="font-bold text-primary">-{formatPrice(productDiscount)}</span>
+                  </div>
+                )}
+                {appliedCoupons.SHIPPING && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-primary font-medium flex items-center gap-1"><Tag className="w-3 h-3" /> Mã vận chuyển ({appliedCoupons.SHIPPING.code})</span>
+                    <span className="font-bold text-primary">-{formatPrice(shippingDiscount)}</span>
                   </div>
                 )}
               </div>
@@ -408,7 +431,27 @@ export default function CheckoutPage() {
                   <button type="button" onClick={() => handleApplyCoupon()} className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700 shrink-0 whitespace-nowrap">Áp dụng</button>
                 </div>
                 {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
-                {appliedCoupon && <p className="text-green-600 text-xs mt-1">Đã áp dụng mã {appliedCoupon.code}</p>}
+                {appliedCouponList.map((coupon) => {
+                  const kind = getCouponKind(coupon);
+                  return (
+                    <div key={kind} className="flex items-center justify-between gap-2 text-green-600 text-xs mt-1">
+                      <span>Đã áp dụng mã {couponKindLabel(kind)} {coupon.code}</span>
+                      <button
+                        type="button"
+                        className="text-primary font-bold hover:underline"
+                        onClick={() => {
+                          const nextCoupons = { ...appliedCoupons };
+                          delete nextCoupons[kind];
+                          setAppliedCoupons(nextCoupons);
+                          saveCheckoutCoupons(nextCoupons);
+                          if (couponCode.trim().toUpperCase() === coupon.code) setCouponCode('');
+                        }}
+                      >
+                        Gỡ bỏ
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
 
               <div className="border-t border-gray-100 pt-4 mb-6">

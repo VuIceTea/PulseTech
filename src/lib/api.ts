@@ -32,7 +32,7 @@ export interface Article { id: string; title: string; slug: string; summary: str
 export interface Policy { id: string; title: string; icon: string; contentHtml: string; orderIndex: number; }
 export interface Wishlist { id: string; productIds: string[]; }
 export interface UserAddress { id?: string; userId: string; fullName: string; phone: string; addressLine: string; ward: string; district: string; city: string; isDefault: boolean; }
-export interface Coupon { code: string; discountAmount: number; discountType: string; finalAmount: number; }
+export interface Coupon { code: string; discountAmount: number; discountType: string; couponType: 'PRODUCT' | 'SHIPPING'; finalAmount: number; }
 export interface FullCoupon { id: string; code: string; description: string; discountPercent: number; discountAmount: number; minOrderValue: number; maxDiscountValue: number; validFrom: string; validUntil: string; currentUsage: number; maxUsage: number; isActive: boolean; count?: number; }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
@@ -59,7 +59,7 @@ export const api = {
   login: (email: string, password: string) => request<ApiUser>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   register: (name: string, email: string, password: string) => request<RegisterResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) }),
   verifyEmail: (token: string) => request<VerifyResponse>(`/auth/verify?token=${encodeURIComponent(token)}`),
-  createOrder: (payload: { customerName: string; customerEmail: string; customerPhone: string; address: string; paymentMethod: string; couponCode?: string; items: OrderItemRequest[] }) =>
+  createOrder: (payload: { customerName: string; customerEmail: string; customerPhone: string; address: string; paymentMethod: string; couponCode?: string; couponCodes?: string[]; items: OrderItemRequest[] }) =>
     request<Order>('/orders', { method: 'POST', body: JSON.stringify(payload) }),
   trackOrder: (orderId: string, phone: string) => request<Order>(`/orders/track?orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`),
   getOrderHistory: (email: string) => request<Order[]>(`/orders/history?email=${encodeURIComponent(email)}`),
@@ -93,6 +93,6 @@ export const userApi = {
 };
 
 export const orderApi = {
-  validateCoupon: (payload: { code: string; orderAmount: number; productIds?: string[]; customerEmail: string }) => request<{ success: boolean; data: any }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) }),
+  validateCoupon: (payload: { code: string; orderAmount: number; shippingFee?: number; productIds?: string[]; customerEmail: string }) => request<{ success: boolean; data: any }>('/orders/coupons/validate', { method: 'POST', body: JSON.stringify(payload) }),
   getCoupons: (email?: string) => request<FullCoupon[]>(`/orders/coupons${email ? `?email=${encodeURIComponent(email)}` : ''}`)
 };
