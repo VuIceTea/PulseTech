@@ -6,13 +6,12 @@ import { Package, Truck, CheckCircle2, ClipboardList, ChevronRight, RefreshCw, A
 import Link from 'next/link';
 import { api, type Order } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export default function OrderHistoryPage() {
   const { user, isLoaded } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,13 +36,6 @@ export default function OrderHistoryPage() {
     };
     fetchOrders();
   }, [user, isLoaded]);
-
-  useEffect(() => {
-    const createdOrderId = searchParams.get('created');
-    if (!createdOrderId) return;
-    toast.success(`Đặt hàng thành công! Mã đơn hàng #${createdOrderId}`);
-    router.replace('/orders', { scroll: false });
-  }, [router, searchParams]);
 
   const handleCancelOrder = (orderId: string) => {
     setCancelTarget(orderId);

@@ -26,6 +26,7 @@ export default function CheckoutPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const [successOrder, setSuccessOrder] = useState<{ orderId: string; customerName: string; totalPrice: number; paymentMethod: string } | null>(null);
   // Form states
   const [fullName, setFullName] = useState(user?.name || '');
   const [phoneNumber, setPhoneNumber] = useState((user as any)?.phone || '');
@@ -72,12 +73,12 @@ export default function CheckoutPage() {
 
   // Redirect to cart if it's empty (e.g. after successful checkout or direct access)
   useEffect(() => {
-    if (mounted && isLoaded && cart.length === 0 && !isSubmitting) {
+    if (mounted && isLoaded && cart.length === 0 && !isSubmitting && !successOrder) {
       router.replace('/cart');
     }
-  }, [mounted, isLoaded, cart.length, isSubmitting, router]);
+  }, [mounted, isLoaded, cart.length, isSubmitting, successOrder, router]);
 
-  if (!mounted || !isLoaded || cart.length === 0) return null;
+  if (!mounted || !isLoaded || (cart.length === 0 && !successOrder)) return null;
 
   if (!isAuthenticated) {
     return (
@@ -213,10 +214,16 @@ export default function CheckoutPage() {
 
       await clearCart();
       sessionStorage.removeItem(CHECKOUT_COUPONS_STORAGE_KEY);
-      router.push(`/orders?created=${encodeURIComponent(order.id)}`);
+      setSuccessOrder({
+        orderId: order.id,
+        customerName: order.customerName || fullName,
+        totalPrice: order.totalPrice,
+        paymentMethod: order.paymentMethod,
+      });
 
     } catch (error) {
       setCheckoutError(error instanceof Error ? error.message : 'Không thể tạo đơn hàng');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -485,6 +492,63 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
+
+      <AnimatePresence>
+        {successOrder && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.55 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black z-50"
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="fixed inset-0 m-auto w-[92%] max-w-2xl h-fit bg-white rounded-[28px] shadow-2xl p-8 sm:p-10 z-50 overflow-hidden text-center"
+            >
+              <div className="mx-auto mb-7 flex h-20 w-20 items-center justify-center rounded-full bg-green-500 text-white shadow-lg">
+                <CheckCircle className="h-12 w-12" />
+              </div>
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold uppercase tracking-wide text-brand-black">
+                Đặt hàng thành công!
+              </h2>
+              <p className="mx-auto mt-5 max-w-lg text-sm sm:text-base font-semibold leading-7 text-gray-500">
+                Cảm ơn bạn <strong className="text-brand-black">{successOrder.customerName}</strong> đã tin dùng sản phẩm của PulseTech.
+                Nhân viên chúng tôi sẽ gọi điện xác nhận đơn hàng trong vòng 10 phút.
+              </p>
+
+              <div className="mx-auto mt-7 max-w-xl rounded-2xl border border-gray-100 bg-gray-50 p-6 text-left text-sm font-bold text-gray-500 space-y-5">
+                <div className="flex justify-between gap-4">
+                  <span>Mã đơn hàng:</span>
+                  <span className="text-brand-black">{successOrder.orderId}</span>
+                </div>
+                <div className="flex justify-between items-center gap-4">
+                  <span>Tổng tiền:</span>
+                  <span className="font-display text-2xl font-extrabold text-primary">{formatPrice(successOrder.totalPrice)}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span>Người nhận:</span>
+                  <span className="text-brand-black">{successOrder.customerName}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span>Hình thức thanh toán:</span>
+                  <span className="text-brand-black text-right">{successOrder.paymentMethod}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => router.push('/')}
+                className="mt-8 rounded-2xl bg-brand-black px-10 py-4 text-sm font-bold text-white shadow-md transition hover:scale-105 hover:bg-gray-900 active:scale-95"
+              >
+                Về Trang Chủ
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Voucher Modal */}
       <AnimatePresence>
