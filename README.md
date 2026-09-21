@@ -1,4 +1,4 @@
-# PulseTech Frontend
+# PulseTech 
 
 > Customer-facing storefront for the **PulseTech** e-commerce platform — built with **Next.js 16**, **React 19**, and **TypeScript**.
 
