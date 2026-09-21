@@ -67,7 +67,7 @@ export default function CartPage() {
   React.useEffect(() => {
     if (user?.email) {
       orderApi.getCoupons(user.email).then(data => {
-        setAvailableVouchers(data.filter(c => c.isActive));
+        setAvailableVouchers(data.filter(c => c.isActive && (c.count ?? 0) > 0));
       }).catch(console.error);
     }
   }, [user]);

@@ -616,7 +616,7 @@ function TabOffers({ user }: { user: any }) {
     const fetchCoupons = async () => {
       try {
         const data = await orderApi.getCoupons(user.email);
-        const activeCoupons = data.filter(c => c.isActive && (c.count ?? 0) > 0);
+        const activeCoupons = data.filter(c => c.isActive);
 
         const sortedVouchers = activeCoupons.sort((a: any, b: any) => {
           const aExpired = new Date(a.validUntil) < new Date();
@@ -650,9 +650,11 @@ function TabOffers({ user }: { user: any }) {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
           {vouchers.map((v) => {
             const isExpired = new Date(v.validUntil) < new Date();
+            const isUsed = !isExpired && (v.count ?? 0) <= 0;
+            const isUnavailable = isExpired || isUsed;
             
             return (
-              <div key={v.id} className={`relative flex w-full h-[140px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:drop-shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all ${isExpired ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'}`} onClick={() => !isExpired && setSelectedVoucher(v)}>
+              <div key={v.id} className={`relative flex w-full h-[140px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.05)] hover:drop-shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition-all ${isUnavailable ? 'cursor-not-allowed opacity-90' : 'cursor-pointer'}`} onClick={() => !isUnavailable && setSelectedVoucher(v)}>
                 
                 {/* Left Section (Red) */}
                 <div 
@@ -693,9 +695,9 @@ function TabOffers({ user }: { user: any }) {
                       <h3 className="font-extrabold text-brand-black text-lg tracking-wide line-clamp-1">{v.code}</h3>
                       <p className="text-[11px] text-gray-500 mt-1 line-clamp-2 leading-relaxed">{v.description}</p>
                     </div>
-                    {(v.count ?? 1) > 1 && !isExpired && (
+                    {(v.count ?? 0) > 1 && !isExpired && (
                       <span className="shrink-0 bg-red-100 text-primary rounded-full px-2 py-0.5 text-[11px] font-bold">
-                        x{v.count ?? 1}
+                        x{v.count}
                       </span>
                     )}
                   </div>
@@ -703,16 +705,18 @@ function TabOffers({ user }: { user: any }) {
                      <span className="text-[10px] text-gray-400 font-medium">
                         HSD: {new Date(v.validUntil).toLocaleDateString('vi-VN')}
                      </span>
-                     <button disabled={isExpired} className={`w-max text-xs font-bold transition-colors ${isExpired ? 'text-gray-400' : 'text-primary hover:text-primary-dark'}`}>
-                       {isExpired ? 'Không khả dụng' : 'Xem chi tiết'}
+                     <button disabled={isUnavailable} className={`w-max text-xs font-bold transition-colors ${isUnavailable ? 'text-gray-400' : 'text-primary hover:text-primary-dark'}`}>
+                       {isExpired ? 'Không khả dụng' : isUsed ? 'Đã dùng' : 'Xem chi tiết'}
                      </button>
                   </div>
                 </div>
                 
                 {/* Expired Overlay */}
-                {isExpired && (
+                {isUnavailable && (
                   <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/60 backdrop-blur-[1px] rounded-2xl">
-                    <div className="bg-white/95 text-gray-500 font-extrabold text-sm px-5 py-1.5 rounded-lg border-2 border-gray-300 shadow-md rotate-[-12deg] tracking-wide uppercase">Đã Hết Hạn</div>
+                    <div className="bg-white/95 text-gray-500 font-extrabold text-sm px-5 py-1.5 rounded-lg border-2 border-gray-300 shadow-md rotate-[-12deg] tracking-wide uppercase">
+                      {isUsed ? 'Đã Dùng' : 'Đã Hết Hạn'}
+                    </div>
                   </div>
                 )}
               </div>
