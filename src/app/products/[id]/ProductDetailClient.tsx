@@ -36,10 +36,10 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
 
   // State managers
   const searchParams = useSearchParams();
-  
+
   // Find storage from URL param if exists
   const storageQuery = searchParams.get('storage');
-  const initialStorage = storageQuery 
+  const initialStorage = storageQuery
     ? storages.find(s => s.name === storageQuery) || storages[0]
     : storages[0];
 
@@ -286,7 +286,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
             <h1 className="font-display font-extrabold text-xl sm:text-3xl text-brand-black tracking-tight flex items-center flex-wrap gap-3">
               {product.name}
               {product.isFeatured && (
-                <span className="bg-primary/10 text-primary border border-primary/20 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider h-fit">
+                <span className="bg-primary/10 text-primary text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider h-fit">
                   Nổi bật
                 </span>
               )}
@@ -396,23 +396,17 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({ produc
                   <p className="text-[10px] text-gray-500">Nếu có lỗi phần cứng nhà sản xuất.</p>
                 </div>
               </div>
-              {displayStock === 0 ? (
-                <div className="flex gap-3">
-                  <button disabled className="flex-1 bg-gray-200 text-gray-500 font-bold py-4 rounded-2xl cursor-not-allowed shadow-sm">
-                    SẢN PHẨM TẠM HẾT HÀNG
-                  </button>
+
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-red-50 text-primary rounded-xl">
+                  <Truck className="h-5 w-5" />
                 </div>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-red-50 text-primary rounded-xl">
-                    <Truck className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-brand-black">Giao hàng miễn phí</h4>
-                    <p className="text-[10px] text-gray-500">Thanh toán an toàn bảo mật, COD toàn quốc.</p>
-                  </div>
+                <div>
+                  <h4 className="font-bold text-brand-black">Giao hàng miễn phí</h4>
+                  <p className="text-[10px] text-gray-500">Thanh toán an toàn bảo mật, COD toàn quốc.</p>
                 </div>
-              )}
+              </div>
+
             </div>
           </div>
 

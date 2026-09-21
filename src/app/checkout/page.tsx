@@ -368,12 +368,11 @@ export default function CheckoutPage() {
                   <div className="ml-3 flex items-center gap-3">
                     <img src="/icons/stripe.svg" alt="Stripe" className="h-7 w-auto object-contain" />
                     <div>
-                      <p className="font-bold text-sm text-brand-black">Stripe (Thẻ Quốc Tế)</p>
+                      <p className="font-bold text-sm text-brand-black">Stripe</p>
                       <p className="text-xs text-gray-500">Thanh toán an toàn qua thẻ Visa, Mastercard, JCB</p>
                     </div>
                   </div>
                 </label>
-
               </div>
             </div>
           </div>
