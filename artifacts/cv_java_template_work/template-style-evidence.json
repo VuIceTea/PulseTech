@@ -1,0 +1,108 @@
+{
+  "input": "D:\\CV_Android_NguyenPhiVu.docx",
+  "fonts_by_char_count": {},
+  "direct_run_formatting_runs": 33,
+  "direct_paragraph_formatting_paragraphs": 1,
+  "heading_like_paragraphs_not_heading_style": [
+    {
+      "para_index": 1,
+      "text": "NGUYEN PHI VU",
+      "style": "Normal"
+    },
+    {
+      "para_index": 2,
+      "text": "Java Backend Developer",
+      "style": "Normal"
+    },
+    {
+      "para_index": 3,
+      "text": "CAREER OBJECTIVE",
+      "style": "Normal"
+    },
+    {
+      "para_index": 5,
+      "text": "EDUCATION",
+      "style": "Normal"
+    },
+    {
+      "para_index": 7,
+      "text": "Java & Backend Development ",
+      "style": "Normal"
+    },
+    {
+      "para_index": 16,
+      "text": "DevOps & Infrashtructure",
+      "style": "Normal"
+    },
+    {
+      "para_index": 23,
+      "text": "Development Tools ",
+      "style": "Normal"
+    },
+    {
+      "para_index": 28,
+      "text": "\nPERSONAL PROJECTS",
+      "style": "Normal"
+    },
+    {
+      "para_index": 29,
+      "text": "T.E.M.G E-Commerce Platform(Technology Equipment Manufacturing Group)",
+      "style": "Normal"
+    },
+    {
+      "para_index": 30,
+      "text": "Source: https://github.com/Dlhuutien/KienTrucvaThietKe_phanMem",
+      "style": "Normal"
+    },
+    {
+      "para_index": 31,
+      "text": "Live Demo: https://kien-trucva-thiet-ke-phan-mem.vercel.app/",
+      "style": "Normal"
+    },
+    {
+      "para_index": 37,
+      "text": "CONTACT",
+      "style": "Normal"
+    }
+  ],
+  "examples": {
+    "direct_run_formatting": [
+      {
+        "para_index": 1,
+        "run_text": "NGUYEN PHI VU",
+        "style": "Normal"
+      },
+      {
+        "para_index": 2,
+        "run_text": "Java Backend Developer",
+        "style": "Normal"
+      },
+      {
+        "para_index": 3,
+        "run_text": "CAREER OBJECTIVE",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "EDUCATION",
+        "style": "Normal"
+      },
+      {
+        "para_index": 6,
+        "run_text": "Industrial University of Ho Chi Minh City",
+        "style": "Normal"
+      }
+    ],
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 21,
+        "text": "",
+        "style": "List Paragraph"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}
