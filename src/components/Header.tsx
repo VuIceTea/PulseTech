@@ -3,7 +3,7 @@
 import { FormEvent, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FileText, MapPin, Menu, Phone, Search, ShoppingCart, X } from 'lucide-react';
+import { FileText, MapPin, Menu, Phone, Search, ShoppingCart, X, ShieldCheck, Scale } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -52,7 +52,8 @@ export const Header = () => {
 
           <nav className="hidden items-center gap-2 text-xs font-semibold lg:flex">
             <a href="tel:18002097" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><Phone className="h-4 w-4" /><span>1800.2097</span></a>
-            <Link href="/products" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><MapPin className="h-4 w-4" /><span>Cửa hàng</span></Link>
+            <Link href="/warranty" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><ShieldCheck className="h-4 w-4" /><span>Tra cứu BH</span></Link>
+            <Link href="/compare" className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><Scale className="h-4 w-4" /><span>So sánh máy</span></Link>
             <Link href={user ? "/orders" : "/order-tracking"} className="flex items-center gap-2 rounded-xl p-2 hover:bg-white/10"><FileText className="h-4 w-4" /><span>Đơn hàng</span></Link>
           </nav>
 
@@ -81,6 +82,8 @@ export const Header = () => {
             <div className="space-y-3 px-4 py-4">
               <form onSubmit={handleSearch} className="relative md:hidden"><input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Tìm sản phẩm..." className="w-full rounded-xl bg-white py-2.5 pl-10 pr-4 text-sm text-brand-black outline-none" /><Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /></form>
               <nav className="grid gap-1 rounded-2xl bg-white p-2 text-sm font-bold text-gray-600">
+                <Link onClick={() => setMobileOpen(false)} href="/warranty" className="rounded-xl px-3 py-3 hover:bg-gray-50 flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /> Tra cứu bảo hành & IMEI</Link>
+                <Link onClick={() => setMobileOpen(false)} href="/compare" className="rounded-xl px-3 py-3 hover:bg-gray-50 flex items-center gap-2"><Scale className="w-4 h-4 text-primary" /> So sánh cấu hình máy</Link>
                 {navigations.map(nav => (
                   <Link key={nav.id} onClick={() => setMobileOpen(false)} href={nav.href} className="rounded-xl px-3 py-3 hover:bg-gray-50">{nav.title}</Link>
                 ))}
