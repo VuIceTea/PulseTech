@@ -14,13 +14,13 @@ export const Header = () => {
   const { user, isLoaded } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [navigations, setNavigations] = useState<{id: string, title: string, href: string}[]>([]);
+  const [navigations, setNavigations] = useState<{ id: string, title: string, href: string }[]>([]);
 
   useEffect(() => {
     import('@/lib/api').then(({ api }) => {
       api.getNavigation().then(data => {
         if (data) setNavigations(data);
-      }).catch(() => {});
+      }).catch(() => { });
     });
   }, []);
 
@@ -58,7 +58,7 @@ export const Header = () => {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2 text-xs font-semibold sm:gap-3">
-            <Link href="/cart" className="relative flex items-center gap-2 rounded-xl bg-white/15 p-2 transition hover:bg-white/20 sm:px-3 sm:py-2.5">
+            <Link href="/cart" className="relative flex items-center gap-2 rounded-xl p-2 transition hover:bg-white/10 sm:px-3 sm:py-2">
               <ShoppingCart className="h-5 w-5" /><span className="hidden sm:inline">Giỏ hàng</span>
               {cartCount > 0 && <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-brand-black">{cartCount}</span>}
             </Link>

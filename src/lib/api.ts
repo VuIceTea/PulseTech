@@ -59,6 +59,8 @@ export const api = {
   login: (email: string, password: string) => request<ApiUser>('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   register: (name: string, email: string, password: string) => request<RegisterResponse>('/auth/register', { method: 'POST', body: JSON.stringify({ name, email, password }) }),
   verifyEmail: (token: string) => request<VerifyResponse>(`/auth/verify?token=${encodeURIComponent(token)}`),
+  updateProfile: (email: string, payload: { name?: string; phone?: string; dob?: string; gender?: string }) =>
+    request<ApiUser>(`/auth/profile?email=${encodeURIComponent(email)}`, { method: 'PUT', body: JSON.stringify(payload) }),
   createOrder: (payload: { customerName: string; customerEmail: string; customerPhone: string; address: string; paymentMethod: string; couponCode?: string; couponCodes?: string[]; items: OrderItemRequest[] }) =>
     request<Order>('/orders', { method: 'POST', body: JSON.stringify(payload) }),
   trackOrder: (orderId: string, phone: string) => request<Order>(`/orders/track?orderId=${encodeURIComponent(orderId)}&phone=${encodeURIComponent(phone)}`),

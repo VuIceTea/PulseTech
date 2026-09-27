@@ -58,7 +58,7 @@ export default function WarrantyLookupPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#0B1437] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-blue-600/10 text-blue-600 mb-2">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-2">
             <ShieldCheck className="w-8 h-8" />
           </div>
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
@@ -78,13 +78,13 @@ export default function WarrantyLookupPage() {
               placeholder="Nhập IMEI (VD: 35678...), Số điện thoại hoặc Mã đơn hàng..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-medium shadow-sm outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-white/10 rounded-2xl text-sm font-medium shadow-sm outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-4 rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50"
+            className="bg-primary hover:bg-primary-dark text-white font-bold px-8 py-4 rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50"
           >
             {loading ? "Đang tra..." : "Tra Cứu"}
           </button>
@@ -101,7 +101,7 @@ export default function WarrantyLookupPage() {
                 <div key={item.id} className="bg-white dark:bg-gray-900 rounded-3xl p-6 border border-gray-100 dark:border-white/10 shadow-lg space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-white/10 pb-4">
                     <div>
-                      <span className="text-xs font-bold text-blue-600 uppercase tracking-wider block mb-1">Dịch Vụ Bảo Hành PulseTech</span>
+                      <span className="text-xs font-bold text-primary uppercase tracking-wider block mb-1">Dịch Vụ Bảo Hành PulseTech</span>
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white">{item.productName}</h3>
                       <div className="text-sm text-gray-500 font-medium">{item.storageVariant}</div>
                     </div>
@@ -110,7 +110,7 @@ export default function WarrantyLookupPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div className="flex items-center gap-3 bg-gray-50 dark:bg-white/5 p-3 rounded-2xl">
-                      <Smartphone className="w-5 h-5 text-blue-600" />
+                      <Smartphone className="w-5 h-5 text-primary" />
                       <div>
                         <div className="text-xs text-gray-400 font-bold uppercase">Mã IMEI</div>
                         <div className="font-mono font-bold text-gray-900 dark:text-white">{item.imei || "Chưa gắn"}</div>
@@ -118,7 +118,7 @@ export default function WarrantyLookupPage() {
                     </div>
 
                     <div className="flex items-center gap-3 bg-gray-50 dark:bg-white/5 p-3 rounded-2xl">
-                      <FileText className="w-5 h-5 text-blue-600" />
+                      <FileText className="w-5 h-5 text-primary" />
                       <div>
                         <div className="text-xs text-gray-400 font-bold uppercase">Mã Đơn Hàng</div>
                         <div className="font-mono font-bold text-gray-900 dark:text-white">#{item.orderId}</div>
