@@ -221,6 +221,18 @@ export default function OrderTrackingPage() {
                           <p className="font-semibold text-brand-black">{order!.paymentMethod}</p>
                         </div>
                       </div>
+                      {((order as any).shippingCarrier || (order as any).trackingCode) && (
+                        <div className="flex gap-3 bg-blue-50 p-3 rounded-xl border border-blue-100 mt-2">
+                          <Truck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-blue-700 text-xs font-bold">Đơn vị vận chuyển</p>
+                            <p className="font-bold text-blue-900 text-sm">{(order as any).shippingCarrier || 'Giao Hàng Nhanh (GHN)'}</p>
+                            {(order as any).trackingCode && (
+                              <p className="text-xs font-mono text-blue-800 mt-0.5">Mã vận đơn: <span className="font-bold select-all">{(order as any).trackingCode}</span></p>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 
