@@ -52,7 +52,7 @@ export default function ComparePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#0B1437] py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="flex items-center justify-between">
-          <Link href="/products" className="inline-flex items-center gap-2 text-sm font-bold text-blue-600 hover:underline">
+          <Link href="/products" className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline">
             <ArrowLeft className="w-4 h-4" /> Quay lại danh sách sản phẩm
           </Link>
           <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
@@ -96,10 +96,10 @@ export default function ComparePage() {
                           <div className="space-y-3">
                             <img src={prod.image} alt={prod.name} className="w-28 h-28 object-contain mx-auto" />
                             <div className="font-bold text-gray-900 dark:text-white text-base">{prod.name}</div>
-                            <div className="text-blue-600 font-extrabold text-lg">
+                            <div className="text-primary font-extrabold text-lg">
                               {prod.basePrice ? prod.basePrice.toLocaleString("vi-VN") : 0} đ
                             </div>
-                            <Link href={`/products/${prod.id}`} className="inline-block px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-colors">
+                            <Link href={`/products/${prod.id}`} className="inline-block px-4 py-2 bg-primary text-white rounded-xl text-xs font-bold hover:bg-primary-dark transition-colors">
                               Xem Chi Tiết
                             </Link>
                           </div>
@@ -114,7 +114,7 @@ export default function ComparePage() {
                 {/* Specs Rows */}
                 <tr>
                   <td className="p-4 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <Monitor className="w-4 h-4 text-blue-600" /> Màn Hình
+                    <Monitor className="w-4 h-4 text-primary" /> Màn Hình
                   </td>
                   {[0, 1, 2].map((idx) => (
                     <td key={idx} className="p-4 text-center font-medium">
@@ -125,7 +125,7 @@ export default function ComparePage() {
 
                 <tr>
                   <td className="p-4 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-blue-600" /> Vi Xử Lý (CPU)
+                    <Cpu className="w-4 h-4 text-primary" /> Vi Xử Lý (CPU)
                   </td>
                   {[0, 1, 2].map((idx) => (
                     <td key={idx} className="p-4 text-center font-medium">
@@ -136,7 +136,7 @@ export default function ComparePage() {
 
                 <tr>
                   <td className="p-4 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <HardDrive className="w-4 h-4 text-blue-600" /> RAM / Bộ Nhớ
+                    <HardDrive className="w-4 h-4 text-primary" /> RAM / Bộ Nhớ
                   </td>
                   {[0, 1, 2].map((idx) => (
                     <td key={idx} className="p-4 text-center font-medium">
@@ -147,7 +147,7 @@ export default function ComparePage() {
 
                 <tr>
                   <td className="p-4 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-blue-600" /> Camera
+                    <Camera className="w-4 h-4 text-primary" /> Camera
                   </td>
                   {[0, 1, 2].map((idx) => (
                     <td key={idx} className="p-4 text-center font-medium">
@@ -158,7 +158,7 @@ export default function ComparePage() {
 
                 <tr>
                   <td className="p-4 font-bold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <Battery className="w-4 h-4 text-blue-600" /> Pin & Sạc
+                    <Battery className="w-4 h-4 text-primary" /> Pin & Sạc
                   </td>
                   {[0, 1, 2].map((idx) => (
                     <td key={idx} className="p-4 text-center font-medium">
