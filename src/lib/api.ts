@@ -39,7 +39,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const prefix = typeof window === 'undefined' ? serverApiPrefix : browserApiPrefix;
   const response = await fetch(`${prefix}${path}`, {
     ...init,
-    headers: { 'Content-Type': 'application/json', ...init?.headers },
+    headers: (() => {
+      const h = { 'Content-Type': 'application/json', ...init?.headers };
+      try {
+        if (typeof window !== 'undefined') {
+          const u = JSON.parse(localStorage.getItem('pulsetech_user') || '{}');
+          if (u.accessToken) h['Authorization'] = `Bearer ${u.accessToken}`;
+        }
+      } catch (e) {}
+      return h;
+    })(),
     cache: init?.method && init.method !== 'GET' ? undefined : 'no-store',
   });
   if (!response.ok) {
