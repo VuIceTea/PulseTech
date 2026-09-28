@@ -154,7 +154,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {product.stock === 0 ? (
             <button
               disabled
-              className="transition-all duration-300 shrink-0 flex items-center justify-center overflow-hidden rounded-full h-8 bg-gray-200 text-gray-500 px-3 cursor-not-allowed"
+              className="transition-all duration-300 shrink-0 flex items-center justify-center overflow-hidden h-8 text-gray-500 px-3 cursor-not-allowed"
               title="Sản phẩm đã hết hàng"
             >
               <span className="text-[11px] font-bold whitespace-nowrap">Hết hàng</span>

@@ -46,7 +46,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const text = await response.text().catch(() => '');
     let body;
     try { body = text ? JSON.parse(text) : null; } catch (e) { body = null; }
-    throw new Error(body?.detail || body?.message || `API trả về lỗi ${response.status}`);
+    const customMessage = body?.detail || body?.message || body?.reason || body?.error;
+    if (customMessage) throw new Error(customMessage);
+    switch (response.status) {
+      case 400: throw new Error('Dữ liệu yêu cầu không hợp lệ. Vui lòng kiểm tra lại thông tin.');
+      case 401: throw new Error('Phiên đăng nhập đã hết hạn hoặc thông tin tài khoản không chính xác.');
+      case 403: throw new Error('Tài khoản của bạn không có quyền thực hiện thao tác này.');
+      case 404: throw new Error('Dữ liệu yêu cầu không tồn tại trên hệ thống.');
+      case 409: throw new Error('Dữ liệu đã tồn tại hoặc xảy ra xung đột hệ thống.');
+      case 500: throw new Error('Máy chủ gặp sự cố nội bộ. Vui lòng thử lại sau ít phút.');
+      case 502: case 503: case 504: throw new Error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+      default: throw new Error(`Đã xảy ra lỗi hệ thống (${response.status}). Vui lòng thử lại.`);
+    }
   }
   const text = await response.text();
   if (!text) return null as T;
