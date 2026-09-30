@@ -19,7 +19,7 @@ import { HiChevronRight } from 'react-icons/hi2';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, logout, isLoaded } = useAuth();
+  const { user, logout, updateUser, isLoaded } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function ProfilePage() {
             >
               {activeTab === 'home' && <TabHome user={user} />}
               {activeTab === 'history' && <TabHistory user={user} />}
-              {activeTab === 'account' && <TabAccount user={user} />}
+              {activeTab === 'account' && <TabAccount user={user} updateUser={updateUser} />}
               {activeTab === 'offers' && <TabOffers user={user} />}
               {activeTab === 'address' && <TabAddress user={user} />}
             </motion.div>
@@ -214,26 +214,35 @@ function TabHome({ user }: { user: any }) {
   );
 }
 
-function TabAccount({ user }: { user: any }) {
+function TabAccount({ user, updateUser }: { user: any, updateUser?: any }) {
   const [totalSpent, setTotalSpent] = useState(0);
   const [formData, setFormData] = useState({
     name: user?.name || '',
-    phone: '',
+    phone: user?.phone || '',
     email: user?.email || '',
-    dob: '',
-    gender: ''
+    dob: user?.dob || '',
+    gender: user?.gender || ''
   });
 
   useEffect(() => {
     if (!user) return;
-    setFormData(prev => ({ ...prev, name: user.name, email: user.email }));
+    setFormData(prev => ({ 
+      ...prev, 
+      name: user.name, 
+      email: user.email,
+      phone: user.phone || prev.phone,
+      dob: user.dob || prev.dob,
+      gender: user.gender || prev.gender
+    }));
     
     userApi.getAddresses(user.email).then((data) => {
       const defaultAddr = data.find(a => a.isDefault);
-      if (defaultAddr && defaultAddr.phone) {
-        setFormData(prev => ({ ...prev, phone: defaultAddr.phone }));
-      } else if (data.length > 0 && data[0].phone) {
-        setFormData(prev => ({ ...prev, phone: data[0].phone }));
+      if (!user.phone) {
+        if (defaultAddr && defaultAddr.phone) {
+          setFormData(prev => ({ ...prev, phone: defaultAddr.phone }));
+        } else if (data.length > 0 && data[0].phone) {
+          setFormData(prev => ({ ...prev, phone: data[0].phone }));
+        }
       }
     }).catch(console.error);
 
@@ -243,15 +252,41 @@ function TabAccount({ user }: { user: any }) {
     }).catch(console.error);
   }, [user]);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const handleSave = async () => {
     if (formData.email !== user.email) {
-      // Simulate API email check
       if (formData.email === 'admin@gmail.com' || formData.email.includes('exist')) {
         toast.error('Email này đã được sử dụng bởi tài khoản khác!');
         return;
       }
     }
-    toast.success('Cập nhật thông tin thành công!');
+    
+    setIsSaving(true);
+    try {
+      const updatedUser = await api.updateProfile(user.email, {
+        name: formData.name,
+        phone: formData.phone,
+        dob: formData.dob,
+        gender: formData.gender
+      });
+      
+      if (updateUser) {
+        updateUser({
+          ...user,
+          name: updatedUser.name,
+          phone: updatedUser.phone,
+          dob: updatedUser.dob,
+          gender: updatedUser.gender
+        });
+      }
+      
+      toast.success('Cập nhật thông tin thành công!');
+    } catch (error: any) {
+      toast.error(error.message || 'Có lỗi xảy ra khi lưu thông tin');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const customSelectStyles = {
@@ -379,8 +414,8 @@ function TabAccount({ user }: { user: any }) {
               </div>
             </div>
             <div className="pt-4 mt-auto">
-              <button onClick={handleSave} className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark shadow-lg shadow-primary/30">
-                Lưu thay đổi
+              <button disabled={isSaving} onClick={handleSave} className="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark shadow-lg shadow-primary/30 disabled:opacity-70 flex justify-center items-center">
+                {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : 'Lưu thay đổi'}
               </button>
             </div>
           </div>
