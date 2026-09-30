@@ -942,7 +942,7 @@ function TabAddress({ user }: { user: any }) {
   const provinceOptions = provinces.map(p => ({ value: p.code, label: p.name }));
   const wardOptions = wards.map(w => ({ value: w.code, label: w.name }));
 
-  const AddressModal = () => (
+  const renderAddressModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -1049,7 +1049,7 @@ function TabAddress({ user }: { user: any }) {
       )}
 
       <AnimatePresence>
-        {modalType && <AddressModal />}
+        {modalType && renderAddressModal()}
       </AnimatePresence>
     </div>
   );
