@@ -806,48 +806,119 @@ function TabAddress({ user }: { user: any }) {
   const [modalType, setModalType] = useState<'add' | 'edit' | null>(null);
   const [addresses, setAddresses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Address form states
+  const [formName, setFormName] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+  const [formAddress, setFormAddress] = useState("");
+  const [isDefault, setIsDefault] = useState(false);
+
   const [provinces, setProvinces] = useState<any[]>([]);
+  const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
+  
   const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
 
-  useEffect(() => {
-    if (!user) return;
+  const loadAddresses = () => {
+    setIsLoading(true);
     userApi.getAddresses(user.email)
       .then(setAddresses)
       .catch(console.error)
       .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    loadAddresses();
   }, [user]);
 
   useEffect(() => {
     if (modalType) {
       fetch('https://provinces.open-api.vn/api/v2/')
         .then(res => res.json())
-        .then(data => {
-          setProvinces(data);
-        })
+        .then(data => setProvinces(data))
         .catch(console.error);
-    } else {
-      setSelectedProvince("");
-      setSelectedWard("");
-      setWards([]);
+        
+      if (modalType === 'add') {
+        setFormName(user.name || "");
+        setFormPhone(user.phone || "");
+        setFormAddress("");
+        setSelectedProvince("");
+        setSelectedDistrict("");
+        setSelectedWard("");
+        setDistricts([]);
+        setWards([]);
+        setIsDefault(addresses.length === 0);
+      }
     }
-  }, [modalType]);
+  }, [modalType, user, addresses.length]);
 
   const handleProvinceChange = (option: any) => {
     const val = option ? option.value : "";
     setSelectedProvince(val);
+    setSelectedDistrict("");
     setSelectedWard("");
+    setDistricts([]);
     setWards([]);
     if (val) {
       fetch(`https://provinces.open-api.vn/api/v2/p/${val}?depth=2`)
         .then(res => res.json())
         .then(data => {
+          if (data && data.districts) setDistricts(data.districts);
+        })
+        .catch(console.error);
+    }
+  };
+
+  const handleDistrictChange = (option: any) => {
+    const val = option ? option.value : "";
+    setSelectedDistrict(val);
+    setSelectedWard("");
+    setWards([]);
+    if (val) {
+      fetch(`https://provinces.open-api.vn/api/v2/d/${val}?depth=2`)
+        .then(res => res.json())
+        .then(data => {
           if (data && data.wards) setWards(data.wards);
         })
         .catch(console.error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProvince || !selectedDistrict || !selectedWard) {
+      toast.error('Vui lòng chọn đầy đủ Tỉnh, Huyện, Xã!');
+      return;
+    }
+    
+    setIsSaving(true);
+    try {
+      const pName = provinces.find(p => p.code == selectedProvince)?.name || "";
+      const dName = districts.find(d => d.code == selectedDistrict)?.name || "";
+      const wName = wards.find(w => w.code == selectedWard)?.name || "";
+      
+      await userApi.addAddress({
+        userId: user.email,
+        fullName: formName,
+        phone: formPhone,
+        addressLine: formAddress,
+        ward: wName,
+        district: dName,
+        city: pName,
+        isDefault: isDefault
+      });
+      
+      toast.success('Đã lưu địa chỉ thành công!');
+      setModalType(null);
+      loadAddresses();
+    } catch (err: any) {
+      toast.error(err.message || 'Lỗi khi lưu địa chỉ');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -891,6 +962,7 @@ function TabAddress({ user }: { user: any }) {
   };
 
   const provinceOptions = provinces.map(p => ({ value: p.code, label: p.name }));
+  const districtOptions = districts.map(d => ({ value: d.code, label: d.name }));
   const wardOptions = wards.map(w => ({ value: w.code, label: w.name }));
 
   const AddressModal = () => (
@@ -904,27 +976,40 @@ function TabAddress({ user }: { user: any }) {
         <button onClick={() => setModalType(null)} className="absolute top-5 right-6 text-gray-400 hover:text-red-500 font-bold text-2xl transition-colors">&times;</button>
         <h3 className="text-xl font-bold text-brand-black mb-8">{modalType === 'add' ? 'Thêm địa chỉ mới' : 'Sửa địa chỉ'}</h3>
 
-        <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setModalType(null); toast.info('Chưa hỗ trợ lưu địa chỉ'); }}>
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Họ và tên</label>
-              <input type="text" defaultValue={user.name} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
+              <input type="text" value={formName} onChange={e => setFormName(e.target.value)} required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
             </div>
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Số điện thoại</label>
-              <input type="text" defaultValue={""} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
+              <input type="text" value={formPhone} onChange={e => setFormPhone(e.target.value)} placeholder="09xxxxxxxxx" required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
             </div>
           </div>
           
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Tỉnh/Thành phố</label>
               <Select
                 options={provinceOptions}
                 value={provinceOptions.find(o => o.value == selectedProvince) || null}
                 onChange={handleProvinceChange}
-                placeholder="Chọn Tỉnh/Thành"
+                placeholder="Tỉnh/Thành"
                 styles={addressSelectStyles}
+                isSearchable={true}
+                noOptionsMessage={() => "Không tìm thấy"}
+              />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-gray-500">Quận/Huyện</label>
+              <Select
+                options={districtOptions}
+                value={districtOptions.find(o => o.value == selectedDistrict) || null}
+                onChange={handleDistrictChange}
+                placeholder="Quận/Huyện"
+                styles={addressSelectStyles}
+                isDisabled={!selectedProvince}
                 isSearchable={true}
                 noOptionsMessage={() => "Không tìm thấy"}
               />
@@ -935,9 +1020,9 @@ function TabAddress({ user }: { user: any }) {
                 options={wardOptions}
                 value={wardOptions.find(o => o.value == selectedWard) || null}
                 onChange={(option: any) => setSelectedWard(option ? option.value : "")}
-                placeholder="Chọn Phường/Xã"
+                placeholder="Phường/Xã"
                 styles={addressSelectStyles}
-                isDisabled={!selectedProvince}
+                isDisabled={!selectedDistrict}
                 isSearchable={true}
                 noOptionsMessage={() => "Không tìm thấy"}
               />
@@ -946,11 +1031,19 @@ function TabAddress({ user }: { user: any }) {
 
           <div>
             <label className="mb-1.5 block text-xs font-semibold text-gray-500">Địa chỉ cụ thể</label>
-            <input type="text" defaultValue={""} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
+            <input type="text" value={formAddress} onChange={e => setFormAddress(e.target.value)} placeholder="Số nhà, tên đường..." required className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-brand-black outline-none focus:border-primary/50 transition-all cursor-text focus:bg-white hover:border-gray-300" />
           </div>
-          <div className="pt-4 flex gap-3">
+
+          <div className="flex items-center gap-2 pt-2 pb-2">
+            <input type="checkbox" id="isDefault" checked={isDefault} onChange={e => setIsDefault(e.target.checked)} className="w-4 h-4 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary" />
+            <label htmlFor="isDefault" className="text-sm font-medium text-gray-700">Đặt làm địa chỉ mặc định</label>
+          </div>
+
+          <div className="pt-2 flex gap-3">
             <button type="button" onClick={() => setModalType(null)} className="flex-1 rounded-xl bg-gray-100 py-3.5 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200">Hủy bỏ</button>
-            <button type="submit" className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark">Lưu địa chỉ</button>
+            <button type="submit" disabled={isSaving} className="flex-1 rounded-xl bg-primary py-3.5 text-sm font-bold text-white transition-colors hover:bg-primary-dark disabled:opacity-70 flex justify-center items-center">
+              {isSaving ? <RefreshCw className="w-5 h-5 animate-spin" /> : 'Lưu địa chỉ'}
+            </button>
           </div>
         </form>
       </motion.div>
@@ -983,8 +1076,8 @@ function TabAddress({ user }: { user: any }) {
                   </div>
                   <button onClick={() => setModalType('edit')} className="text-sm font-semibold text-primary hover:underline">Sửa</button>
                 </div>
-                <p className="mt-2 text-sm text-gray-600">{addr.phone}</p>
-                <p className="mt-1 text-sm text-gray-600">{addr.address}</p>
+                <p className="mt-2 text-sm text-gray-600 font-medium">SĐT: {addr.phone}</p>
+                <p className="mt-1 text-sm text-gray-600">{addr.addressLine}, {addr.ward}, {addr.district}, {addr.city}</p>
               </div>
             </div>
           ))}
