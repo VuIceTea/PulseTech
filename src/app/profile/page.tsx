@@ -837,9 +837,11 @@ function TabAddress({ user }: { user: any }) {
 
   useEffect(() => {
     if (modalType) {
-      fetch('https://provinces.open-api.vn/api/v2/')
+      fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
         .then(res => res.json())
-        .then(data => setProvinces(data))
+        .then(res => {
+          if (res.error === 0) setProvinces(res.data);
+        })
         .catch(console.error);
         
       if (modalType === 'add') {
@@ -864,10 +866,10 @@ function TabAddress({ user }: { user: any }) {
     setDistricts([]);
     setWards([]);
     if (val) {
-      fetch(`https://provinces.open-api.vn/api/v2/p/${val}?depth=2`)
+      fetch(`https://esgoo.net/api-tinhthanh/2/${val}.htm`)
         .then(res => res.json())
-        .then(data => {
-          if (data && data.districts) setDistricts(data.districts);
+        .then(res => {
+          if (res.error === 0) setDistricts(res.data);
         })
         .catch(console.error);
     }
@@ -879,10 +881,10 @@ function TabAddress({ user }: { user: any }) {
     setSelectedWard("");
     setWards([]);
     if (val) {
-      fetch(`https://provinces.open-api.vn/api/v2/d/${val}?depth=2`)
+      fetch(`https://esgoo.net/api-tinhthanh/3/${val}.htm`)
         .then(res => res.json())
-        .then(data => {
-          if (data && data.wards) setWards(data.wards);
+        .then(res => {
+          if (res.error === 0) setWards(res.data);
         })
         .catch(console.error);
     }
@@ -897,9 +899,9 @@ function TabAddress({ user }: { user: any }) {
     
     setIsSaving(true);
     try {
-      const pName = provinces.find(p => p.code == selectedProvince)?.name || "";
-      const dName = districts.find(d => d.code == selectedDistrict)?.name || "";
-      const wName = wards.find(w => w.code == selectedWard)?.name || "";
+      const pName = provinces.find(p => p.id == selectedProvince)?.full_name || "";
+      const dName = districts.find(d => d.id == selectedDistrict)?.full_name || "";
+      const wName = wards.find(w => w.id == selectedWard)?.full_name || "";
       
       await userApi.addAddress({
         userId: user.email,
@@ -961,9 +963,9 @@ function TabAddress({ user }: { user: any }) {
     })
   };
 
-  const provinceOptions = provinces.map(p => ({ value: p.code, label: p.name }));
-  const districtOptions = districts.map(d => ({ value: d.code, label: d.name }));
-  const wardOptions = wards.map(w => ({ value: w.code, label: w.name }));
+  const provinceOptions = provinces.map(p => ({ value: p.id, label: p.full_name }));
+  const districtOptions = districts.map(d => ({ value: d.id, label: d.full_name }));
+  const wardOptions = wards.map(w => ({ value: w.id, label: w.full_name }));
 
   const AddressModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
