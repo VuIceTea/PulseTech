@@ -815,11 +815,9 @@ function TabAddress({ user }: { user: any }) {
   const [isDefault, setIsDefault] = useState(false);
 
   const [provinces, setProvinces] = useState<any[]>([]);
-  const [districts, setDistricts] = useState<any[]>([]);
   const [wards, setWards] = useState<any[]>([]);
   
   const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
 
   const loadAddresses = () => {
@@ -837,11 +835,9 @@ function TabAddress({ user }: { user: any }) {
 
   useEffect(() => {
     if (modalType) {
-      fetch('https://esgoo.net/api-tinhthanh/1/0.htm')
+      fetch('https://provinces.open-api.vn/api/v2/')
         .then(res => res.json())
-        .then(res => {
-          if (res.error === 0) setProvinces(res.data);
-        })
+        .then(data => setProvinces(data))
         .catch(console.error);
         
       if (modalType === 'add') {
@@ -849,9 +845,7 @@ function TabAddress({ user }: { user: any }) {
         setFormPhone(user.phone || "");
         setFormAddress("");
         setSelectedProvince("");
-        setSelectedDistrict("");
         setSelectedWard("");
-        setDistricts([]);
         setWards([]);
         setIsDefault(addresses.length === 0);
       }
@@ -861,30 +855,13 @@ function TabAddress({ user }: { user: any }) {
   const handleProvinceChange = (option: any) => {
     const val = option ? option.value : "";
     setSelectedProvince(val);
-    setSelectedDistrict("");
-    setSelectedWard("");
-    setDistricts([]);
-    setWards([]);
-    if (val) {
-      fetch(`https://esgoo.net/api-tinhthanh/2/${val}.htm`)
-        .then(res => res.json())
-        .then(res => {
-          if (res.error === 0) setDistricts(res.data);
-        })
-        .catch(console.error);
-    }
-  };
-
-  const handleDistrictChange = (option: any) => {
-    const val = option ? option.value : "";
-    setSelectedDistrict(val);
     setSelectedWard("");
     setWards([]);
     if (val) {
-      fetch(`https://esgoo.net/api-tinhthanh/3/${val}.htm`)
+      fetch(`https://provinces.open-api.vn/api/v2/p/${val}?depth=2`)
         .then(res => res.json())
-        .then(res => {
-          if (res.error === 0) setWards(res.data);
+        .then(data => {
+          if (data && data.wards) setWards(data.wards);
         })
         .catch(console.error);
     }
@@ -892,16 +869,15 @@ function TabAddress({ user }: { user: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedProvince || !selectedDistrict || !selectedWard) {
-      toast.error('Vui lòng chọn đầy đủ Tỉnh, Huyện, Xã!');
+    if (!selectedProvince || !selectedWard) {
+      toast.error('Vui lòng chọn đầy đủ Tỉnh/Thành và Phường/Xã!');
       return;
     }
     
     setIsSaving(true);
     try {
-      const pName = provinces.find(p => p.id == selectedProvince)?.full_name || "";
-      const dName = districts.find(d => d.id == selectedDistrict)?.full_name || "";
-      const wName = wards.find(w => w.id == selectedWard)?.full_name || "";
+      const pName = provinces.find(p => p.code == selectedProvince)?.name || "";
+      const wName = wards.find(w => w.code == selectedWard)?.name || "";
       
       await userApi.addAddress({
         userId: user.email,
@@ -909,7 +885,7 @@ function TabAddress({ user }: { user: any }) {
         phone: formPhone,
         addressLine: formAddress,
         ward: wName,
-        district: dName,
+        district: "",
         city: pName,
         isDefault: isDefault
       });
@@ -963,9 +939,8 @@ function TabAddress({ user }: { user: any }) {
     })
   };
 
-  const provinceOptions = provinces.map(p => ({ value: p.id, label: p.full_name }));
-  const districtOptions = districts.map(d => ({ value: d.id, label: d.full_name }));
-  const wardOptions = wards.map(w => ({ value: w.id, label: w.full_name }));
+  const provinceOptions = provinces.map(p => ({ value: p.code, label: p.name }));
+  const wardOptions = wards.map(w => ({ value: w.code, label: w.name }));
 
   const AddressModal = () => (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto">
@@ -990,12 +965,12 @@ function TabAddress({ user }: { user: any }) {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Tỉnh/Thành phố</label>
               <Select
-                options={provinceOptions}
-                value={provinceOptions.find(o => o.value == selectedProvince) || null}
+                options={provinces.map(p => ({ value: p.code, label: p.name }))}
+                value={provinces.map(p => ({ value: p.code, label: p.name })).find(o => o.value == selectedProvince) || null}
                 onChange={handleProvinceChange}
                 placeholder="Tỉnh/Thành"
                 styles={addressSelectStyles}
@@ -1004,27 +979,14 @@ function TabAddress({ user }: { user: any }) {
               />
             </div>
             <div>
-              <label className="mb-1.5 block text-xs font-semibold text-gray-500">Quận/Huyện</label>
-              <Select
-                options={districtOptions}
-                value={districtOptions.find(o => o.value == selectedDistrict) || null}
-                onChange={handleDistrictChange}
-                placeholder="Quận/Huyện"
-                styles={addressSelectStyles}
-                isDisabled={!selectedProvince}
-                isSearchable={true}
-                noOptionsMessage={() => "Không tìm thấy"}
-              />
-            </div>
-            <div>
               <label className="mb-1.5 block text-xs font-semibold text-gray-500">Phường/Xã</label>
               <Select
-                options={wardOptions}
-                value={wardOptions.find(o => o.value == selectedWard) || null}
+                options={wards.map(w => ({ value: w.code, label: w.name }))}
+                value={wards.map(w => ({ value: w.code, label: w.name })).find(o => o.value == selectedWard) || null}
                 onChange={(option: any) => setSelectedWard(option ? option.value : "")}
                 placeholder="Phường/Xã"
                 styles={addressSelectStyles}
-                isDisabled={!selectedDistrict}
+                isDisabled={!selectedProvince}
                 isSearchable={true}
                 noOptionsMessage={() => "Không tìm thấy"}
               />
@@ -1079,7 +1041,7 @@ function TabAddress({ user }: { user: any }) {
                   <button onClick={() => setModalType('edit')} className="text-sm font-semibold text-primary hover:underline">Sửa</button>
                 </div>
                 <p className="mt-2 text-sm text-gray-600 font-medium">SĐT: {addr.phone}</p>
-                <p className="mt-1 text-sm text-gray-600">{addr.addressLine}, {addr.ward}, {addr.district}, {addr.city}</p>
+                <p className="mt-1 text-sm text-gray-600">{addr.addressLine}, {addr.ward}{addr.district ? `, ${addr.district}` : ''}, {addr.city}</p>
               </div>
             </div>
           ))}
