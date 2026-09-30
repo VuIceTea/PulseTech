@@ -56,6 +56,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     let body;
     try { body = text ? JSON.parse(text) : null; } catch (e) { body = null; }
     const customMessage = body?.detail || body?.message || body?.reason || body?.error;
+    if (response.status === 401 || response.status === 403) {
+      if (typeof window !== 'undefined' && localStorage.getItem('pulsetech_user')) {
+        localStorage.removeItem('pulsetech_user');
+        window.location.href = '/login';
+      }
+    }
     if (customMessage) throw new Error(customMessage);
     switch (response.status) {
       case 400: throw new Error('Dữ liệu yêu cầu không hợp lệ. Vui lòng kiểm tra lại thông tin.');
