@@ -3,13 +3,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
-export interface User { name: string; email: string; }
+export interface User { id?: string; name: string; email: string; phone?: string; dob?: string; gender?: string; rewardPoints?: number; tier?: string; accessToken?: string; }
 interface AuthResult { success: boolean; message?: string; }
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<AuthResult>;
   register: (name: string, email: string, password: string) => Promise<AuthResult>;
   logout: () => void;
+  updateUser: (user: User) => void;
   isAuthenticated: boolean;
   isLoaded: boolean;
 }
@@ -79,7 +80,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('pulsetech_user');
   };
 
-  return <AuthContext.Provider value={{ user, login, register, logout, isAuthenticated: !!user, isLoaded }}>{children}</AuthContext.Provider>;
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem('pulsetech_user', JSON.stringify(updatedUser));
+  };
+
+  return <AuthContext.Provider value={{ user, login, register, logout, updateUser, isAuthenticated: !!user, isLoaded }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
