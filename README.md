@@ -1,247 +1,189 @@
-# PulseTech 
+# PulseTech Storefront
 
-> Customer-facing storefront for the **PulseTech** e-commerce platform — built with **Next.js 16**, **React 19**, and **TypeScript**.
+> A full-featured technology e-commerce storefront built with **Next.js 16**, **React 19**, **TypeScript**, and a Java/Spring Boot microservice backend.
 
-🌐 **Live:** https://pulse-tech-beryl.vercel.app
-
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Interface Preview](#interface-preview)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Local Development](#local-development)
-- [Environment Variables](#environment-variables)
-- [Pages & Routes](#pages--routes)
-- [Deploying to Vercel](#deploying-to-vercel)
-- [Development Notes](#development-notes)
-
----
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?logo=vercel)](https://pulse-tech-beryl.vercel.app)
+[![Admin](https://img.shields.io/badge/Admin_Repository-PulseTech_Admin-4318FF)](https://github.com/VuIceTea/PulseTech-Admin)
+[![Backend](https://img.shields.io/badge/Backend-Spring_Boot-6DB33F?logo=springboot&logoColor=white)](https://github.com/VuIceTea/PulseTech-Backend)
 
 ## Overview
 
-PulseTech Frontend is a full-featured **Next.js App Router** application for a modern technology e-commerce store, including:
+PulseTech is a responsive customer-facing shopping application for phones, tablets, laptops, wearables, audio devices, and accessories. It connects to the PulseTech API Gateway through the `/backend-api/*` proxy, so browser clients never need direct microservice addresses.
 
-- 🛍️ Product browsing, search, and filtering
-- 🛒 Shopping cart and online checkout
-- 🔐 User registration and login with email verification
-- ❤️ Wishlist management
-- 📦 Order placement, history, and tracking
-- 👤 User profile and address book management
-- 💳 VNPay payment integration
-- 📱 Fully responsive — mobile-first design
+### Shopping experience
 
-All API requests are proxied through the `/backend-api/*` path to the backend **API Gateway**, keeping backend service URLs completely hidden from the client.
+- Dynamic home page with CMS-managed navigation, banners, categories, promotions, flash sales, and featured products.
+- Product catalog with keyword search, category/brand/specification filters, price ranges, sorting, and responsive product cards.
+- Product detail pages with color and storage variants, variant-level prices and stock, category-specific specifications, image galleries, reviews, quantity validation, wishlist, and related promotions.
+- Side-by-side product comparison for price and technical specifications.
+- Persistent guest/member cart backed by the Order Service, with cart merging after login.
+- Wishlist synchronized to the signed-in customer account.
 
----
+### Checkout, promotions, and orders
+
+- Checkout through **COD, VNPay QR, MoMo, and Stripe**.
+- Product and shipping vouchers can be combined, while only one voucher of each type is active at a time.
+- Per-customer voucher quantities, one-time consumption, replacement rules, validation, and cart-to-checkout transfer.
+- Order confirmation dialog, payment return handling, automatic cart cleanup, and variant stock deduction.
+- Order history, order cancellation rules, public order tracking, and return/refund requests.
+- Customer profile with personal information, saved delivery addresses, reward points, membership tier, and assigned vouchers.
+
+### Customer support
+
+- AI shopping assistant grounded in live product, variant-stock, and policy data.
+- Warranty and IMEI lookup by IMEI, phone number, or order number.
+- Store locator, trade-in pricing experience, technology blog, and policy center.
+- Registration with email verification and custom client-side validation messages.
+- Reusable skeleton loading states and responsive layouts across the storefront.
 
 ## Interface Preview
 
-### Storefront home
+All screenshots below were captured from the local application at `http://localhost:3000` using live backend data.
 
-![PulseTech storefront home](docs/screenshots/home.png)
+### Discover and compare products
 
-### Product catalog
+| Home page | Product catalog |
+|---|---|
+| ![PulseTech home page](docs/screenshots/home.png) | ![PulseTech product catalog](docs/screenshots/products.png) |
 
-![PulseTech product catalog](docs/screenshots/products.png)
+| Product detail and variants | Product comparison |
+|---|---|
+| ![PulseTech product detail](docs/screenshots/product-detail.png) | ![PulseTech product comparison](docs/screenshots/compare.png) |
 
-### Product detail and variant selection
+### Cart and checkout
 
-![PulseTech product detail](docs/screenshots/product-detail.png)
+| Shopping cart and vouchers | Multi-method checkout |
+|---|---|
+| ![PulseTech shopping cart](docs/screenshots/cart.png) | ![PulseTech checkout](docs/screenshots/checkout.png) |
 
-The administration interface and its screenshots are available in the [PulseTech Admin repository](https://github.com/VuIceTea/PulseTech-Admin#interface-preview).
+### Order and after-sales support
 
----
+| Public order tracking | Warranty and IMEI lookup |
+|---|---|
+| ![PulseTech order tracking](docs/screenshots/order-tracking.png) | ![PulseTech warranty lookup](docs/screenshots/warranty-lookup.png) |
+
+| Store system | Trade-in program |
+|---|---|
+| ![PulseTech store locator](docs/screenshots/stores.png) | ![PulseTech trade-in program](docs/screenshots/trade-in.png) |
+
+### Content and account access
+
+| Technology blog | Policy center |
+|---|---|
+| ![PulseTech technology blog](docs/screenshots/blog.png) | ![PulseTech policy center](docs/screenshots/policies.png) |
+
+| Customer login | Customer registration |
+|---|---|
+| ![PulseTech customer login](docs/screenshots/login.png) | ![PulseTech customer registration](docs/screenshots/register.png) |
+
+The operational dashboard is documented separately in the [PulseTech Admin repository](https://github.com/VuIceTea/PulseTech-Admin#interface-preview).
 
 ## Tech Stack
 
-| Component        | Technology                              |
-|------------------|-----------------------------------------|
-| Framework        | Next.js 16 (App Router)                 |
-| UI Library       | React 19                                |
-| Language         | TypeScript 5                            |
-| Styling          | Tailwind CSS v4                         |
-| Component Library| shadcn/ui + Radix UI                    |
-| Animations       | Framer Motion                           |
-| Icons            | Lucide React + React Icons              |
-| Notifications    | Sonner (toast notifications)            |
-| QR Code          | react-qr-code                           |
-| Linting          | ESLint (eslint-config-next)             |
-| Cloud Hosting    | Vercel                                  |
+| Area | Technology |
+|---|---|
+| Framework | Next.js 16 App Router |
+| UI | React 19, TypeScript 5, Tailwind CSS 4 |
+| Components | shadcn/ui, Radix UI, Lucide React, React Icons |
+| Motion and feedback | Framer Motion, Sonner |
+| AI assistant | AI SDK with Google/Groq providers |
+| Payments | COD, VNPay, MoMo, Stripe |
+| Backend integration | REST APIs through Spring Cloud Gateway |
+| Deployment | Vercel, Docker standalone output |
 
----
+## Application Routes
+
+| Route | Purpose | Login required |
+|---|---|:---:|
+| `/` | Home, promotions, categories, and featured products | No |
+| `/products` | Searchable and filterable product catalog | No |
+| `/products/[id]` | Product detail, variants, stock, reviews, and purchase actions | No |
+| `/compare` | Product specification comparison | No |
+| `/cart` | Cart management and voucher selection | No |
+| `/checkout` | Delivery details, vouchers, and payment selection | Yes |
+| `/order-tracking` | Public lookup by order ID and phone | No |
+| `/orders` | Customer order history and return/cancel actions | Yes |
+| `/wishlist` | Saved products | Yes |
+| `/profile` | Account, addresses, rewards, and vouchers | Yes |
+| `/warranty` | Warranty and IMEI lookup | No |
+| `/stores` | PulseTech store locations | No |
+| `/trade-in` | Trade-in flow and estimated prices | No |
+| `/blog` | Technology articles | No |
+| `/policies` | Warranty, shipping, return, and service policies | No |
+| `/login` | Customer authentication | No |
+| `/register` | Account registration | No |
+| `/verify-email` | Email verification callback | No |
 
 ## Project Structure
 
-```
+```text
 frontend/
 ├── src/
-│   ├── app/                  # App Router — all pages (route segments)
-│   │   ├── page.tsx          # Home page
-│   │   ├── layout.tsx        # Root layout
-│   │   ├── loading.tsx       # Global loading UI
-│   │   ├── login/            # Login page
-│   │   ├── register/         # Registration page
-│   │   ├── verify-email/     # Email verification callback
-│   │   ├── products/         # Product listing & detail pages
-│   │   ├── cart/             # Shopping cart
-│   │   ├── checkout/         # Checkout flow
-│   │   ├── orders/           # Order history
-│   │   ├── order-tracking/   # Order tracking by ID + phone
-│   │   ├── wishlist/         # Saved items
-│   │   ├── profile/          # User profile & address book
-│   │   ├── blog/             # Blog / news articles
-│   │   ├── stores/           # Store locator
-│   │   ├── trade-in/         # Device trade-in program
-│   │   └── policies/         # Store policies
-│   ├── components/           # Shared, reusable UI components
-│   ├── context/              # React Context providers (Auth, Cart, etc.)
-│   ├── hooks/                # Custom React hooks
-│   ├── lib/                  # API client and utility functions
-│   ├── types/                # Global TypeScript type definitions
-│   └── config/               # Application-level configuration
-├── public/                   # Static assets (images, icons, fonts)
-├── next.config.ts            # Next.js config with API proxy rewrites
-├── package.json
-├── tsconfig.json
+│   ├── app/                 # Next.js pages, loading UI, and AI chat route
+│   ├── components/          # Header, footer, product cards, chat, and shared UI
+│   ├── context/             # Authentication, cart, and wishlist state
+│   ├── lib/                 # REST client, validation, coupon, and utility logic
+│   ├── config/              # Catalog and application configuration
+│   └── types/               # Product and shared TypeScript models
+├── docs/screenshots/        # README interface gallery
+├── public/                  # Static images and icons
+├── next.config.ts           # Standalone output and API Gateway rewrite
 ├── Dockerfile
-└── .env.example
+└── package.json
 ```
-
----
-
-## Prerequisites
-
-- **Node.js** ≥ 20
-- **npm** ≥ 10 *(or yarn / pnpm / bun)*
-- A running instance of the PulseTech backend (local or on Render)
-
----
 
 ## Local Development
 
-### 1. Clone the repository
+### Prerequisites
+
+- Node.js 20 or newer
+- npm 10 or newer
+- PulseTech API Gateway running at `http://localhost:8080`
+
+### Run the storefront
 
 ```bash
 git clone https://github.com/VuIceTea/PulseTech.git
 cd PulseTech
-```
-
-### 2. Install dependencies
-
-```bash
 npm install
-```
-
-### 3. Configure environment variables
-
-```bash
-cp .env.example .env
-```
-
-Update `.env` with your backend URL:
-
-```env
-# URL of the backend API Gateway
-API_URL=http://localhost:8080
-```
-
-> When running alongside the backend via Docker Compose (`d:\backend`), `API_URL` is automatically injected — no manual configuration needed.
-
-### 4. Start the development server
-
-```bash
+cp .env.example .env.local
 npm run dev
 ```
 
-Open **http://localhost:3000** in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
-### Available Scripts
+### Environment
 
-| Command           | Description                            |
-|-------------------|----------------------------------------|
-| `npm run dev`     | Start the development server with HMR  |
-| `npm run build`   | Build the optimized production bundle  |
-| `npm run start`   | Serve the production build locally     |
-| `npm run lint`    | Run ESLint across the codebase         |
-
----
-
-## Environment Variables
-
-| Variable  | Required | Default                  | Description                                        |
-|-----------|----------|--------------------------|----------------------------------------------------|
-| `API_URL` | ✅        | `http://localhost:8080`  | Base URL of the backend API Gateway                |
-
-### How the API proxy works
-
-`next.config.ts` defines a rewrite rule at build time:
-
-```
-/backend-api/<path>  →  ${API_URL}/api/<path>
+```env
+API_URL=http://localhost:8080
 ```
 
-This means all frontend API calls use `/backend-api/...` — the actual backend address is never exposed to the browser. This approach also allows seamlessly switching between local and cloud backends by simply changing `API_URL`.
+The Next.js rewrite maps:
 
----
-
-## Pages & Routes
-
-| Route               | Description                              | Auth Required |
-|---------------------|------------------------------------------|:-------------:|
-| `/`                 | Home page (featured products, banners)   | ❌            |
-| `/products`         | Product listing with filters             | ❌            |
-| `/products/[id]`    | Product detail page with reviews         | ❌            |
-| `/login`            | User login                               | ❌            |
-| `/register`         | New account registration                 | ❌            |
-| `/verify-email`     | Email verification callback page         | ❌            |
-| `/cart`             | Shopping cart                            | ❌            |
-| `/checkout`         | Checkout and payment                     | ❌            |
-| `/order-tracking`   | Track order by ID and phone number       | ❌            |
-| `/orders`           | Order history                            | ✅            |
-| `/wishlist`         | Saved / favorite products                | ✅            |
-| `/profile`          | User profile and address book            | ✅            |
-| `/blog`             | Blog articles and tech news              | ❌            |
-| `/stores`           | Physical store locator                   | ❌            |
-| `/trade-in`         | Device trade-in program                  | ❌            |
-| `/policies`         | Return, warranty, and store policies     | ❌            |
-
----
-
-## Deploying to Vercel
-
-### Option 1: Vercel Dashboard *(recommended)*
-
-1. Push your code to GitHub.
-2. Go to [vercel.com](https://vercel.com) → **Add New Project** → select the repository.
-3. Vercel auto-detects Next.js — no build configuration needed.
-4. Add the following **Environment Variable:**
-   ```
-   API_URL = https://<your-api-gateway>.onrender.com
-   ```
-5. Click **Deploy**.
-
-### Option 2: Vercel CLI
-
-```bash
-npm install -g vercel
-vercel --prod
+```text
+/backend-api/<path> -> ${API_URL}/api/<path>
 ```
 
-### After deployment
+### Scripts
 
-- Every push to the `main` branch triggers an automatic **rebuild and redeploy** on Vercel.
-- Monitor deployments in the **Deployments** tab of the Vercel Dashboard.
-- If you change an environment variable, click **Redeploy** (uncheck *"Use existing Build Cache"*) to apply the new value.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the local development server |
+| `npm run build` | Create the optimized production build |
+| `npm run start` | Run the production build |
+| `npm run lint` | Run ESLint |
 
----
+## Deployment
+
+The repository is configured for Vercel. Set `API_URL` to the public API Gateway address, then deploy the `main` branch. The application uses Next.js standalone output and can also be packaged with Docker.
+
+## Related Repositories
+
+- [PulseTech Admin](https://github.com/VuIceTea/PulseTech-Admin) — management dashboard.
+- [PulseTech Backend](https://github.com/VuIceTea/PulseTech-Backend) — Java/Spring Boot microservices, MongoDB, Redis, payments, and API Gateway.
 
 ## Development Notes
 
-- **Main branch:** `main` — automatically deployed to Vercel on every push.
-- **Development branch:** `VuDev` — used for active development; merged into `main` upon completion.
-- Never commit the `.env` file — it is already listed in `.gitignore`.
-- All new features and bug fixes are automatically committed and pushed to GitHub upon completion.
+- `main` is the deployment branch; `VuDev` is used for active development.
+- Do not commit `.env` or provider credentials.
+- Prices, stock, vouchers, and order states are validated by backend services rather than trusted from the browser.
