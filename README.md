@@ -9,6 +9,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Interface Preview](#interface-preview)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
@@ -34,6 +35,24 @@ PulseTech Frontend is a full-featured **Next.js App Router** application for a m
 - 📱 Fully responsive — mobile-first design
 
 All API requests are proxied through the `/backend-api/*` path to the backend **API Gateway**, keeping backend service URLs completely hidden from the client.
+
+---
+
+## Interface Preview
+
+### Storefront home
+
+![PulseTech storefront home](docs/screenshots/home.png)
+
+### Product catalog
+
+![PulseTech product catalog](docs/screenshots/products.png)
+
+### Product detail and variant selection
+
+![PulseTech product detail](docs/screenshots/product-detail.png)
+
+The administration interface and its screenshots are available in the [PulseTech Admin repository](https://github.com/VuIceTea/PulseTech-Admin#interface-preview).
 
 ---
 
