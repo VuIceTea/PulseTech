@@ -3,7 +3,23 @@ import type { Product } from '@/types/product';
 const browserApiPrefix = '/backend-api';
 const serverApiPrefix = `${process.env.API_URL ?? 'http://localhost:8080'}/api`;
 
-export interface ApiUser { id: string; name: string; email: string; rewardPoints: number; }
+export interface ApiUser {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  dob?: string;
+  gender?: string;
+  rewardPoints: number;
+  tier?: string;
+  verified?: boolean;
+  locked?: boolean;
+  createdAt?: string;
+  roles?: string[];
+  accessToken?: string;
+  tokenType?: string;
+  expiresAt?: string;
+}
 export interface RegisterResponse { email: string; message: string; }
 export interface VerifyResponse { message: string; }
 export interface OrderItemRequest { productId: string; color: string; storage: string; quantity: number; }
@@ -40,14 +56,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${prefix}${path}`, {
     ...init,
     headers: (() => {
-      const h = { 'Content-Type': 'application/json', ...init?.headers };
+      const headers = new Headers(init?.headers);
+      headers.set('Content-Type', 'application/json');
       try {
         if (typeof window !== 'undefined') {
           const u = JSON.parse(localStorage.getItem('pulsetech_user') || '{}');
-          if (u.accessToken) h['Authorization'] = `Bearer ${u.accessToken}`;
+          if (u.accessToken) headers.set('Authorization', `Bearer ${u.accessToken}`);
         }
       } catch (e) {}
-      return h;
+      return headers;
     })(),
     cache: init?.method && init.method !== 'GET' ? undefined : 'no-store',
   });
