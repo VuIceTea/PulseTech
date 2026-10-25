@@ -78,6 +78,32 @@ All screenshots below were captured from the local application at `http://localh
 
 The operational dashboard is documented separately in the [PulseTech Admin repository](https://github.com/VuIceTea/PulseTech-Admin#interface-preview).
 
+## End-to-End Customer Demo
+
+The gallery below documents a real local test journey using live microservices and Stripe test mode. Sensitive login and card details are intentionally excluded from screenshots and source control.
+
+| Signed-in home | Product catalog | Product detail |
+|---|---|---|
+| ![Authenticated PulseTech home](docs/screenshots/demo/01-home-authenticated.png) | ![Product discovery](docs/screenshots/demo/02-product-catalog.png) | ![Variant-level product detail](docs/screenshots/demo/03-product-detail.png) |
+
+| Wishlist | Product comparison | Stripe order confirmation |
+|---|---|---|
+| ![Customer wishlist](docs/screenshots/demo/04-wishlist.png) | ![Product comparison](docs/screenshots/demo/05-product-compare.png) | ![Stripe test payment completed](docs/screenshots/demo/06-payment-success.png) |
+
+| Empty cart after payment | Order history | Customer profile |
+|---|---|---|
+| ![Cart cleared after successful payment](docs/screenshots/demo/07-post-payment-cart.png) | ![Customer order history](docs/screenshots/demo/08-order-history.png) | ![Customer profile and benefits](docs/screenshots/demo/09-customer-profile.png) |
+
+| Public order tracking | Warranty lookup | Store locator |
+|---|---|---|
+| ![Public order tracking](docs/screenshots/demo/10-order-tracking.png) | ![Warranty lookup](docs/screenshots/demo/11-warranty-lookup.png) | ![PulseTech store locator](docs/screenshots/demo/12-store-locator.png) |
+
+| Trade-in | Technology blog | Policy center |
+|---|---|---|
+| ![Trade-in experience](docs/screenshots/demo/13-trade-in.png) | ![Technology blog](docs/screenshots/demo/14-blog.png) | ![Policy center](docs/screenshots/demo/15-policies.png) |
+
+The completed Stripe test order `PT843205` verified the entire data flow: the order changed to confirmed, the cart was cleared, and stock for the purchased `Xiaomi 14 Ultra / 512GB` variant was reduced to 49. The admin dashboard receives the order identifier, customer and delivery details, payment method, item/variant/quantity, prices, total, creation time, and fulfillment status.
+
 ## Tech Stack
 
 | Area | Technology |
@@ -172,6 +198,7 @@ The Next.js rewrite maps:
 | `npm run build` | Create the optimized production build |
 | `npm run start` | Run the production build |
 | `npm run lint` | Run ESLint |
+| `npm run demo:screenshots` | Capture the authenticated storefront and admin demo galleries (requires local services and demo credentials in environment variables) |
 
 ## Deployment
 
